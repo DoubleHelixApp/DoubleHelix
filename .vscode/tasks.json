@@ -4,7 +4,7 @@
         {
             "label": "Compile UI",
             "type": "shell",
-            "command": "pyside6-uic wgse/gui/form.ui -o wgse/gui/ui_form.py && pyside6-uic wgse/gui/header.ui -o wgse/gui/header.py",
+            "command": "pyside6-uic wgse/gui/form.ui -o wgse/gui/ui_form.py",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
