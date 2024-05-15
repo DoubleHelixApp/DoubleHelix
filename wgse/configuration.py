@@ -2,6 +2,8 @@ import configparser
 import logging
 import multiprocessing
 from pathlib import Path
+# Why third_party is not recognized by the IDE?
+# See wgse/__init__.py
 from wgse import third_party
 from wgse import mtDNA
 from wgse import metadata
