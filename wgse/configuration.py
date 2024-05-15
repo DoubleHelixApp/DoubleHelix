@@ -2,13 +2,13 @@ import configparser
 import logging
 import multiprocessing
 from pathlib import Path
+
 # Why third_party is not recognized by the IDE?
 # See wgse/__init__.py
 from wgse import third_party
 from wgse import mtDNA
 from wgse import metadata
 import wgse
-
 
 logger = logging.getLogger("configuration")
 logging.getLogger().setLevel(logging.DEBUG)
@@ -25,17 +25,18 @@ class WGSEDefaults:
 
 class GeneralConfig:
     """General configuration for the app.
-    
+
     Every attribute of this class can be loaded from the configuration
     files if present. See the documentation for ConfigurationManager.
-    NOTE: you can add every type of variables as long as they can be 
+    NOTE: you can add every type of variables as long as they can be
     constructed with a (single) string. Otherwise this will fail.
-    
+
     Attributes:
         last_path (Path): path for the last file opened
         log_level (str): minimum log level. Possible values: DEBUG,
             INFO, WARNING, CRITICAL
     """
+
     def __init__(self) -> None:
         self.last_path: Path = Path.home()
         self.log_level: str = "DEBUG"
@@ -43,19 +44,20 @@ class GeneralConfig:
 
 class ExternalConfig:
     """Configuration for 3rd party dependencies.
-    
+
     Every attribute of this class can be loaded from the configuration
     files if present. See the documentation for ConfigurationManager.
-    NOTE: you can add every type of variables as long as they can be 
+    NOTE: you can add every type of variables as long as they can be
     constructed with a (single) string. Otherwise this will fail.
-    
+
     Attributes:
         root (Path): folder that contains 3rd party dependencies.
             If this does not point to a valid directory, the files
             should be under PATH.
         threads (int): How many threads is possible to use.
-    
+
     """
+
     def __init__(self) -> None:
         self.root: Path = Path(third_party.__file__).parent
         self.threads: int = multiprocessing.cpu_count()
@@ -63,18 +65,19 @@ class ExternalConfig:
 
 class RepositoryConfig:
     """Configuration for reference genome and metadata repository.
-    
+
     Every attribute of this class can be loaded from the configuration
     files if present. See the documentation for ConfigurationManager.
-    NOTE: you can add every type of variables as long as they can be 
+    NOTE: you can add every type of variables as long as they can be
     constructed with a (single) string. Otherwise this will fail.
-    
+
     Attributes:
         repository (Path): Root folder for reference genomes.
         temporary (Path): Temporary files directory.
         metadata (Path): Root folder for metadata.
         mtdna (Path): Root folder for mtDNA files.
     """
+
     def __init__(self) -> None:
         self.genomes: Path = Path(WGSEDefaults.LOCAL_FOLDER, "genomes")
         self.temporary: Path = Path(WGSEDefaults.LOCAL_FOLDER, "temp")
@@ -84,19 +87,20 @@ class RepositoryConfig:
 
 class AlignmentStatsConfig:
     """Configuration for alignment stats calculation.
-    
+
     Every attribute of this class can be loaded from the configuration
     files if present. See the documentation for ConfigurationManager.
-    NOTE: you can add every type of variables as long as they can be 
+    NOTE: you can add every type of variables as long as they can be
     constructed with a (single) string. Otherwise this will fail.
-    
+
     Attributes:
         skip (int): How many samples to skip at the beginning
             of the file (where lots of repetitive and low quality
             sequences usually are).
-        samples (int): How many samples to consider when calculating 
+        samples (int): How many samples to consider when calculating
             the stats.
     """
+
     def __init__(self) -> None:
         self.skip: int = 40000
         self.samples: int = 20000
@@ -104,21 +108,22 @@ class AlignmentStatsConfig:
 
 class ConfigurationManager:
     """Initialize the configuration.
-    
+
     Every static attribute declared here will be initialized
     when the class is initialized by looking for sections
-    with the same as the attribute, containing the same attributes 
-    as the attribute. 
-    
+    with the same as the attribute, containing the same attributes
+    as the attribute.
+
     Attributes:
         GENERAL (GeneralConfig): Configuration parameters for the whole
             app.
         EXTERNAL (ExternalConfig): Configuration for 3rd party dependencies.
-        REPOSITORY (RepositoryConfig): Configuration for reference genome 
+        REPOSITORY (RepositoryConfig): Configuration for reference genome
             and metadata repository.
         ALIGNMENT_STATS (AlignmentStatsConfig): Configuration for alignment
             stats calculation.
     """
+
     GENERAL: GeneralConfig = GeneralConfig()
     EXTERNAL: ExternalConfig = ExternalConfig()
     REPOSITORY: RepositoryConfig = RepositoryConfig()
@@ -130,13 +135,9 @@ class ConfigurationManager:
     def load(self) -> None:
         self._parser = configparser.ConfigParser()
         if WGSEDefaults.LOCAL_CONFIG.exists():
-            logging.info(
-                f"Loading {WGSEDefaults.LOCAL_CONFIG}"
-            )
+            logging.info(f"Loading {WGSEDefaults.LOCAL_CONFIG}")
         if WGSEDefaults.GLOBAL_CONFIG.exists():
-            logging.info(
-                f"Loading {WGSEDefaults.GLOBAL_CONFIG}"
-            )
+            logging.info(f"Loading {WGSEDefaults.GLOBAL_CONFIG}")
         self._parser.read(WGSEDefaults.LOCAL_CONFIG)
         self._parser.read(WGSEDefaults.GLOBAL_CONFIG)
 

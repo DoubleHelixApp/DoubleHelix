@@ -26,7 +26,7 @@ setup(
     author_email="",
     include_package_data=True,
     package_data={
-        "wgse.mtDNA": ["*.*"], 
+        "wgse.mtDNA": ["*.*"],
         "wgse.metadata": ["*.*"],
         "wgse.metadata.microarray_templates.head": ["*.*"],
         "wgse.metadata.microarray_templates.body": ["*.*"],
@@ -34,8 +34,8 @@ setup(
         "wgse.metadata.report_templates": ["*.*"],
     },
     description="Whole Genome Sequencing data manipulation tool",
-    long_description=open("README.md","r").read(),
-    long_description_content_type='text/markdown',
+    long_description=open("README.md", "r").read(),
+    long_description_content_type="text/markdown",
     install_requires=DEPENDENCIES,
     url="https://github.com/chaplin89/WGSE-NG",
     version=VERSION,
@@ -50,8 +50,8 @@ setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
     entry_points={
-        'gui_scripts': [
-            'wgse = wgse.main:main',
+        "gui_scripts": [
+            "wgse = wgse.main:main",
         ]
     },
     keywords="bioinformatics",
