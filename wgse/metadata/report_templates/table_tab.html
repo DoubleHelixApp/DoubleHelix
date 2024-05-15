@@ -1,0 +1,104 @@
+{% from "table_macro.html" import build_table %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WGSE - Export</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+    </style>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("[class=nav-link],[class=dropdown-item],[class=navbar-brand]").click(function () {
+                $(".page-content").removeClass("active");
+                $($(this).attr("href")).addClass("active");
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#home">WGSE</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#file-info">File info</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#alignment-statistics">Alignment statistics</a>
+                </li>
+                
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" id="navbarDropdownHeader" aria-haspopup="true" aria-expanded="false" href="javascript:void">Header</a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownHeader">
+                        <a class="dropdown-item" href="#sequences">Sequences</a></li>
+                        <a class="dropdown-item" href="#read-groups">Read groups</a></li>
+                        <a class="dropdown-item" href="#programs">Programs</a></li>
+                        <a class="dropdown-item" href="#comments">Comments</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#index-statistics">Index statistics</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="home" class="container page-content active">
+        
+        <h1>WGSE - Welcome!</h1>
+        <p>This is your report made with WGSE. It contains information about your WGS file. 
+            Please use the menu above to navigate through the sections.
+            This file was generated on {{ general.now }} with WGSE {{ general.version }}. For more info about WGSE see <a href="https://wgse.io">here</a>.
+        </p>
+        
+    </div>
+
+    <div id="file-info" class="container page-content">
+        {{ build_table(file_info_data) }}
+    </div>
+
+    <div id="alignment-statistics" class="container page-content">
+        {{ build_table(alignment_stats_data) }}
+    </div>
+
+    <div id="sequences" class="container page-content">
+        {{ build_table(sequences_data) }}
+    </div>
+
+    <div id="read-groups" class="container page-content">
+        {{ build_table(read_groups_data) }}
+    </div>
+
+    <div id="programs" class="container page-content">
+        {{ build_table(programs_data) }}
+    </div>
+
+    <div id="Comments" class="container page-content">
+        {{ build_table(comments_data) }}
+    </div>
+
+    <div id="index-statistics" class="container page-content">
+        {{ build_table(index_stat_data) }}
+    </div>
+</body>
+
+</html>

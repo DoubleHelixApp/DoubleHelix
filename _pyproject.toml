@@ -1,0 +1,21 @@
+[project]
+name = "wgse"
+version = "0.0.1-alpha"
+description = "Genome sequencing data manipulation tool"
+readme = {file = "README.md", content-type = "text/markdown"}
+keywords = ["genetics", "bioinformatic", "wgs", "sequencing"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers"
+]
+dependencies = [
+    "pefile",
+    "pycurl",
+    "tqdm",
+    "google-cloud-storage",
+    "sphinx",
+    "pytest",
+    "pyqt6",
+    "pyinstaller",
+    "PySide6"
+]

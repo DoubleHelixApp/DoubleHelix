@@ -1,0 +1,26 @@
+[
+    {
+        "name" : "CRS",
+        "md5" : "",
+        "length" : 16570,
+        "url" : "https://www.mitomap.org/foswiki/pub/MITOMAP/MitoSeqs/hummtcg1981_fasta.txt"
+    },
+    {
+        "name" : "RSRS",
+        "md5" : "",
+        "length": 16570,
+        "url" : "http://www.phylotree.org/resources/RSRS_annotated.htm"
+    },
+    {
+        "name" : "rCRS",
+        "md5" : "c68f52674c9fb33aef52dcf399755519",
+        "length" : 16569,
+        "url" : "https://www.ncbi.nlm.nih.gov/nuccore/NC_012920.1"
+    },
+    {
+        "name" : "Yoruba",
+        "md5" : "",
+        "length": 16571,
+        "url" : "https://www.ncbi.nlm.nih.gov/nucleotide/AF347015"
+    }
+]

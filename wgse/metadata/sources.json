@@ -1,0 +1,65 @@
+[
+    {
+        "name": "YSeq",
+        "description": "Files used as a reference for YSeq",
+        "urls": [
+            "http://genomes.yseq.net/WGS/ref/"
+        ],
+        "builds": [
+            {
+                "name": "19",
+                "urls": [
+                    "http://genomes.yseq.net/WGS/ref/hg19/"
+                ]
+            },
+            {
+                "name": "38",
+                "urls": [
+                    "http://genomes.yseq.net/WGS/ref/hg38/"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Google",
+        "description": "Files used in the Google Life Project",
+        "urls": [
+            "https://storage.cloud.google.com/genomics-public-data/"
+        ]
+    },
+    {
+        "name": "USCS",
+        "description": "Files distributed by the University of California Santa Cruz (USCS) Genomic Institute (https://genomics.ucsc.edu/)",
+        "urls": [
+            "https://hgdownload.soe.ucsc.edu/goldenPath/"
+        ],
+        "builds": [
+            {
+                "name": "19",
+                "urls": [
+                    "https://hgdownload.soe.ucsc.edu/goldenPath/hg19/"
+                ]
+            },
+            {
+                "name": "38",
+                "urls": [
+                    "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "1k",
+        "description": "Files used as reference in the Project 1000 Genomes (https://www.internationalgenome.org/)",
+        "urls": [
+            "https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/"
+        ]
+    },
+    {
+        "name": "Ensembl",
+        "description": "File distributed by the Ensembl project (https://www.ensembl.org/info/about/index.html)",
+        "urls": [
+            "https://ftp.ensembl.org/pub/"
+        ]
+    }
+]

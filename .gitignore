@@ -1,0 +1,16 @@
+temp
+**/*.pyc
+repository/genomes/
+repository/temp/
+3rd_party
+.~*
+.pytest_cache
+__pycache__
+.venv*
+build
+dist
+*.egg-info
+configuration/main.ini
+_build
+_static
+_templates

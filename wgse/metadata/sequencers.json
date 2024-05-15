@@ -1,0 +1,247 @@
+[
+    {
+        "name": "Illumina NS 6000 (Dante)",
+        "sequencer_regex": "^(A00910|A00925|A00966|A01245):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]:[0-9]+):([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":"https://www.illumina.com/systems/sequencing-platforms/novaseq.html"
+    },
+    {
+        "name": "Illumina NS 6000 (FTDNA)",
+        "sequencer_regex": "^(A00186):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]:[0-9]+):([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":"https://www.illumina.com/systems/sequencing-platforms/novaseq.html"
+    },
+    {
+        "name": "Illumina NS 6000 (GeneDX)",
+        "sequencer_regex": "^(A00571):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]:[0-9]+):([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":"https://www.illumina.com/systems/sequencing-platforms/novaseq.html"
+    },
+    {
+        "name": "Illumina NS 6000 (Illum)",
+        "sequencer_regex": "^(A00582):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]:[0-9]+):([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":"https://www.illumina.com/systems/sequencing-platforms/novaseq.html"
+    },
+    {
+        "name": "Illumina Novaseq 6000",
+        "sequencer_regex": "^(M_)?(A\\d{5}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]:[0-9]+):([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":"https://www.illumina.com/systems/sequencing-platforms/novaseq.html"
+    },
+    {
+        "name": "Illumina NextSeq 500/550",
+        "sequencer_regex": "^(N[BS]\\d{6}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]:[0-9]+):([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":"https://www.illumina.com/systems/sequencing-platforms/nextseq.html"
+    },
+    {
+        "name": "Illumina NextSeq 2000",
+        "sequencer_regex": "^(V\\d{5}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]):[0-9]+:([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":"https://www.illumina.com/systems/sequencing-platforms/nextseq-1000-2000.html"
+    },
+    {
+        "name": "Solexa GAI (HiSeq 1000)",
+        "sequencer_regex": "^(HWI-C\\d{3,5}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]):[0-9]+:([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":""
+    },
+    {
+        "name": "Illumina HiSeq 1000",
+        "sequencer_regex": "^(C\\d{3,5}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]:[0-9]+):([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":""
+    },
+    {
+        "name": "Solexa GAII (HiSeq 2000)",
+        "sequencer_regex": "^(HWI-ST\\d{3,5}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]):[0-9]+:([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":""
+    },
+    {
+        "name": "Solexa GAII (HiSeq 2500)",
+        "sequencer_regex": "^(HWI-D\\d{3,5}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]):[0-9]+:([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":""
+    },
+    {
+        "name": "Illumina HiSeq 2500",
+        "sequencer_regex": "^(D\\d{3,5}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]:[0-9]+):([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":""
+    },
+    {
+        "name": "Solexa GAIIx (HiSeq 3000)",
+        "sequencer_regex": "^(HWI-J\\d{3,5}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]):[0-9]+:([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":""
+    },
+    {
+        "name": "Illumina HiSeq 3000",
+        "sequencer_regex": "^(J\\d{3,5}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]):[0-9]+:([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":""
+    },
+    {
+        "name": "Illumina HiSeq 4000",
+        "sequencer_regex": "^(F_)?(K\\d{3,5}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]):[0-9]+:([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":""
+    },
+    {
+        "name": "Solexa GAxx? (FTDNA)",
+        "sequencer_regex": "^(SN\\d{6,8}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]:[0-9]+):([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":""
+    },
+    {
+        "name": "Illumina HiSeq X",
+        "sequencer_regex": "^(ST[-_])?(E\\d{3,5}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]):[0-9]+:([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":"https://www.illumina.com/systems/sequencing-platforms/novaseq-x-plus.html"
+    },
+    {
+        "name": "Illumina MiniSeq",
+        "sequencer_regex": "^(MN\\d{3,5}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]):[0-9]+:([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url":"https://www.illumina.com/systems/sequencing-platforms/miniseq.html"
+    },
+    {
+        "name": "Solexa GA (MiSeq)",
+        "sequencer_regex": "^(HWI-M\\d{3,5}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]):[0-9]+:([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url": "https://www.illumina.com/systems/sequencing-platforms/miseq.html"
+    },
+    {
+        "name": "Illumina MiSeq",
+        "sequencer_regex": "^(M\\d{3,5}):(\\d+):([a-zA-Z0-9]{9}):(\\d):(\\d+):(\\d+):(\\d+)$",
+        "coord_regex": ":([0-9]+:[a-zA-Z0-9]{9}:[0-9]):[0-9]+:([0-9]+):([0-9]+)",
+        "coord_order": "txy",
+        "url": "https://www.illumina.com/systems/sequencing-platforms/miseq.html"
+    },
+    {
+        "name": "MGI DNB T7 (ProPhase)",
+        "sequencer_regex": "^(PRO\\d{7})(_[A-Za-z0-9_]{25,29}_)(E100\\d{6})(L\\d)(C\\d{3})(R\\d{3})(\\d{6,8})([/1]?|[/2]?)$",
+        "coord_regex": "([FE][P]?[0-9]{9}L[0-9])(C[0-9]{3})(R[0-9]{3})",
+        "coord_order": "txy",
+        "url":"https://en.mgi-tech.com/products/instruments_info/5/"
+    },
+    {
+        "name": "MGI DNB T7 (ProPhase-bug)",
+        "sequencer_regex": "^(<NEBULA_ID>)(_[A-Za-z0-9_]{25,29}_)(E100\\d{6})(L\\d)(C\\d{3})(R\\d{3})(\\d{6,8})([/1]?|[/2]?)$",
+        "coord_regex": "([FE][P]?[0-9]{9}L[0-9])(C[0-9]{3})(R[0-9]{3})",
+        "coord_order": "txy",
+        "url":"https://en.mgi-tech.com/products/instruments_info/5/"
+    },
+    {
+        "name": "MGI DNB T7 (ProPhase 2)",
+        "sequencer_regex": "^(NG[A-Z0-9]{8}_[0-9_]{17}_ProPhase_BP_)(E[12]00\\d{6})(L\\d)(C\\d{3})(R\\d{3})(\\d{6,8})([/1]?|[/2]?)$",
+        "coord_regex": "([FE][P]?[0-9]{9}L[0-9])(C[0-9]{3})(R[0-9]{3})",
+        "coord_order": "txy",
+        "url":"https://en.mgi-tech.com/products/instruments_info/5/"
+    },
+    {
+        "name": "MGI DNB T7 (Dante, 6xxx)",
+        "sequencer_regex": "^(E200006\\d{3})(L\\d)(C\\d{3})(R\\d{3})(\\d{6,8})([/1]?|[/2]?)$",
+        "coord_regex": "E([0-9]{9}L[0-9])C([0-9]{3})R([0-9]{3})",
+        "coord_order": "txy",
+        "url":"https://en.mgi-tech.com/products/instruments_info/5/"
+    },
+    {
+        "name": "MGI DNB T7",
+        "sequencer_regex": "^(E[12]00\\d{6})(L\\d)(C\\d{3})(R\\d{3})(\\d{6,8})([/1]?|[/2]?)$",
+        "coord_regex": "([FE][P]?[0-9]{9}L[0-9])(C[0-9]{3})(R[0-9]{3})",
+        "coord_order": "txy",
+        "url":"https://en.mgi-tech.com/products/instruments_info/5/"
+    },
+    {
+        "name": "MGI DNB T10 (ProPhase)",
+        "sequencer_regex": "^(PRO\\d{7})(_[A-Za-z0-9_]{25,29}_)(FP200\\d{6})(L\\d)(C\\d{3})(R\\d{3})(\\d{6,8})([/1]?|[/2]?)$",
+        "coord_regex": "FP2([0-9]{8}L[0-9])C([0-9]{3})R([0-9]{3})",
+        "coord_order": "txy",
+        "url": "https://en.mgi-tech.com/products/instruments_info/26/"
+    },
+    {
+        "name": "MGI DNB T10 (ProPhase-bug)",
+        "sequencer_regex": "^(<NEBULA_ID>)(_[A-Za-z0-9_]{25,29}_)(FP200\\d{6})(L\\d)(C\\d{3})(R\\d{3})(\\d{6,8})([/1]?|[/2]?)$",
+        "coord_regex": "FP2([0-9]{8}L[0-9])C([0-9]{3})R([0-9]{3})",
+        "coord_order": "txy",
+        "url": "https://en.mgi-tech.com/products/instruments_info/26/"
+    },
+    {
+        "name": "MGI DNB T10 (ProPhase 2)",
+        "sequencer_regex": "^(N[A-Z0-9]{9}_[0-9_]{17}_ProPhase_BP_)(FP2[07]0\\d{6})(L\\d)(C\\d{3})(R\\d{3})(\\d{6,8})([/1]?|[/2]?)$",
+        "coord_regex": "FP2([0-9]{8}L[0-9])C([0-9]{3})R([0-9]{3})",
+        "coord_order": "txy",
+        "url": "https://en.mgi-tech.com/products/instruments_info/26/"
+    },
+    {
+        "name": "MGI DNB T10 (ySeq Riga)",
+        "sequencer_regex": "^(FP270\\d{6})(L\\d)(C\\d{3})(R\\d{3})(\\d{6,8})([/1]?|[/2]?)$",
+        "coord_regex": "FP2([0-9]{8}L[0-9])C([0-9]{3})R([0-9]{3})",
+        "coord_order": "txy",
+        "url": "https://en.mgi-tech.com/products/instruments_info/26/"
+    },
+    {
+        "name": "MGI DNB T10",
+        "sequencer_regex": "^(FP2[07]]0\\d{6})(L\\d)(C\\d{3})(R\\d{3})(\\d{6,8})([/1]?|[/2]?)$",
+        "coord_regex": "FP2([0-9]{8}L[0-9])C([0-9]{3})R([0-9]{3})",
+        "coord_order": "txy",
+        "url": "https://en.mgi-tech.com/products/instruments_info/26/"
+    },
+    {
+        "name": "MGI DNB G400",
+        "sequencer_regex": "^(V3[05]0\\d{6})(L\\d)(C\\d{3})(R\\d{3})(\\d{6,8})([/1]?|[/2]?)$",
+        "coord_regex": "V3[05]0([0-9]{6}L[0-9])C([0-9]{3})R([0-9]{3})",
+        "coord_order": "txy",
+        "url": "https://en.mgi-tech.com/products/instruments_info/2/"
+    },
+    {
+        "name": "MGI DNB G400 FAST",
+        "sequencer_regex": "^([CV]L?100\\d{6})(L\\d)(C\\d{3})(R\\d{3})_?(\\d{6,8})([/1]?|[/2]?)$",
+        "coord_regex": "[CV]L?100([0-9]{6}L[0-9])C([0-9]{3})R([0-9]{3})",
+        "coord_order": "txy",
+        "url": "https://en.mgi-tech.com/products/instruments_info/2/"
+    },
+    {
+        "name": "MGI DNB G400 (ySeq)",
+        "sequencer_regex": "^(YSEQ1):(\\d+):([A-Z0-9]{10,12}):(\\d):(\\d{5,7}):(\\d{3}):(\\d{3})$",
+        "coord_regex": "YSEQ1:[0-9]+:([A-Z0-9]{10,12}:[0-9]):[0-9]{6}:([0-9]{3}):([0-9]{3})",
+        "coord_order": "txy",
+        "url": "https://en.mgi-tech.com/products/instruments_info/2/"
+    },
+    {
+        "name": "PacBio HiFi Revio",
+        "sequencer_regex": "^(m\\d{5}e?)_(\\d{6})_(\\d{6})(_s\\d+)?/(\\d{8,9})/ccs",
+        "coord_regex": "",
+        "coord_order": "",
+        "url": "https://www.pacb.com/revio/"
+    },
+    {
+        "name": "Oxford Nanopore",
+        "sequencer_regex": "^([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{12})$",
+        "coord_regex": "",
+        "coord_order": "",
+        "url": "https://nanoporetech.com/"
+    }
+]
