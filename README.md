@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="https://avatars.githubusercontent.com/u/168782993?s=200&v=4">
+</p>
+  <h1 align="center">WGSE-NG</h1>
+
 [![Documentation Status](https://readthedocs.org/projects/wgse-ng/badge/?version=latest)](https://wgse-ng.readthedocs.io/en/latest/?badge=latest)
 [![Python application](https://github.com/chaplin89/WGSE-NG/actions/workflows/python-app.yml/badge.svg)](https://github.com/chaplin89/WGSE-NG/actions/workflows/python-app.yml/badge.svg)
 [![Python Publish](https://github.com/chaplin89/WGSE-NG/actions/workflows/python-publish.yml/badge.svg)](https://github.com/chaplin89/WGSE-NG/actions/workflows/python-publish.yml/badge.svg)
