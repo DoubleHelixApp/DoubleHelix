@@ -1,18 +1,28 @@
+import os
+import signal
+from subprocess import Popen
 import sys
 import webbrowser
 from pathlib import Path
 
-from PyQt6.QtCore import QObject, pyqtSignal
+from PyQt6.QtCore import QObject, QThread
 from PyQt6.QtWidgets import QApplication, QMainWindow
-from PySide6.QtCore import QModelIndex
-from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow,
-                               QMessageBox, QTableWidgetItem)
+from PySide6.QtCore import QModelIndex, SignalInstance, Signal
+from PySide6.QtWidgets import (
+    QApplication,
+    QFileDialog,
+    QMainWindow,
+    QMessageBox,
+    QTableWidgetItem,
+)
 
 from wgse.adapters.alignment_stats_adapter import AlignmentStatsAdapter
-from wgse.adapters.header_adapter import (HeaderCommentsAdapter,
-                                          HeaderProgramsAdapter,
-                                          HeaderReadGroupAdapter,
-                                          HeaderSequenceAdapter)
+from wgse.adapters.header_adapter import (
+    HeaderCommentsAdapter,
+    HeaderProgramsAdapter,
+    HeaderReadGroupAdapter,
+    HeaderSequenceAdapter,
+)
 from wgse.adapters.index_stats_adapter import IndexStatsAdapter
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
 from wgse.configuration import MANAGER_CFG
@@ -24,22 +34,22 @@ from wgse.gui.ui_form import Ui_MainWindow
 from wgse.utility.external import External
 
 
-class Worker(QObject):
-    def __init__(self, f, parent=None) -> None:
+class SimpleWorker(QThread):
+    def __init__(self, function, parent=None) -> None:
         super().__init__(parent)
-        self.finished = pyqtSignal()
-        self.progress = pyqtSignal(int)  # Optional progress signal
-        self.f = f
+        self.progress = Signal(int)
+        self.function = function
+        self.process: Popen = None
 
     def run(self):
-        """Long-running task goes here."""
-        try:
-            self.f()
-            # Emit progress updates (optional)
-            # self.progress.emit(percentage)
-            pass
-        finally:
-            self.finished.emit()  # Always emit finished, even with errors
+        self.process = self.function()
+        self.process.wait()
+
+    def kill(self):
+        if hasattr(os.sys, "winver"):
+            self.process.kill()
+        else:
+            self.process.send_signal(signal.SIGTERM)
 
 
 class WGSEWindow(QMainWindow):
@@ -72,11 +82,19 @@ class WGSEWindow(QMainWindow):
         self.ui.actionExit.triggered.connect(self.on_close)
         self.ui.actionSettings.triggered.connect(self.on_settings)
         self.ui.fileInformationTable.doubleClicked.connect(self.file_item_clicked)
-        self.ui.exportButton.clicked.connect(self.export)
-        self.ui.progressBar.hide()
+        self.ui.extract.clicked.connect(self.export)
+        self.ui.progress.hide()
+        self.ui.stop.hide()
+        self.ui.stop.clicked.connect(self.stop)
 
+        self._long_operation: SimpleWorker = None
         if self.config.last_path != None:
             self.on_open(self.config.last_path)
+
+    def stop(self):
+        self.ui.stop.setDisabled(True)
+        if self._long_operation is not None:
+            self._long_operation.kill()
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -185,6 +203,7 @@ class WGSEWindow(QMainWindow):
         if self.current_file is None:
             return
         handlers = {
+            "Directory": self._open_dir,
             "Sorted": self._do_sorting,
             "Indexed": self._do_indexing,
             "Reference": self._show_reference,
@@ -192,11 +211,14 @@ class WGSEWindow(QMainWindow):
             "Alignment stats": self._show_alignment_stats,
             "Index stats": self._show_index_stats,
             "Coverage stats": self._show_coverage_stats,
-        } 
+        }
         item = self.ui.fileInformationTable.verticalHeaderItem(index.row())
         if item.text() not in handlers:
             return
         handlers[item.text()]()
+
+    def _open_dir(self):
+        os.startfile(self.current_file.file_info.path.parent)
 
     def _do_sorting(self):
         if self.current_file is None:
@@ -237,14 +259,23 @@ class WGSEWindow(QMainWindow):
             if choice == QMessageBox.StandardButton.No:
                 return
 
-        # TODO: move this in another thread
-        self.ui.progressBar.setMaximum(0)
-        self.ui.progressBar.setMinimum(0)
-        self.ui.progressBar.setValue(0)
-        self.ui.progressBar.show()
-        self._external.index(self.current_file.path)
+        self.ui.progress.setMaximum(0)
+        self.ui.progress.setMinimum(0)
+        self.ui.progress.setValue(0)
+        self.ui.progress.show()
+        self.ui.stop.setEnabled(True)
+        self.ui.stop.show()
+        self._long_operation = SimpleWorker(
+            lambda: self._external.index(self.current_file.path, wait=False)
+        )
+        self._long_operation.finished.connect(self.reload)
+        self._long_operation.start()
+
+    def reload(self):
+        self.ui.progress.hide()
+        self.ui.stop.hide()
+        self._long_operation.deleteLater()
         self.on_open(self.current_file.path)
-        self.ui.progressBar.hide()
 
     def _show_index_stats(self):
         if self.current_file is None:

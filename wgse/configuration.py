@@ -133,7 +133,7 @@ class ConfigurationManager:
         self.load()
 
     def load(self) -> None:
-        self._parser = configparser.ConfigParser()
+        self._parser = configparser.ConfigParser(interpolation=None)
         if WGSEDefaults.LOCAL_CONFIG.exists():
             logging.info(f"Loading {WGSEDefaults.LOCAL_CONFIG}")
         if WGSEDefaults.GLOBAL_CONFIG.exists():

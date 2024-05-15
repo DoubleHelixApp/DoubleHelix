@@ -71,6 +71,7 @@
         "VERIFYHOST",
         "VERIFYPEER",
         "wgse",
+        "winver",
         "WRITEDATA",
         "YSEQ"
     ],

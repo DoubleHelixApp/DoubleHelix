@@ -127,9 +127,9 @@ class External:
         process = subprocess.run(arguments, check=True, capture_output=True)
         return process.stdout.decode("utf-8")
 
-    def index(self, path: Path):
+    def index(self, path: Path, wait=True):
         return self.samtools(
-            ["index", "-@", self._config.threads, "-b", str(path)], wait=True
+            ["index", "-@", self._config.threads, "-b", str(path)], wait=wait
         )
 
     def _gzip_filename(self, input: Path, action: BgzipAction):

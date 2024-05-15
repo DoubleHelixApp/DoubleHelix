@@ -1,7 +1,6 @@
 {
     "files": [
         "form.ui",
-        "header.ui",
         "reference.ui",
         "resources.qrc"
     ]
