@@ -4,9 +4,9 @@
   <h1 align="center">WGSE-NG</h1>
 
 [![Documentation Status](https://readthedocs.org/projects/wgse-ng/badge/?version=latest)](https://wgse-ng.readthedocs.io/en/latest/?badge=latest)
-[![Python application](https://github.com/chaplin89/WGSE-NG/actions/workflows/python-app.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-app.yml/badge.svg)
-[![Python Publish](https://github.com/chaplin89/WGSE-NG/actions/workflows/python-publish.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-publish.yml/badge.svg)
-[![Python Publish](https://github.com/chaplin89/WGSE-NG/actions/workflows/python-pyinstaller.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller.yml/badge.svg)
+[![Python application](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-app.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-app.yml/badge.svg)
+[![Python Publish](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-publish.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-publish.yml/badge.svg)
+[![Python Publish](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller.yml/badge.svg)
 
 This is my attempt to improve [WGSE](https://github.com/WGSExtract/WGSExtract-Dev). Still under heavy development. Don't expect anything working.
 
