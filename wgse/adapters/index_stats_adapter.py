@@ -27,17 +27,17 @@ class IndexStatsAdapter:
 
         percentage_mapped = ""
         percentage_unmapped = ""
-        if grouped_others.value[1] != 0:
+        if grouped_others.columns[1] != 0:
             percentage_mapped = (
-                f" ({(grouped_others.value[2]/grouped_others.value[1])*100:.1f}%)"
+                f" ({(grouped_others.columns[2]/grouped_others.columns[1])*100:.1f}%)"
             )
             percentage_unmapped = (
-                f" ({(grouped_others.value[3]/grouped_others.value[1])*100:.1f}%)"
+                f" ({(grouped_others.columns[3]/grouped_others.columns[1])*100:.1f}%)"
             )
 
-        grouped_others.value[2] = f"{grouped_others.value[2]}{percentage_mapped}"
-        grouped_others.value[3] = f"{grouped_others.value[3]}{percentage_unmapped}"
-        grouped_others.value[1] = str(grouped_others.value[1])
+        grouped_others.columns[2] = f"{grouped_others.columns[2]}{percentage_mapped}"
+        grouped_others.columns[3] = f"{grouped_others.columns[3]}{percentage_unmapped}"
+        grouped_others.columns[1] = str(grouped_others.columns[1])
 
         for stat in stats:
             if stat.type == SequenceType.Other:

@@ -8,12 +8,13 @@ from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow,
 
 from wgse.adapters.alignment_map_file_info_adapter import AlignmentMapFileInfoAdapter
 from wgse.adapters.alignment_stats_adapter import AlignmentStatsAdapter
-from wgse.adapters.header_adapter import HeaderAdapter
+from wgse.adapters.header_adapter import HeaderAdapter, HeaderCommentsAdapter, HeaderProgramsAdapter, HeaderReadGroupAdapter, HeaderSequenceAdapter
 from wgse.adapters.index_stats_adapter import IndexStatsAdapter
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
 from wgse.configuration import MANAGER_CFG
 from wgse.data.gender import Gender
 from wgse.data.sorting import Sorting
+from wgse.gui.table_dialog import ListTableDialog, TableDialog
 from wgse.utility.external import External
 from wgse.fasta.reference import Reference
 from wgse.gui.alignment_statistics_dialog import AlignmentStatisticsDialog
@@ -21,7 +22,6 @@ from wgse.gui.header_dialog import HeaderDialog
 from wgse.gui.extract import ExtractDialog
 from wgse.gui.index_statistics_dialog import IndexStatisticsDialog
 from wgse.gui.ui_form import Ui_MainWindow
-from wgse.gui.filedrop import Ui_Drop
 from wgse.renderers.html_aligned_file_report import HTMLAlignedFileReport
 
 class WGSEWindow(QMainWindow):
@@ -252,9 +252,9 @@ class WGSEWindow(QMainWindow):
             if choice == QMessageBox.StandardButton.No:
                 return
             self._do_indexing(user_informed=True)
-            self.on_open(self.current_file.path)
-        dialog = IndexStatisticsDialog(self)
-        dialog.exec(self.current_file.file_info.index_stats)
+        dialog = TableDialog("Index Statistics", self)
+        dialog.set_data(IndexStatsAdapter.adapt(self.current_file.file_info.index_stats))
+        dialog.exec()
 
     def _show_coverage_stats(self):
         return
@@ -265,14 +265,23 @@ class WGSEWindow(QMainWindow):
     def _show_alignment_stats(self):
         if self.current_file is None:
             return
-        dialog = AlignmentStatisticsDialog(self)
-        dialog.exec(self.current_file.file_info.alignment_stats)
+        dialog = TableDialog("Alignment statistics", self)
+        dialog.set_data(AlignmentStatsAdapter.adapt(self.current_file.file_info.alignment_stats))
+        dialog.exec()
 
     def _show_header(self):
         if self.current_file is None:
             return
-        dialog = HeaderDialog(self)
-        dialog.exec(self.current_file.header)
+        
+        dialog = ListTableDialog("Header", self)
+        data = {
+            "Sequences": HeaderSequenceAdapter.adapt(self.current_file.header.sequences.values()),
+            "Programs": HeaderProgramsAdapter.adapt(self.current_file.header.programs),
+            "Read groups": HeaderReadGroupAdapter.adapt(self.current_file.header.read_groups),
+            "Comments" : HeaderCommentsAdapter.adapt(self.current_file.header.comments)
+        }
+        dialog.set_data(data)
+        dialog.exec()
 
     def _gender_determined(self, gender: Gender):
         pass

@@ -1,7 +1,7 @@
 class TabularDataRow:
-    def __init__(self, header: str, value: list[str]) -> None:
-        self.header = header
-        self.value = value
+    def __init__(self, header: str, columns: list[str]) -> None:
+        self.vertical_header = header
+        self.columns = columns
 
 
 class TabularData:

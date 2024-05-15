@@ -18,8 +18,8 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QGridLayout, QHeaderView,
     QMainWindow, QMenu, QMenuBar, QProgressBar,
-    QPushButton, QSizePolicy, QStatusBar, QTabWidget,
-    QTableWidget, QTableWidgetItem, QWidget)
+    QPushButton, QSizePolicy, QStatusBar, QTableWidget,
+    QTableWidgetItem, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -42,35 +42,9 @@ class Ui_MainWindow(object):
         self.actionGenomes.setObjectName(u"actionGenomes")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.gridLayout_6 = QGridLayout(self.centralwidget)
-        self.gridLayout_6.setObjectName(u"gridLayout_6")
-        self.tabWidget = QTabWidget(self.centralwidget)
-        self.tabWidget.setObjectName(u"tabWidget")
-        self.informationTab = QWidget()
-        self.informationTab.setObjectName(u"informationTab")
-        self.gridLayout = QGridLayout(self.informationTab)
+        self.gridLayout = QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.pushButton_6 = QPushButton(self.informationTab)
-        self.pushButton_6.setObjectName(u"pushButton_6")
-
-        self.gridLayout.addWidget(self.pushButton_6, 2, 1, 1, 1)
-
-        self.exportButton = QPushButton(self.informationTab)
-        self.exportButton.setObjectName(u"exportButton")
-
-        self.gridLayout.addWidget(self.exportButton, 2, 0, 1, 1)
-
-        self.pushButton_7 = QPushButton(self.informationTab)
-        self.pushButton_7.setObjectName(u"pushButton_7")
-
-        self.gridLayout.addWidget(self.pushButton_7, 2, 2, 1, 1)
-
-        self.pushButton = QPushButton(self.informationTab)
-        self.pushButton.setObjectName(u"pushButton")
-
-        self.gridLayout.addWidget(self.pushButton, 2, 3, 1, 1)
-
-        self.fileInformationTable = QTableWidget(self.informationTab)
+        self.fileInformationTable = QTableWidget(self.centralwidget)
         self.fileInformationTable.setObjectName(u"fileInformationTable")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         sizePolicy.setHorizontalStretch(0)
@@ -96,15 +70,31 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.fileInformationTable, 0, 0, 1, 4)
 
-        self.progressBar = QProgressBar(self.informationTab)
+        self.exportButton = QPushButton(self.centralwidget)
+        self.exportButton.setObjectName(u"exportButton")
+
+        self.gridLayout.addWidget(self.exportButton, 1, 0, 1, 1)
+
+        self.pushButton_6 = QPushButton(self.centralwidget)
+        self.pushButton_6.setObjectName(u"pushButton_6")
+
+        self.gridLayout.addWidget(self.pushButton_6, 1, 1, 1, 1)
+
+        self.pushButton_7 = QPushButton(self.centralwidget)
+        self.pushButton_7.setObjectName(u"pushButton_7")
+
+        self.gridLayout.addWidget(self.pushButton_7, 1, 2, 1, 1)
+
+        self.pushButton = QPushButton(self.centralwidget)
+        self.pushButton.setObjectName(u"pushButton")
+
+        self.gridLayout.addWidget(self.pushButton, 1, 3, 1, 1)
+
+        self.progressBar = QProgressBar(self.centralwidget)
         self.progressBar.setObjectName(u"progressBar")
         self.progressBar.setValue(24)
 
-        self.gridLayout.addWidget(self.progressBar, 4, 0, 1, 4)
-
-        self.tabWidget.addTab(self.informationTab, "")
-
-        self.gridLayout_6.addWidget(self.tabWidget, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.progressBar, 2, 0, 1, 4)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
@@ -141,9 +131,6 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.actionExit.triggered.connect(MainWindow.close)
 
-        self.tabWidget.setCurrentIndex(0)
-
-
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
 
@@ -156,11 +143,10 @@ class Ui_MainWindow(object):
         self.actionAbout.setText(QCoreApplication.translate("MainWindow", u"About", None))
         self.actionLog_viewer.setText(QCoreApplication.translate("MainWindow", u"Log viewer", None))
         self.actionGenomes.setText(QCoreApplication.translate("MainWindow", u"Reference genomes", None))
-        self.pushButton_6.setText(QCoreApplication.translate("MainWindow", u"Haplotype", None))
         self.exportButton.setText(QCoreApplication.translate("MainWindow", u"Extract", None))
+        self.pushButton_6.setText(QCoreApplication.translate("MainWindow", u"Haplotype", None))
         self.pushButton_7.setText(QCoreApplication.translate("MainWindow", u"Variant calling", None))
         self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Analysis", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.informationTab), QCoreApplication.translate("MainWindow", u"Information", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuHelp.setTitle(QCoreApplication.translate("MainWindow", u"Help", None))
         self.menuTools.setTitle(QCoreApplication.translate("MainWindow", u"Tools", None))

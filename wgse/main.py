@@ -1,6 +1,8 @@
 import wgse.gui
 from wgse.utility.check_prerequisites import (CheckPrerequisites,
                                               PrerequisiteIssueType)
+
+
 def main():
     failing = CheckPrerequisites().check_prerequisites()
     if len(failing) > 0:

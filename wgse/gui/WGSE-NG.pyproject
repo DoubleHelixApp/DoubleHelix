@@ -1,10 +1,8 @@
 {
     "files": [
-        "extract.ui",
-        "file_drop.ui",
-        "filedrop.ui",
         "form.ui",
         "header.ui",
+        "reference.ui",
         "resources.qrc"
     ]
 }
