@@ -1,11 +1,14 @@
 import enum
 import inspect
+import logging
 import subprocess
+import wgse.utility.external
 from subprocess import Popen
 
 from wgse.configuration import MANAGER_CFG
 from wgse.utility.external import External
 
+logger = logging.getLogger(__name__)
 
 class PrerequisiteIssueSeverity(enum.Enum):
     INFO = enum.auto()
@@ -47,6 +50,8 @@ class CheckPrerequisites:
     def check_prerequisites(self) -> list[PrerequisiteIssue]:
         # TODO: this sucks
         # TODO: empty config var should fallback on defaults with an INFO msg
+        old_level = logging.getLogger(wgse.utility.external.__name__).level
+        logging.getLogger(wgse.utility.external.__name__).setLevel(logging.INFO)
         missing = []
         if self._repo.metadata is None:
             missing.append(
@@ -145,6 +150,7 @@ class CheckPrerequisites:
                     f"{f.__name__} : {e!s}",
                 )
                 missing.append(m)
+        logging.getLogger(wgse.utility.external.__name__).setLevel(old_level)
         return missing
 
 

@@ -176,8 +176,11 @@ class AlignmentMapFile:
         # If file is not sorted computing AlignmentStats is expensive.
         # Let the caller request them.
         if file_info.sorted == Sorting.Coordinate:
-            calculator = AlignmentStatsCalculator(file_info)
-            file_info.alignment_stats = calculator.get_stats()
+            is_cram = file_info.file_type == FileType.CRAM 
+            has_reference = file_info.reference_genome.ready_reference is not None
+            if is_cram and has_reference or not is_cram:
+                calculator = AlignmentStatsCalculator(file_info)
+                file_info.alignment_stats = calculator.get_stats()
         return file_info
 
     def get_mitochondrial_dna_type(self, reference: Reference):

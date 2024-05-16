@@ -24,6 +24,7 @@ from wgse.adapters.header_adapter import (
     HeaderSequenceAdapter,
 )
 from wgse.adapters.index_stats_adapter import IndexStatsAdapter
+from wgse.adapters.reference_adapter import ReferenceAdapter
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
 from wgse.configuration import MANAGER_CFG
 from wgse.data.gender import Gender
@@ -179,7 +180,7 @@ class WGSEWindow(QMainWindow):
             ("Filename", str(self.current_file.path.name)),
             ("Size", size),
             ("File Type", info.file_type.name),
-            ("Reference", info.reference_genome.build),
+            ("Reference", f"{info.reference_genome.build} ({info.reference_genome.status.name})"),
             ("Gender", gender_string),
             ("Sorted", sorted_string),
             ("Indexed", indexed_string),
@@ -305,7 +306,10 @@ class WGSEWindow(QMainWindow):
         return
 
     def _show_reference(self):
-        pass
+        adapted = ReferenceAdapter.adapt(self.current_file.file_info.reference_genome)
+        dialog = TableDialog("Reference genome", self)
+        dialog.set_data(adapted)
+        dialog.exec()
 
     def _show_alignment_stats(self):
         if self.current_file is None:

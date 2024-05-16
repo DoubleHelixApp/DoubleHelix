@@ -9,6 +9,8 @@ from pathlib import Path
 
 from wgse.configuration import MANAGER_CFG
 
+logger = logging.getLogger(__name__)
+
 if "win" in sys.platform:
     third_party = str(MANAGER_CFG.EXTERNAL.root)
     if third_party not in os.environ["PATH"]:
@@ -41,7 +43,7 @@ def exe(f, interpreter=[]):
             # need to collect the output
             stdout = subprocess.PIPE
             stderr = subprocess.PIPE
-        logging.debug(f"Calling: {shlex.join(args)}")
+        logger.debug(f"Calling: {shlex.join(args)}")
 
         output = subprocess.Popen(args, stdout=stdout, stdin=stdin, stderr=stderr)
         if wait == True:
