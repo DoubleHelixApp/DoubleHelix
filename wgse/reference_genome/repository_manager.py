@@ -147,7 +147,7 @@ class RepositoryManager:
     def self_test(self):
         for index, reference in enumerate(self.genomes):
             if reference.sequences is None:
-                logging.info(f"Processing {genome} as it has no sequences.")
+                logging.info(f"Processing {reference} as it has no sequences.")
                 genome = manager.ingest(
                     reference.fasta_url, reference.source, reference.build
                 )
