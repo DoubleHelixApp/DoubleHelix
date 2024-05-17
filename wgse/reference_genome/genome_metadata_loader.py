@@ -3,7 +3,7 @@ import typing
 
 from wgse.configuration import MANAGER_CFG
 from wgse.data.build import Build
-from wgse.data.reference import Genome
+from wgse.data.genome import Genome
 from wgse.data.sequence import Sequence
 from wgse.data.source import Source
 
@@ -58,7 +58,7 @@ class GenomeMetadataLoader:
         if not self.genome_root.is_dir():
             raise FileNotFoundError(
                 f"Unable to find {str(self.genome_root)} or is not a directory."
-            )        
+            )
         if not self.references_path.is_file():
             raise FileNotFoundError(
                 f"Unable to find {str(self.references_path)} or is not a file."

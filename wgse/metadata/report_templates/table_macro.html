@@ -10,13 +10,13 @@
         </thead>
         {% endif %}
         <tbody>
-            {% for index in range(0, tabular_data.rows|length) %}
+            {% for row in tabular_data.rows %}
             <tr>
-                {% if tabular_data.rows[index].header %}
-                <th scope="row">{{ tabular_data.rows[index].header }}</th>
+                {% if row.vertical_header %}
+                <th scope="row">{{ row.vertical_header }}</th>
                 {% endif %}
 
-                {% for column in tabular_data.rows[index].value %}
+                {% for column in row.columns %}
                 <td>{{ column }}</td>
                 {% endfor %}
             </tr>

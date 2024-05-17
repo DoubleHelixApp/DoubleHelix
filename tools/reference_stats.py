@@ -3,7 +3,7 @@ import logging
 import time
 from pathlib import Path
 
-from wgse.data.reference import Genome
+from wgse.data.genome import Genome
 from wgse.utility.external import External
 from wgse.fasta.fasta_letter_counter import FASTALetterCounter
 from wgse.fasta.fasta_stats_files import FASTAStatsFiles

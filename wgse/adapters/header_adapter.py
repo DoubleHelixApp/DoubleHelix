@@ -10,8 +10,36 @@ from wgse.data.tabular_data import TabularData, TabularDataRow
 class HeaderSequenceAdapter:
     def adapt(input_data: list[AlignmentMapHeaderSequence]):
         return TabularData(
-            ["Name", "Length", "MD5"],
-            [TabularDataRow(None, [x.name, str(x.length), x.md5]) for x in input_data],
+            [
+                "Name",
+                "Length",
+                "MD5",
+                "Alternate locus",
+                "Alternative names",
+                "Description",
+                "Genome",
+                "Molecule topology",
+                "Species",
+                "URI",
+            ],
+            [
+                TabularDataRow(
+                    None,
+                    [
+                        x.name,
+                        str(x.length),
+                        x.md5,
+                        x.alternate_locus,
+                        x.alternative_names,
+                        x.description,
+                        x.genome_assembly_identifier,
+                        x.molecule_topology,
+                        x.species,
+                        x.uri,
+                    ],
+                )
+                for x in input_data
+            ],
         )
 
 

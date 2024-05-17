@@ -2,7 +2,7 @@ from collections import OrderedDict
 import enum
 import logging
 
-from wgse.data.reference import Genome
+from wgse.data.genome import Genome
 from wgse.data.sequence import Sequence
 
 
@@ -116,3 +116,9 @@ class Reference:
                 logger.info(f"{genome!s} is a perfect match.")
                 match_list.append(genome)
         return match_list
+    
+    def __str__(self) -> str:
+        return f"{self.build} ({self.status.name})"
+    
+    def __repr__(self) -> str:
+        return self.__str__()

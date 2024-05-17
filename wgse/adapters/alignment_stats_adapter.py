@@ -1,3 +1,4 @@
+import enum
 from wgse.data.alignment_stats import AlignmentStats
 from wgse.data.tabular_data import TabularData, TabularDataRow
 
@@ -24,5 +25,7 @@ class AlignmentStatsAdapter:
         rows = []
         for key, value in name_map.items():
             data = input_data.__dict__[key]
+            if isinstance(data, enum.Enum):
+                data = str(data.name)
             rows.append(TabularDataRow(value, [str(data)]))
         return TabularData(None, rows)

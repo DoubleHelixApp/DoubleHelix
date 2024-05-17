@@ -136,15 +136,15 @@ class AlignmentStatsCalculator:
         majority = considered_samples * 0.5
         read_type = ReadType.Unknown
         if read_type_count > majority:
-            read_type = ReadType.PairedEnd
+            read_type = ReadType.Paired
         elif read_type_count < -majority:
-            read_type = ReadType.SingleEnd
+            read_type = ReadType.Single
 
         if count_length <= 2:
             raise RuntimeError(
                 "Unable to compute read length stats as the number of valid samples is less than 2."
             )
-        if count_insert_size <= 2 and read_type == ReadType.PairedEnd:
+        if count_insert_size <= 2 and read_type == ReadType.Paired:
             raise RuntimeError(
                 "Unable to compute insert size stats as the number of valid samples is less than 2."
             )
@@ -158,6 +158,8 @@ class AlignmentStatsCalculator:
             )
 
         stats = AlignmentStats()
+        stats.samples_count = self._config.samples
+        stats.skipped_samples = self._config.skip
         stats.read_type = read_type
         stats.duplicate = duplicate_count
         stats.sequencer = sequencer

@@ -13,7 +13,6 @@ class AlignmentMapFileInfoAdapter:
             "content": "Content",
             "primary": "Primary",
             "mitochondrial_dna_type": "Mitochondrial DNA type",
-            "build": "Build",
             "name_type_chromosomes": "Name type chromosomes",
             "name_type_mtdna": "Name type mtDNA",
             "sequence_count": "Sequence count",
