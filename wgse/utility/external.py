@@ -205,8 +205,14 @@ class External:
         if inferred_filename != output:
             inferred_filename.rename(output)
             if action == BgzipAction.Compress:
+                target = Path(str(output) + ".gzi")
                 inferred_gzi_filename = Path(str(inferred_filename) + ".gzi")
-                inferred_gzi_filename.rename(str(output) + ".gzi")
+                if target.exists():
+                    target.unlink()
+                if not inferred_gzi_filename.exists():
+                    raise FileNotFoundError(f"BGZIP index not found for {inferred_gzi_filename.name}")
+                inferred_gzi_filename.rename(target)
+        return output
 
     def idxstats(self, input: Path):
         """Generate BAM index statistics"""

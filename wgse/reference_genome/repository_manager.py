@@ -20,19 +20,19 @@ class RepositoryManager:
         self,
         loader: GenomeMetadataLoader = GenomeMetadataLoader(),
         downloader: Downloader = Downloader(),
-        mtdna : MtDNA = MtDNA(),
-        config: RepositoryConfig = RepositoryConfig()
+        mtdna: MtDNA = MtDNA(),
+        config: RepositoryConfig = RepositoryConfig(),
     ) -> None:
         self._loader = loader
         self._downloader = downloader
         self._mtdna = mtdna
-        self._genomes = self._loader.load()
+        self.genomes = self._loader.load()
         # Index individual sequences by their MD5 and length
         self._sequences_by_md5: dict[str, list[Sequence]] = self._group_sequences(
-            lambda s: s.md5, self._genomes
+            lambda s: s.md5, self.genomes
         )
         self._sequences_by_length: dict[int, list[Sequence]] = self._group_sequences(
-            lambda s: s.length, self._genomes
+            lambda s: s.length, self.genomes
         )
         self._config = config
 
@@ -49,12 +49,14 @@ class RepositoryManager:
             # normal chromosomes sequences.
             if (len(unique_seq) > 1) and ln > 57227414:
                 different_md5_same_length.append(ln)
-                logging.debug(f"There are {len(unique_seq)} different MD5 for length {ln} ({name}).")
-        
+                logging.debug(
+                    f"There are {len(unique_seq)} different MD5 for length {ln} ({name})."
+                )
+
         # Analyzing the whole genome, looking for identical length sequences
         # with different MD5 sequences
-        different_md5s_same_lengths = {}    
-        for genome in self._genomes:
+        different_md5s_same_lengths = {}
+        for genome in self.genomes:
             if genome.sequences is None:
                 continue
             seq_lengths = ",".join([str(x.length) for x in genome.sequences])
@@ -63,16 +65,18 @@ class RepositoryManager:
                 different_md5s_same_lengths[seq_lengths] = []
             if seq_md5 not in different_md5s_same_lengths[seq_lengths]:
                 different_md5s_same_lengths[seq_lengths].append(seq_md5)
-        
-        ambiguous = len([x for x,y in different_md5s_same_lengths.items() if len(y)>1])
+
+        ambiguous = len(
+            [x for x, y in different_md5s_same_lengths.items() if len(y) > 1]
+        )
         logging.debug(f"Found {ambiguous} ambiguous genomes.")
         for different_md5_same_length, md5s in different_md5s_same_lengths.items():
-            if len(md5s)>1:
+            if len(md5s) > 1:
                 logging.debug("")
 
     def find(self, sequences: list[Sequence]):
         md5_available = all([x.md5 is not None for x in sequences])
-        matching = OrderedDict([(x,[]) for x in sequences])
+        matching = OrderedDict([(x, []) for x in sequences])
         if md5_available:
             for sequence in sequences:
                 if sequence.md5 in self._sequences_by_md5:
@@ -83,7 +87,7 @@ class RepositoryManager:
                     matching[sequence] = self._sequences_by_length[sequence.length]
         return Reference(matching)
 
-    def _group_sequences(self, criteria, genomes : list[Genome]):
+    def _group_sequences(self, criteria, genomes: list[Genome]):
         grouped = {}
         for genome in genomes:
             if genome.sequences is None:
@@ -139,13 +143,27 @@ class RepositoryManager:
             _external.make_dictionary(genome.fasta, genome.dict)
         else:
             logging.info(f"{genome}: Dictionary file exists.")
+    
+    def self_test(self):
+        for index, reference in enumerate(self.genomes):
+            if reference.sequences is None:
+                logging.info(f"Processing {genome} as it has no sequences.")
+                genome = manager.ingest(
+                    reference.fasta_url, reference.source, reference.build
+                )
+                manager.genomes[index] = genome
+                manager._loader.save(manager.genomes)
 
-    def ingest(self, url: str = None, source: str = None, build: str = None, force=False):
-        genome = Genome(url, source=source, build=build, parent_folder=self._config.genomes)
+    def ingest(
+        self, url: str = None, source: str = None, build: str = None, force=False
+    ):
+        genome = Genome(
+            url, source=source, build=build, parent_folder=self._config.genomes
+        )
         downloader = Downloader()
         decompressor = Decompressor()
         compressor = BGZIPCompressor()
-        
+
         if genome.fasta.exists() and not force:
             logging.info(f"File {genome.fasta.name} already exist. Re-using it.")
             self._create_companion_files(genome, force)
@@ -153,12 +171,12 @@ class RepositoryManager:
             return genome
         elif genome.fasta.exists() and force:
             genome.fasta.unlink()
-            genome.bgzip_md5=None
-            genome.downloaded_md5=None
-            genome.decompressed_md5=None
-            genome.bgzip_size=None
-            genome.download_size=None
-            genome.decompressed_size=None
+            genome.bgzip_md5 = None
+            genome.downloaded_md5 = None
+            genome.decompressed_md5 = None
+            genome.bgzip_size = None
+            genome.download_size = None
+            genome.decompressed_size = None
 
         logging.info(f"Ingesting {genome}.")
         logging.info(f"1/4: Downloading fasta from: {genome.fasta_url}.")
@@ -172,15 +190,14 @@ class RepositoryManager:
         genome.sequences = self._get_sequences(genome)
         return genome
 
+
 if __name__ == "__main__":
     manager = RepositoryManager()
-    for index, reference in enumerate(manager._genomes):
-        if reference.sequences is None:
-            genome = manager.ingest(reference.fasta_url, reference.source, reference.build)
-            manager._genomes[index] = reference
-            manager._loader.save(manager._genomes)
-    
-    # manager = RepositoryManager()
-    # genome = manager.ingest(url, source, build)
-    # manager._genomes.append(genome)
-    # manager._loader.save(manager._genomes)
+    manager.genomes.append(
+        manager.ingest(
+            "https://source/reference.fa",
+            "NIH", # Anything that matches entries in sources.json
+            "38",  # Only 38 or 19
+        )
+    )
+    GenomeMetadataLoader().save(manager.genomes)

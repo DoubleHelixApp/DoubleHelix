@@ -61,5 +61,12 @@
         "urls": [
             "https://ftp.ensembl.org/pub/"
         ]
+    },
+    {
+        "name": "NIH",
+        "description": "File distributed by the National Library of Medicine (https://ncbi.nlm.nih.gov/)",
+        "urls": [
+            "https://ftp.ncbi.nlm.nih.gov/genomes"
+        ]
     }
 ]
