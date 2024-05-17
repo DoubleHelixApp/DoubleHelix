@@ -143,17 +143,17 @@ class RepositoryManager:
             _external.make_dictionary(genome.fasta, genome.dict)
         else:
             logging.info(f"{genome}: Dictionary file exists.")
-    
+
     def self_test(self):
         for index, reference in enumerate(self.genomes):
             if reference.sequences is None:
                 try:
                     logging.info(f"Processing {reference} as it has no sequences.")
-                    genome = manager.ingest(
+                    genome = self.ingest(
                         reference.fasta_url, reference.source, reference.build
                     )
-                    manager.genomes[index] = genome
-                    manager._loader.save(manager.genomes)
+                    self.genomes[index] = genome
+                    self._loader.save(self.genomes)
                 except Exception as e:
                     logging.critical(e)
 
@@ -192,8 +192,3 @@ class RepositoryManager:
         self._create_companion_files(genome)
         genome.sequences = self._get_sequences(genome)
         return genome
-
-
-if __name__ == "__main__":
-    manager = RepositoryManager()
-    manager.self_test()
