@@ -44,8 +44,11 @@ def exe(f, interpreter=[]):
             stdout = subprocess.PIPE
             stderr = subprocess.PIPE
         logger.debug(f"Calling: {shlex.join(args)}")
-
-        output = subprocess.Popen(args, stdout=stdout, stdin=stdin, stderr=stderr)
+        si=None
+        if "win" in sys.platform:
+            si = subprocess.STARTUPINFO()
+            si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        output = subprocess.Popen(args, stdout=stdout, stdin=stdin, stderr=stderr, startupinfo=si)
         if wait == True:
             out, err = output.communicate()
             if output.returncode != 0:
