@@ -8,7 +8,7 @@ from pathlib import Path
 
 from wgse.utility.external import BgzipAction, External
 from wgse.reference_genome.genome_metadata_loader import Genome
-from wgse.utility.file_type_checker import FileTypeChecker, Type
+from wgse.utility.file_type_checker import FileTypeChecker, FileType
 
 
 class Decompressor:
@@ -20,12 +20,12 @@ class Decompressor:
         self._external = external
         self._type_checker = type_checker
 
-        self._handlers: typing.Dict[Type, typing.Callable[[Path, Path], None]] = {
-            Type.GZIP: Decompressor.razf_gzip,
-            Type.RAZF_GZIP: Decompressor.razf_gzip,
-            Type.ZIP: Decompressor.zip,
-            Type.SEVENZIP: Decompressor.sevenzip,
-            Type.BZIP: Decompressor.bzip,
+        self._handlers: typing.Dict[FileType, typing.Callable[[Path, Path], None]] = {
+            FileType.GZIP: Decompressor.razf_gzip,
+            FileType.RAZF_GZIP: Decompressor.razf_gzip,
+            FileType.ZIP: Decompressor.zip,
+            FileType.SEVENZIP: Decompressor.sevenzip,
+            FileType.BZIP: Decompressor.bzip,
         }
 
     def gz(self, input_file: Path, output_file: Path):
@@ -70,13 +70,14 @@ class Decompressor:
 
         type = self._type_checker.get_type(file)
         # Shortcut in case we're dealing with a BGZIP file
-        if type == Type.BGZIP:
+        if type == FileType.BGZIP:
             if genome.bgzip_size is None:
-                return True
+                genome.bgzip_size = file.stat().st_size
+                return False
             if file.stat().st_size == genome.bgzip_size:
                 return False
         # Shortcut in case we're dealing with a FASTA file
-        elif type == Type.DECOMPRESSED:
+        elif type == FileType.DECOMPRESSED:
             if genome.decompressed_size is None:
                 return True
             if file.stat().st_size == genome.decompressed_size:
@@ -84,11 +85,11 @@ class Decompressor:
         return True
 
     def perform(self, genome: Genome, downloaded: Path = None):
-        if self.decompression_needed(genome, downloaded):
+        if not self.decompression_needed(genome, downloaded):
             return downloaded
         
         target = downloaded.with_suffix(".fa")
-        if self.decompression_needed(genome, target):
+        if not self.decompression_needed(genome, target):
             return target
 
         if not downloaded.exists():

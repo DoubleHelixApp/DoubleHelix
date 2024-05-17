@@ -4,7 +4,7 @@ from pathlib import Path
 from wgse.utility.external import External
 
 
-class Type(enum.Enum):
+class FileType(enum.Enum):
     ZIP = 0
     BZIP = 1
     SEVENZIP = 2
@@ -18,36 +18,36 @@ class Type(enum.Enum):
 class FileTypeChecker:
 
     _EXT_TO_TYPE = {
-        ".7z": Type.SEVENZIP,
-        ".zip": Type.ZIP,
-        ".bz2": Type.BZIP,
-        ".bz": Type.BZIP,
-        ".gz": Type.RAZF_GZIP,
-        ".fa": Type.DECOMPRESSED,
-        ".fasta": Type.DECOMPRESSED,
-        ".fna": Type.DECOMPRESSED
+        ".7z": FileType.SEVENZIP,
+        ".zip": FileType.ZIP,
+        ".bz2": FileType.BZIP,
+        ".bz": FileType.BZIP,
+        ".gz": FileType.RAZF_GZIP,
+        ".fa": FileType.DECOMPRESSED,
+        ".fasta": FileType.DECOMPRESSED,
+        ".fna": FileType.DECOMPRESSED
     }
     
     _TYPE_TO_EXT = {
-        Type.SEVENZIP: ".7z",
-        Type.ZIP : ".zip",
-        Type.BZIP: ".bz2",
-        Type.RAZF_GZIP:".fa.gz",
-        Type.GZIP:".fa.gz",
-        Type.DECOMPRESSED: ".fa"
+        FileType.SEVENZIP: ".7z",
+        FileType.ZIP : ".zip",
+        FileType.BZIP: ".bz2",
+        FileType.RAZF_GZIP:".fa.gz",
+        FileType.GZIP:".fa.gz",
+        FileType.DECOMPRESSED: ".fa"
     }
 
     _HTSFILE_TO_TYPE = {
-        "BGZF": Type.BGZIP,
-        "gzip": Type.RAZF_GZIP,
-        "RAZF": Type.RAZF_GZIP,
-        "FASTA": Type.DECOMPRESSED,
+        "BGZF": FileType.BGZIP,
+        "gzip": FileType.RAZF_GZIP,
+        "RAZF": FileType.RAZF_GZIP,
+        "FASTA": FileType.DECOMPRESSED,
     }
 
     def __init__(self, external: External=External()) -> None:
         self._external = external
 
-    def get_type(self, file: Path) -> Type:
+    def get_type(self, file: Path) -> FileType:
         """Get a Type starting from a file path.
 
         Args:
