@@ -147,12 +147,15 @@ class RepositoryManager:
     def self_test(self):
         for index, reference in enumerate(self.genomes):
             if reference.sequences is None:
-                logging.info(f"Processing {reference} as it has no sequences.")
-                genome = manager.ingest(
-                    reference.fasta_url, reference.source, reference.build
-                )
-                manager.genomes[index] = genome
-                manager._loader.save(manager.genomes)
+                try:
+                    logging.info(f"Processing {reference} as it has no sequences.")
+                    genome = manager.ingest(
+                        reference.fasta_url, reference.source, reference.build
+                    )
+                    manager.genomes[index] = genome
+                    manager._loader.save(manager.genomes)
+                except Exception as e:
+                    logging.critical(e)
 
     def ingest(
         self, url: str = None, source: str = None, build: str = None, force=False
@@ -193,11 +196,4 @@ class RepositoryManager:
 
 if __name__ == "__main__":
     manager = RepositoryManager()
-    manager.genomes.append(
-        manager.ingest(
-            "https://source/reference.fa",
-            "NIH", # Anything that matches entries in sources.json
-            "38",  # Only 38 or 19
-        )
-    )
-    GenomeMetadataLoader().save(manager.genomes)
+    manager.self_test()
