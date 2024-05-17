@@ -17,8 +17,6 @@ DEPENDENCIES = [
     "WGSE-NG-3rd-party",
 ]
 
-DOC = ""
-
 setup(
     name="WGSE-NG",
     packages=find_packages(include=["wgse", "wgse.*"]),
@@ -37,10 +35,13 @@ setup(
     long_description=open("README.md", "r").read(),
     long_description_content_type="text/markdown",
     install_requires=DEPENDENCIES,
-    url="https://github.com/chaplin89/WGSE-NG",
+    url="https://github.com/WGSE-NG/WGSE-NG",
     version=VERSION,
     classifiers=[
-        "Development Status :: 1 - Planning",
+        "Development Status :: 3 - Alpha",
+        "Environment :: Console",
+        "Environment :: X11 Applications :: Qt",
+        "Environment :: Win32 (MS Windows)",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: BSD License",
@@ -54,5 +55,5 @@ setup(
             "wgse = wgse.main:main",
         ]
     },
-    keywords="bioinformatics",
+    keywords=["bioinformatics", "genetics", "wgs", "microarray", "science"],
 )
