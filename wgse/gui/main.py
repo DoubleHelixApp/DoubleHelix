@@ -26,6 +26,7 @@ from wgse.adapters.header_adapter import (
 from wgse.adapters.index_stats_adapter import IndexStatsAdapter
 from wgse.adapters.reference_adapter import ReferenceAdapter
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
+from wgse.alignment_map.index_stats_calculator import IndexStatsCalculator
 from wgse.configuration import MANAGER_CFG
 from wgse.data.gender import Gender
 from wgse.data.sorting import Sorting
@@ -296,6 +297,25 @@ class WGSEWindow(QMainWindow):
             if choice == QMessageBox.StandardButton.No:
                 return
             self._do_indexing(user_informed=True)
+        if self.current_file.file_info.index_stats is None:
+            prompt = QMessageBox()
+            prompt.setWindowTitle("Index stats not available")
+            prompt.setText("Index stats needs to be calculated for this file.")
+            prompt.setInformativeText(
+                "Do you want to calculate the stats? This may take a while."
+            )
+            prompt.setStandardButtons(
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            prompt.setDefaultButton(QMessageBox.StandardButton.No)
+            choice = QMessageBox.StandardButton(prompt.exec())
+            if choice == QMessageBox.StandardButton.No:
+                return
+
+            indexed_stats = IndexStatsCalculator(self.current_file.path)
+            self.current_file.file_info.index_stats = indexed_stats.get_stats()
+            self.current_file.file_info.gender = self.current_file.get_gender(self.current_file.file_info.index_stats)
+        
         dialog = TableDialog("Index Statistics", self)
         dialog.set_data(
             IndexStatsAdapter.adapt(self.current_file.file_info.index_stats)
