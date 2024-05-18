@@ -89,7 +89,7 @@ class WGSEWindow(QMainWindow):
         self.ui.stop.setEnabled(True)
         self.ui.stop.show()
         caller = VariantCaller()
-        self._long_operation = SimpleWorker(lambda: caller.call(self.current_file), self)
+        self._long_operation = SimpleWorker(lambda: caller.call(self.current_file))
         self._long_operation.start()
         self._long_operation.finished.connect(self.reload)
 
@@ -261,17 +261,27 @@ class WGSEWindow(QMainWindow):
             if choice == QMessageBox.StandardButton.No:
                 return
 
-        self.ui.progress.setMaximum(0)
+        self.ui.progress.setMaximum(100)
         self.ui.progress.setMinimum(0)
         self.ui.progress.setValue(0)
         self.ui.progress.show()
         self.ui.stop.setEnabled(True)
         self.ui.stop.show()
         self._long_operation = SimpleWorker(
-            lambda: self._external.index(self.current_file.path, wait=False)
+            lambda: self._external.index(self.current_file.path, wait=False),
+            None,
+            self._set_progress
         )
         self._long_operation.finished.connect(self.reload)
         self._long_operation.start()
+        
+    def _set_progress(self, read_bytes, _):
+        if read_bytes is None:
+            self.ui.progress.setValue(100)
+            return
+        percentage = read_bytes/self.current_file.path.stat().st_size
+        print(int(percentage*100))
+        self.ui.progress.setValue(int(percentage*100))
 
     def reload(self):
         self.ui.progress.hide()
