@@ -51,7 +51,7 @@ setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
     entry_points={
-        "gui_scripts": [
+        "console_scripts": [
             "wgse = wgse.main:main",
         ]
     },
