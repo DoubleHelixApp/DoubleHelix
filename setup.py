@@ -51,8 +51,11 @@ setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
     entry_points={
-        "console_scripts": [
+        "gui_scripts": [
             "wgse = wgse.main:main",
+        ],
+        "console_scripts": [
+            "wgse_cli = wgse.main:main",
         ]
     },
     keywords=["bioinformatics", "genetics", "wgs", "microarray", "science"],

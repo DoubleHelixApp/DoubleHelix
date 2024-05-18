@@ -184,6 +184,8 @@
     </property>
     <addaction name="actionLog_viewer"/>
     <addaction name="actionGenomes"/>
+    <addaction name="separator"/>
+    <addaction name="actionCreate_launcher_on_desktop"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
@@ -223,6 +225,11 @@
   <action name="actionGenomes">
    <property name="text">
     <string>Reference genomes</string>
+   </property>
+  </action>
+  <action name="actionCreate_launcher_on_desktop">
+   <property name="text">
+    <string>Create launcher on desktop</string>
    </property>
   </action>
  </widget>

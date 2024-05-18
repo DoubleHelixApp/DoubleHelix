@@ -10,14 +10,12 @@ from PySide6.QtWidgets import (
     QSpacerItem,
     QVBoxLayout,
     QDialog,
-    QWidget,
 )
 
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
 from wgse.data.file_type import FileType
 from wgse.gui.microarray_format import MicroarrayFormatWidget
 from wgse.renderers.html_aligned_file_report import HTMLAlignedFileReport
-from wgse.microarray.microarray_converter import MicroarrayConverter
 
 
 class ExtractTargetFormat(enum.Enum):
@@ -78,8 +76,11 @@ class ExtractDialog(QDialog):
         self.main.show()
         self.mainLayout = QGridLayout(self)
         self.mainLayout.setObjectName("mainLayout")
+        
+        # 1st row
         self.mainLayout.addWidget(self.main, 0, 0, 1, 3)
         
+        # 2nd row [BACK] (space) [NEXT]
         self.mainLayout.addWidget(self.back_button, 1, 0, 1, 1)
         self.mainLayout.addItem(self.horizontalSpacer, 1, 1, 1, 1)
         self.mainLayout.addWidget(self.next_button, 1, 2, 1, 1)
@@ -218,14 +219,12 @@ class ExtractDialog(QDialog):
     def _to_sam(self):
         if self.current_file is None:
             return
-
         self.current_file.convert(FileType.SAM)
         self.close()
 
     def _to_cram(self):
         if self.current_file is None:
             return
-
         self.current_file.convert(FileType.CRAM)
         self.close()
 
@@ -289,6 +288,7 @@ class ExtractDialog(QDialog):
         sequences = self._target_sequences
         format = self._target_format
         input = self.current_file.path
+        self._format_handlers[format]()
 
     def _sequence_selected(self):
         selected = [x.isChecked() for x in self.sequencesOptions]
@@ -298,6 +298,7 @@ class ExtractDialog(QDialog):
         index = selected.index(True)
         button = self.sequencesOptions[index]
         self._target_sequences = ExtractTargetSequences[button.objectName()]
+        self._perform_extraction()
 
     def back(self):
         if self.main.objectName() == "formatSelection":

@@ -1,28 +1,18 @@
 import os
-import signal
-from subprocess import Popen
 import sys
 import webbrowser
 from pathlib import Path
 
-from PyQt6.QtCore import QObject, QThread
 from PyQt6.QtWidgets import QApplication, QMainWindow
-from PySide6.QtCore import QModelIndex, SignalInstance, Signal
-from PySide6.QtWidgets import (
-    QApplication,
-    QFileDialog,
-    QMainWindow,
-    QMessageBox,
-    QTableWidgetItem,
-)
+from PySide6.QtCore import QModelIndex
+from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow,
+                               QMessageBox, QTableWidgetItem)
 
 from wgse.adapters.alignment_stats_adapter import AlignmentStatsAdapter
-from wgse.adapters.header_adapter import (
-    HeaderCommentsAdapter,
-    HeaderProgramsAdapter,
-    HeaderReadGroupAdapter,
-    HeaderSequenceAdapter,
-)
+from wgse.adapters.header_adapter import (HeaderCommentsAdapter,
+                                          HeaderProgramsAdapter,
+                                          HeaderReadGroupAdapter,
+                                          HeaderSequenceAdapter)
 from wgse.adapters.index_stats_adapter import IndexStatsAdapter
 from wgse.adapters.reference_adapter import ReferenceAdapter
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
@@ -34,24 +24,9 @@ from wgse.gui.extract import ExtractDialog
 from wgse.gui.table_dialog import ListTableDialog, TableDialog
 from wgse.gui.ui_form import Ui_MainWindow
 from wgse.utility.external import External
-
-
-class SimpleWorker(QThread):
-    def __init__(self, function, parent=None) -> None:
-        super().__init__(parent)
-        self.progress = Signal(int)
-        self.function = function
-        self.process: Popen = None
-
-    def run(self):
-        self.process = self.function()
-        self.process.wait()
-
-    def kill(self):
-        if hasattr(os.sys, "winver"):
-            self.process.kill()
-        else:
-            self.process.send_signal(signal.SIGTERM)
+from wgse.utility.shortcut import Shortcut
+from wgse.utility.simple_worker import SimpleWorker
+from wgse.variant_caller import VariantCaller
 
 
 class WGSEWindow(QMainWindow):
@@ -71,7 +46,21 @@ class WGSEWindow(QMainWindow):
         self._external = external
         self.config = config
         self.switch_to_main()
-        return
+        self.ui.actionDocumentation.triggered.connect(self.on_doc)
+        self.ui.actionOpen.triggered.connect(self.on_open)
+        self.ui.actionExit.triggered.connect(self.on_close)
+        self.ui.actionSettings.triggered.connect(self.on_settings)
+        self.ui.actionCreate_launcher_on_desktop.triggered.connect(self.create_launcher)
+
+    def create_launcher(self):
+        path = Shortcut().create()
+        message_box = QMessageBox()
+        message_box.setWindowTitle("Created")
+        message_box.setText(f"A link to WGSE-NG was created at {path}")
+        message_box.setStandardButtons(
+            QMessageBox.StandardButton.Ok
+        )
+        message_box.exec()
 
     def switch_to_main(self):
         self.ui = Ui_MainWindow()
@@ -79,12 +68,9 @@ class WGSEWindow(QMainWindow):
 
         self.ui.fileInformationTable.setAlternatingRowColors(True)
 
-        self.ui.actionDocumentation.triggered.connect(self.on_doc)
-        self.ui.actionOpen.triggered.connect(self.on_open)
-        self.ui.actionExit.triggered.connect(self.on_close)
-        self.ui.actionSettings.triggered.connect(self.on_settings)
         self.ui.fileInformationTable.doubleClicked.connect(self.file_item_clicked)
         self.ui.extract.clicked.connect(self.export)
+        self.ui.variant.clicked.connect(self.variant_calling)
         self.ui.progress.hide()
         self.ui.stop.hide()
         self.ui.stop.clicked.connect(self.stop)
@@ -92,6 +78,20 @@ class WGSEWindow(QMainWindow):
         self._long_operation: SimpleWorker = None
         if self.config.last_path != None:
             self.on_open(self.config.last_path)
+            
+    def variant_calling(self):
+        if self.current_file is None:
+            return
+        self.ui.progress.setMaximum(0)
+        self.ui.progress.setMinimum(0)
+        self.ui.progress.setValue(0)
+        self.ui.progress.show()
+        self.ui.stop.setEnabled(True)
+        self.ui.stop.show()
+        caller = VariantCaller()
+        self._long_operation = SimpleWorker(lambda: caller.call(self.current_file), self)
+        self._long_operation.start()
+        self._long_operation.finished.connect(self.reload)
 
     def stop(self):
         self.ui.stop.setDisabled(True)
