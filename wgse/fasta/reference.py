@@ -93,23 +93,18 @@ class Reference:
         match_list = []
         for genome, matches in self._genome_map.items():
             matching = True
-            logger.debug(f"{genome!s}: matching {len(matches.keys())}/{len([x for x in matches.values()if x is not None])}")
             for genome_sequence, query_sequence in matches.items():
                 if query_sequence is None:
-                    logger.debug(f"Discarding genome {genome!s} because {genome_sequence.name} does not have a match.")
                     matching = False
                     break
                 if genome_sequence.name != query_sequence.name:
-                    logger.debug(f"Discarding genome {genome!s} because {genome_sequence.name} is different from {query_sequence.name}.")
                     matching = False
                     break
                 if query_sequence.md5 is not None:
                     if genome_sequence.md5 != query_sequence.md5:
-                        logger.debug(f"Discarding genome {genome!s} because {genome_sequence.md5} is different from {query_sequence.md5}.")
                         matching = False
                         break
                 if query_sequence.length != query_sequence.length:
-                    logger.debug(f"Discarding genome {genome!s} because {genome_sequence.length} is different from {query_sequence.length}.")
                     matching = False
                     break
             if matching:

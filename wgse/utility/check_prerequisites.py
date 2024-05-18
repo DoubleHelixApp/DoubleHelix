@@ -1,6 +1,7 @@
 import enum
 import inspect
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import subprocess
 import wgse.utility.external
 from subprocess import Popen
@@ -9,6 +10,7 @@ from wgse.configuration import MANAGER_CFG
 from wgse.utility.external import External
 
 logger = logging.getLogger(__name__)
+
 
 class PrerequisiteIssueSeverity(enum.Enum):
     INFO = enum.auto()
@@ -45,16 +47,50 @@ class CheckPrerequisites:
         self._repo = MANAGER_CFG.REPOSITORY
         self._ext = MANAGER_CFG.EXTERNAL
         self._gen = MANAGER_CFG.GENERAL
-        self.failed = self.check_prerequisites()
+        self._config_logging()
+
+    def _config_logging(self):
+        if not self._repo.log_path.exists():
+            self._repo.log_path.mkdir(parents=True, exist_ok=True)
+        logger = logging.getLogger()
+        logger.setLevel(logging.DEBUG)
+        for handler in logger.handlers:
+            logger.removeHandler(handler)
+            
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
+        
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.DEBUG)
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
+
+        log_file = self._repo.log_path.joinpath('app.log')
+        handler = TimedRotatingFileHandler(log_file, when='midnight', interval=1, backupCount=10)
+        handler.suffix = "%Y-%m-%d"
+        handler.setLevel(logging.DEBUG)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
+        return logger
 
     def check_prerequisites(self) -> list[PrerequisiteIssue]:
         # TODO: this sucks
         # TODO: empty config var should fallback on defaults with an INFO msg
+        logger.info("Self test started.")
         old_level = logging.getLogger(wgse.utility.external.__name__).level
         logging.getLogger(wgse.utility.external.__name__).setLevel(logging.INFO)
-        missing = []
+        missing = {
+            x: []
+            for x in [
+                PrerequisiteIssueSeverity.ERROR,
+                PrerequisiteIssueSeverity.WARNING,
+                PrerequisiteIssueSeverity.INFO,
+            ]
+        }
         if self._repo.metadata is None:
-            missing.append(
+            missing[PrerequisiteIssueSeverity.ERROR].append(
                 PrerequisiteIssue(
                     PrerequisiteIssueSeverity.ERROR,
                     PrerequisiteIssueType.CONFIG_ISSUE,
@@ -62,7 +98,7 @@ class CheckPrerequisites:
                 )
             )
         elif not self._repo.metadata.exists():
-            missing.append(
+            missing[PrerequisiteIssueSeverity.ERROR].append(
                 PrerequisiteIssue(
                     PrerequisiteIssueSeverity.ERROR,
                     PrerequisiteIssueType.CONFIG_ISSUE,
@@ -71,7 +107,7 @@ class CheckPrerequisites:
             )
 
         if self._repo.genomes is None:
-            missing.append(
+            missing[PrerequisiteIssueSeverity.ERROR].append(
                 PrerequisiteIssue(
                     PrerequisiteIssueSeverity.ERROR,
                     PrerequisiteIssueType.CONFIG_ISSUE,
@@ -79,7 +115,7 @@ class CheckPrerequisites:
                 )
             )
         elif not self._repo.genomes.exists():
-            missing.append(
+            missing[PrerequisiteIssueSeverity.ERROR].append(
                 PrerequisiteIssue(
                     PrerequisiteIssueSeverity.ERROR,
                     PrerequisiteIssueType.CONFIG_ISSUE,
@@ -88,7 +124,7 @@ class CheckPrerequisites:
             )
 
         if self._repo.temporary is None:
-            missing.append(
+            missing[PrerequisiteIssueSeverity.ERROR].append(
                 PrerequisiteIssue(
                     PrerequisiteIssueSeverity.ERROR,
                     PrerequisiteIssueType.CONFIG_ISSUE,
@@ -97,7 +133,7 @@ class CheckPrerequisites:
             )
         elif not self._repo.temporary.exists():
             self._repo.temporary.mkdir(parents=True)
-            missing.append(
+            missing[PrerequisiteIssueSeverity.INFO].append(
                 PrerequisiteIssue(
                     PrerequisiteIssueSeverity.INFO,
                     PrerequisiteIssueType.CONFIG_ISSUE,
@@ -106,17 +142,25 @@ class CheckPrerequisites:
             )
 
         if self._ext.root is None:
-            missing.append("Root folder field is empty in external config")
-        elif not self._repo.temporary.exists():
-            missing.append(
+            missing[PrerequisiteIssueSeverity.ERROR].append(
                 PrerequisiteIssue(
+                    PrerequisiteIssueSeverity.ERROR,
                     PrerequisiteIssueType.CONFIG_ISSUE,
                     f"Root folder does not exist: {self._ext.root!s}",
                 )
             )
+        elif not self._repo.temporary.exists():
+            missing[PrerequisiteIssueSeverity.INFO].append(
+                PrerequisiteIssue(
+                    PrerequisiteIssueSeverity.ERROR,
+                    PrerequisiteIssueType.CONFIG_ISSUE,
+                    f"Temp folder does not exist: {self._ext.root!s}. Creating",
+                )
+            )
+            self._repo.temporary.mkdir(parents=True, exist_ok=True)
 
         if self._ext.threads is None:
-            missing.append(
+            missing[PrerequisiteIssueSeverity.ERROR].append(
                 PrerequisiteIssue(
                     PrerequisiteIssueSeverity.ERROR,
                     PrerequisiteIssueType.CONFIG_ISSUE,
@@ -142,15 +186,20 @@ class CheckPrerequisites:
                     PrerequisiteIssueType.MISSING_BINARY,
                     f.__name__,
                 )
-                missing.append(m)
+                missing[PrerequisiteIssueSeverity.ERROR].append(m)
             except Exception as e:
                 m = PrerequisiteIssue(
                     PrerequisiteIssueSeverity.ERROR,
                     PrerequisiteIssueType.BINARY_ERROR,
                     f"{f.__name__} : {e!s}",
                 )
-                missing.append(m)
+                missing[PrerequisiteIssueSeverity.ERROR].append(m)
         logging.getLogger(wgse.utility.external.__name__).setLevel(old_level)
+        logger.info(
+            f"Self test ended: {len(missing[PrerequisiteIssueSeverity.ERROR])} errors, "
+            + f"{len(missing[PrerequisiteIssueSeverity.WARNING])} warning, "
+            + f"{len(missing[PrerequisiteIssueSeverity.INFO])} info."
+        )
         return missing
 
 

@@ -81,6 +81,7 @@ class RepositoryConfig:
     def __init__(self) -> None:
         self.genomes: Path = Path(WGSEDefaults.LOCAL_FOLDER, "genomes")
         self.temporary: Path = Path(WGSEDefaults.LOCAL_FOLDER, "temp")
+        self.log_path: Path = Path(WGSEDefaults.LOCAL_FOLDER,"logs")
         self.metadata: Path = Path(metadata.__file__).parent
         self.mtdna: Path = Path(mtDNA.__file__).parent
 
