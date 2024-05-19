@@ -123,8 +123,17 @@ class WGSEWindow(QMainWindow):
     def export(self):
         if self.current_file is None:
             return
-        dialog = ExtractDialog(self.current_file, self)
+        dialog = ExtractDialog(self.current_file, progress=self._set_export_progress)
         dialog.exec()
+        self._prepare_long_operation("Exporting")
+        
+    def _set_export_progress(self, total, current):
+        if current is None:
+            self._prepare_ready()
+            return
+        if total is None or total == 0:
+            return
+        self.ui.progress.setValue((current / total) * 100)
 
     def on_close(self):
         MANAGER_CFG.save()

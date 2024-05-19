@@ -96,24 +96,27 @@ class AlignmentMapFile:
         lines = lines.decode().split("\n")
         return AlignmentMapHeader(lines)
 
-    def _to_fastq(self):
+    def _to_fastq(self, io):
         pass
 
-    def _to_fasta(self, regions=""):
+    def _to_fasta(self, regions="", io=None):
         input = None
         output = None
         reference = str(self.file_info.reference_genome.ready_reference.fasta)
         faidx_opt = f"faidx {reference} {regions}"
         consensus_opt = f"consensus {input} -o {output}"
+        if io is not None:
+            raise NotImplementedError()
+            io = lambda r,w: io(r,w)
 
-        faidx = self._external.samtools(faidx_opt, stdout=subprocess.PIPE)
+        faidx = self._external.samtools(faidx_opt, stdout=subprocess.PIPE, io=io)
         consensus = self._external.samtools(
             shlex.split(consensus_opt), stdin=faidx.stdout
         )
         consensus.communicate()
         return output
 
-    def _to_alignment_map(self, target: FileType, region):
+    def _to_alignment_map(self, target: FileType, region, io):
         suffixes = self.path.suffixes.copy()
         if len(suffixes) == 0:
             suffixes = [None]
@@ -135,16 +138,18 @@ class AlignmentMapFile:
         
         view_opt = f'view {target_opt} {format_dependent_opt} "{self.path!s}" {region} -o "{output}"'
         view_opt = shlex.split(view_opt)
-        self._external.samtools(view_opt, wait=True)
+        if io is not None:
+            progress = lambda r,w: io(self.path.stat().st_size, r)
+        return self._external.samtools(view_opt, io=progress)
 
-    def convert(self, target: FileType, regions = ""):
+    def convert(self, target: FileType, regions = "", io=None):
         if self.file_info.file_type == target:
             raise ValueError("Target and source file type for conversion are identical")
         if target == FileType.FASTA:
-            self._to_fasta()
+            self._to_fasta(io)
         if target == FileType.FASTQ:
-            self._to_fastq()
-        self._to_alignment_map(target, regions)
+            self._to_fastq(io)
+        return self._to_alignment_map(target, regions, io=io)
 
     def _initialize_file_info(self):
         file_info = AlignmentMapFileInfo()

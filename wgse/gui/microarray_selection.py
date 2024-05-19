@@ -12,10 +12,10 @@ from PySide6.QtWidgets import (
 from wgse.microarray.microarray_converter import MicroarrayConverterTarget
 
 
-class MicroarrayFormatWidget(QWidget):
+class MicroarraySelection(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
-        self.setObjectName("microarrayFormatSelection")
+        self.setObjectName(MicroarraySelection.__name__)
         self.main_group_box = QGroupBox("Select microarray format", parent)
         self.group_box_layout = QVBoxLayout(self.main_group_box)
 
