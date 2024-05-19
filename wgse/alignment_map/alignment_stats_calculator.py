@@ -1,22 +1,25 @@
+import logging
 import subprocess
 from math import sqrt
 
 from wgse.alignment_map.alignment_map_row import (AlignmentMapFlag,
                                                   AlignmentMapRow)
 from wgse.configuration import MANAGER_CFG
-from wgse.data.file_type import FileType
 from wgse.data.alignment_map_file_info import AlignmentMapFileInfo
 from wgse.data.alignment_stats import AlignmentStats
+from wgse.data.file_type import FileType
 from wgse.data.read_type import ReadType
 from wgse.utility.external import External
 from wgse.utility.sequencers import Sequencers
+
+logger = logging.getLogger(__name__)
 
 
 class AlignmentStatsCalculator:
     def __init__(
         self,
         path: AlignmentMapFileInfo,
-        config = MANAGER_CFG.ALIGNMENT_STATS,
+        config=MANAGER_CFG.ALIGNMENT_STATS,
         external: External = External(),
         sequencers: Sequencers = Sequencers(),
     ) -> None:
@@ -35,8 +38,10 @@ class AlignmentStatsCalculator:
         options = []
         if self.aligned_file.file_type == FileType.CRAM:
             ready_reference = self.aligned_file.reference_genome.ready_reference
-            if  ready_reference is None:
-                raise RuntimeError("Unable to compute stats because there is no reference available for a CRAM file")
+            if ready_reference is None:
+                raise RuntimeError(
+                    "Unable to compute stats because there is no reference available for a CRAM file"
+                )
             options.extend(["-T", ready_reference.fasta])
         options.append(self.aligned_file.path)
 
@@ -68,7 +73,8 @@ class AlignmentStatsCalculator:
         considered_samples = 0
 
         if len(samples) == 0:
-            raise RuntimeError("Cannot compute stats as the file is empty")
+            logger.error("Cannot compute alignment stats as the file is empty")
+            return
 
         # Process the template name for 1st sample to determine the sequencer
         # as it should not give a different result on the other samples.
@@ -141,21 +147,25 @@ class AlignmentStatsCalculator:
             read_type = ReadType.Single
 
         if count_length <= 2:
-            raise RuntimeError(
+            logger.error(
                 "Unable to compute read length stats as the number of valid samples is less than 2."
             )
+            return None
         if count_insert_size <= 2 and read_type == ReadType.Paired:
-            raise RuntimeError(
+            logger.error(
                 "Unable to compute insert size stats as the number of valid samples is less than 2."
             )
+            return None
         if count_quality <= 2:
-            raise RuntimeError(
+            logger.error(
                 "Unable to compute alignment quality stats as the number of valid samples is less than 2."
             )
+            return None
         if read_type == ReadType.Unknown:
-            raise RuntimeError(
+            logger.error(
                 "Unable to determine read type as there's a similar number of single vs paired reads."
             )
+            return None
 
         stats = AlignmentStats()
         stats.samples_count = self._config.samples
