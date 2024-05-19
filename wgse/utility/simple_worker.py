@@ -1,58 +1,39 @@
-from PyQt6.QtCore import QObject, QThread
-from PySide6.QtCore import Signal
-
-
+import logging
 import os
 import signal
 from subprocess import Popen
+from threading import Thread
 
 import debugpy
-import psutil
 
 
-class IOMonitor(QThread):
-    def __init__(
-        self, process: Popen, io_report, polling_seconds=1, parent=None
-    ) -> None:
-        super().__init__(parent)
-        self.process: Popen = process
-        self.io_report = io_report
-        self.polling_seconds = polling_seconds
-
-    def run(self):
-        debugpy.debug_this_thread()
-        try:
-            while True:
-                self.sleep(self.polling_seconds)
-                process = psutil.Process(self.process.pid)
-                counters = process.io_counters()
-                self.io_report(counters.read_bytes, counters.write_bytes)
-                if process.status() != psutil.STATUS_RUNNING:
-                    break
-        except Exception as e:
-            self.io_report(None, None)
-
-
-class SimpleWorker(QThread):
-    def __init__(self, function, parent=None, io_report=None) -> None:
-        super().__init__(parent)
-        self.progress = Signal(int)
+class SimpleWorker(Thread):
+    def __init__(self, function, *args, **kwargs) -> None:
+        super().__init__()
         self.function = function
-        self.process: Popen = None
-        self.io_report = io_report
-        self._io_monitor = None
+        self.process = None
+        self._kwargs = kwargs
+        self._args = args
+        self.start()
 
     def run(self):
-        debugpy.debug_this_thread()
-        self.process = self.function()
-        if isinstance(self.process, Popen) and self.io_report is not None:
-            self._io_monitor = IOMonitor(self.process, self.io_report)
-            self._io_monitor.start()
-        if self.process is not None:
-            self.process.wait()
+        if debugpy.is_client_connected():
+            debugpy.debug_this_thread()
+        self.process = self.function(*self._args, **self._kwargs)
+        if self.process is not None and isinstance(self.process, Popen):
+            self.process.communicate()
 
     def kill(self):
-        if hasattr(os.sys, "winver"):
-            self.process.kill()
-        else:
-            self.process.send_signal(signal.SIGTERM)
+        process = self.process
+        if process is None:
+            logging.debug("Trying to kill a SimpleWorker but there's nothing to kill.")
+            return
+        if not isinstance(process, Popen):
+            raise RuntimeError("Trying to kill a process that is not a Popen object.")
+        try:
+            if hasattr(os.sys, "winver"):
+                process.kill()
+            else:
+                process.send_signal(signal.SIGTERM)
+        except Exception as e:
+            logging.error(f"Error when killing process {e!s}")

@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from wgse.configuration import MANAGER_CFG
+from wgse.utility.process_io_monitor import ProcessIOMonitor
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ def exe(f, interpreter=[]):
         f (Callable): function to decorate.
     """
 
-    def execute_binary(self, args=[], stdout=None, stdin=None, stderr=None, wait=False):
+    def execute_binary(self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None):
         args = [*interpreter, shutil.which(f.__name__), *[str(x) for x in args]]
 
         if wait:
@@ -44,11 +45,17 @@ def exe(f, interpreter=[]):
             stdout = subprocess.PIPE
             stderr = subprocess.PIPE
         logger.debug(f"Calling: {shlex.join(args)}")
-        si=None
+        
+        # Force windows to hide the prompt window
+        startup_info=None
         if "win" in sys.platform:
-            si = subprocess.STARTUPINFO()
-            si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        output = subprocess.Popen(args, stdout=stdout, stdin=stdin, stderr=stderr, startupinfo=si)
+            startup_info = subprocess.STARTUPINFO()
+            startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            
+        output = subprocess.Popen(args, stdout=stdout, stdin=stdin, stderr=stderr, startupinfo=startup_info)
+        if io is not None:
+            monitor = ProcessIOMonitor(output, io)
+            monitor.start()
         if wait == True:
             out, err = output.communicate()
             if output.returncode != 0:
@@ -132,9 +139,9 @@ class External:
         process = subprocess.run(arguments, check=True, capture_output=True)
         return process.stdout.decode("utf-8")
 
-    def index(self, path: Path, wait=True):
+    def index(self, path: Path, wait=True, io=None):
         return self.samtools(
-            ["index", "-@", self._config.threads, "-b", str(path)], wait=wait
+            ["index", "-@", self._config.threads, "-b", str(path)], wait=wait, io=io
         )
 
     def _gzip_filename(self, input: Path, action: BgzipAction):
@@ -237,49 +244,49 @@ class External:
     # for more details.
 
     @exe
-    def bgzip(self, args=[], stdout=None, stdin=None, stderr=None, wait=False):
+    def bgzip(self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None):
         raise FileNotFoundError()
 
     @exe
-    def samtools(self, args=[], stdout=None, stdin=None, stderr=None, wait=False):
+    def samtools(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
         raise FileNotFoundError()
 
     @exe
-    def bwa(self, args=[], stdout=None, stdin=None, stderr=None, wait=False):
+    def bwa(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
         raise FileNotFoundError()
 
     @exe
-    def bwamem2(self, args=[], stdout=None, stdin=None, stderr=None, wait=False):
+    def bwamem2(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
         raise FileNotFoundError()
 
     @exe
-    def minimap2(self, args=[], stdout=None, stdin=None, stderr=None, wait=False):
+    def minimap2(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
         raise FileNotFoundError()
 
     @exe
-    def fastp(self, args=[], stdout=None, stdin=None, stderr=None, wait=False):
+    def fastp(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
         raise FileNotFoundError()
 
     @exe
-    def bcftools(self, args=[], stdout=None, stdin=None, stderr=None, wait=False):
+    def bcftools(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
         raise FileNotFoundError()
 
     @exe
-    def tabix(self, args=[], stdout=None, stdin=None, stderr=None, wait=False):
+    def tabix(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
         raise FileNotFoundError()
 
     @jar
-    def haplogrep(self, args=[], stdout=None, stdin=None, stderr=None, wait=False):
+    def haplogrep(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
         raise FileNotFoundError()
 
     @jar
-    def FastQC(self, args=[], stdout=None, stdin=None, stderr=None, wait=False):
+    def FastQC(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
         raise FileNotFoundError()
 
     @jar
-    def picard(self, args=[], stdout=None, stdin=None, stderr=None, wait=False):
+    def picard(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
         raise FileNotFoundError()
 
     @jar
-    def DISCVRSeq(self, args=[], stdout=None, stdin=None, stderr=None, wait=False):
+    def DISCVRSeq(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
         raise FileNotFoundError()

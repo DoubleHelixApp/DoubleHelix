@@ -17,8 +17,6 @@ from wgse.reference_genome.genome_metadata_loader import Genome
 
 
 class FASTALetterCounter:
-    """Represent a collection of sequences"""
-
     def __init__(self, genome: Genome):
         self._bases_progressbar = None
         self.genome = genome

@@ -27,5 +27,5 @@ class AlignmentMapFileInfo:
         self.name_type_mtdna: MitochondrialNameType = None
         self.sequence_count: int = None
         self.alignment_stats: AlignmentStats = None
-        self.index_stats: dict[SequenceType, list[SequenceStatistics]] = None
+        self.index_stats: list[SequenceStatistics] = None
         self.gender: Gender = None

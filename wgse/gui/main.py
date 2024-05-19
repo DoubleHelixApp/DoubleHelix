@@ -5,14 +5,21 @@ from pathlib import Path
 
 from PyQt6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QModelIndex
-from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow,
-                               QMessageBox, QTableWidgetItem)
+from PySide6.QtWidgets import (
+    QApplication,
+    QFileDialog,
+    QMainWindow,
+    QMessageBox,
+    QTableWidgetItem,
+)
 
 from wgse.adapters.alignment_stats_adapter import AlignmentStatsAdapter
-from wgse.adapters.header_adapter import (HeaderCommentsAdapter,
-                                          HeaderProgramsAdapter,
-                                          HeaderReadGroupAdapter,
-                                          HeaderSequenceAdapter)
+from wgse.adapters.header_adapter import (
+    HeaderCommentsAdapter,
+    HeaderProgramsAdapter,
+    HeaderReadGroupAdapter,
+    HeaderSequenceAdapter,
+)
 from wgse.adapters.index_stats_adapter import IndexStatsAdapter
 from wgse.adapters.reference_adapter import ReferenceAdapter
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
@@ -57,9 +64,7 @@ class WGSEWindow(QMainWindow):
         message_box = QMessageBox()
         message_box.setWindowTitle("Created")
         message_box.setText(f"A link to WGSE-NG was created at {path}")
-        message_box.setStandardButtons(
-            QMessageBox.StandardButton.Ok
-        )
+        message_box.setStandardButtons(QMessageBox.StandardButton.Ok)
         message_box.exec()
 
     def switch_to_main(self):
@@ -78,25 +83,30 @@ class WGSEWindow(QMainWindow):
         self._long_operation: SimpleWorker = None
         if self.config.last_path != None:
             self.on_open(self.config.last_path)
-            
+
     def variant_calling(self):
         if self.current_file is None:
             return
-        self.ui.progress.setMaximum(0)
-        self.ui.progress.setMinimum(0)
-        self.ui.progress.setValue(0)
-        self.ui.progress.show()
-        self.ui.stop.setEnabled(True)
-        self.ui.stop.show()
-        caller = VariantCaller()
-        self._long_operation = SimpleWorker(lambda: caller.call(self.current_file))
-        self._long_operation.start()
-        self._long_operation.finished.connect(self.reload)
+        self._prepare_long_operation(f"Variant calling.")
+        self._long_operation = VariantCaller(progress=self._set_calling_progress)
+        self._worker = SimpleWorker(
+            self._long_operation.call,
+            self.current_file,
+        )
+
+    def _set_calling_progress(self, sub_operation, total, current):
+        if current is None:
+            self._prepare_ready()
+            return
+        if total is None or total == 0:
+            return
+        self.ui.statusbar.showMessage(f"Variant calling, {sub_operation}")
+        self.ui.progress.setValue((current / total) * 100)
 
     def stop(self):
-        self.ui.stop.setDisabled(True)
         if self._long_operation is not None:
             self._long_operation.kill()
+        self._prepare_ready()
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -181,7 +191,10 @@ class WGSEWindow(QMainWindow):
             ("Filename", str(self.current_file.path.name)),
             ("Size", size),
             ("File Type", info.file_type.name),
-            ("Reference", f"{info.reference_genome.build} ({info.reference_genome.status.name})"),
+            (
+                "Reference",
+                f"{info.reference_genome.build} ({info.reference_genome.status.name})",
+            ),
             ("Gender", gender_string),
             ("Sorted", sorted_string),
             ("Indexed", indexed_string),
@@ -260,33 +273,40 @@ class WGSEWindow(QMainWindow):
             choice = QMessageBox.StandardButton(prompt.exec())
             if choice == QMessageBox.StandardButton.No:
                 return
+        self._prepare_long_operation("Indexing")
+        self._long_operation = SimpleWorker(
+            self._external.index, self.current_file.path, io=self._set_index_progress
+        )
 
+    def _prepare_long_operation(self, message):
         self.ui.progress.setMaximum(100)
         self.ui.progress.setMinimum(0)
         self.ui.progress.setValue(0)
         self.ui.progress.show()
         self.ui.stop.setEnabled(True)
         self.ui.stop.show()
-        self._long_operation = SimpleWorker(
-            lambda: self._external.index(self.current_file.path, wait=False),
-            None,
-            self._set_progress
-        )
-        self._long_operation.finished.connect(self.reload)
-        self._long_operation.start()
-        
-    def _set_progress(self, read_bytes, _):
+        self.ui.statusbar.showMessage(message)
+
+    def _prepare_ready(self):
+        self._long_operation = None
+        self.ui.progress.hide()
+        self.ui.stop.setEnabled(False)
+        self.ui.stop.hide()
+        self.reload()
+        self.ui.statusbar.showMessage("Ready.")
+
+    def _set_index_progress(self, read_bytes, _):
         if read_bytes is None:
-            self.ui.progress.setValue(100)
+            self._prepare_ready()
             return
-        percentage = read_bytes/self.current_file.path.stat().st_size
-        print(int(percentage*100))
-        self.ui.progress.setValue(int(percentage*100))
+        percentage = read_bytes / self.current_file.path.stat().st_size
+        print(int(percentage * 100))
+        self.ui.progress.setValue(int(percentage * 100))
 
     def reload(self):
         self.ui.progress.hide()
         self.ui.stop.hide()
-        self._long_operation.deleteLater()
+        self.ui.statusbar.showMessage("Ready")
         self.on_open(self.current_file.path)
 
     def _show_index_stats(self):
@@ -324,8 +344,10 @@ class WGSEWindow(QMainWindow):
 
             indexed_stats = IndexStatsCalculator(self.current_file.path)
             self.current_file.file_info.index_stats = indexed_stats.get_stats()
-            self.current_file.file_info.gender = self.current_file.get_gender(self.current_file.file_info.index_stats)
-        
+            self.current_file.file_info.gender = self.current_file.get_gender(
+                self.current_file.file_info.index_stats
+            )
+
         dialog = TableDialog("Index Statistics", self)
         dialog.set_data(
             IndexStatsAdapter.adapt(self.current_file.file_info.index_stats)

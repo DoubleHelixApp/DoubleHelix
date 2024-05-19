@@ -1,9 +1,14 @@
 import enum
+import logging
 import shlex
 import subprocess
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
+from wgse.data.sequence_type import SequenceType
 from wgse.utility.external import External
 from wgse.configuration import MANAGER_CFG
+from wgse.utility.process_io_monitor import ProcessIOMonitor
+
+logger = logging.getLogger(__name__)
 
 
 class VariantCallingType(enum.Enum):
@@ -18,13 +23,25 @@ class VariantCaller:
         repo_config=MANAGER_CFG.REPOSITORY,
         ext_config=MANAGER_CFG.EXTERNAL,
         external: External = External(),
+        progress=None
     ) -> None:
         self._external = external
         self._ext_config = ext_config
         self._ploidy = str(repo_config.metadata.joinpath("ploidy.txt"))
+        self._is_quitting = False
+        self._current_operation = None
+        self._progress = progress
 
     def call(self, aligned_file: AlignmentMapFile, type=VariantCallingType.Both):
+        if aligned_file.file_info.index_stats is None:
+            raise RuntimeError("Index stats cannot be None for variant calling")
+        if aligned_file.file_info.reference_genome.ready_reference is None:
+            raise RuntimeError("Reference cannot be None for variant calling")
+        self.current_file = aligned_file
         reference = str(aligned_file.file_info.reference_genome.ready_reference.fasta)
+        logger.info(
+            f"Calling variants with {aligned_file.file_info.reference_genome.ready_reference}"
+        )
         input_file = aligned_file.path
 
         skip_variant_opt = ""
@@ -45,13 +62,37 @@ class VariantCaller:
         call_opt = shlex.split(call_opt)
         tabix_opt = shlex.split(tabix_opt)
 
-        mpileup: subprocess.Popen = self._external.bcftools(
-            pileup_opt, stdout=subprocess.PIPE
+        mapped_sequences = [x.mapped for x in self.current_file.file_info.index_stats]
+        mapped_sequences = sum(mapped_sequences)
+        
+        # 112 bytes seems to be the average bytes written for a single base
+        self.pileup_bytes_write = (
+            mapped_sequences
+            * self.current_file.file_info.alignment_stats.average_length
+            * 112
+        )
+        
+        self._current_operation : subprocess.Popen = self._external.bcftools(
+            pileup_opt,
+            stdout=subprocess.PIPE,
+            io=lambda r, w: self._progress("[1/2] Calling", self.pileup_bytes_write, w),
         )
 
-        call = self._external.bcftools(call_opt, stdin=mpileup.stdout)
+
+
+        call = self._external.bcftools(call_opt, stdin=self._current_operation.stdout)
         call.communicate()
-        tabix = self._external.tabix(tabix_opt, wait=True)
+        if self._is_quitting:
+            return
+        self._current_operation = self._external.tabix(tabix_opt, wait=True, io=lambda r, w: self._progress("[2/2] Indexing", output_file.stat().st_size, r),)
+
+    def kill(self):
+        self._is_quitting = True
+        self._current_operation.kill()
+
+    def _stats(self, operation, read, write):
+        if write is not None:
+            print(f"{operation}: {(write/self.pileup_bytes_write)*100}")
 
 
 if __name__ == "__main__":
