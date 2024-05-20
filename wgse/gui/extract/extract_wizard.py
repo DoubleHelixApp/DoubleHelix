@@ -46,7 +46,7 @@ class ExtractWizard(QDialog):
         self.next_button = QPushButton("Next", self)
         self.next_button.setObjectName("nextButton")
 
-        self._format_selection = FormatSelection(self)
+        self._format_selection = FormatSelection(self,self.current_file.file_info.file_type)
         self._sequence_selection = SequenceSelection(self)
         self._microarray_selection = MicroarraySelection(self)
 
@@ -85,26 +85,26 @@ class ExtractWizard(QDialog):
     def _to_bam(self):
         if self.current_file is None:
             return
-        self.current_file.convert(FileType.BAM, None, io=self._progress)
+        self.current_file.convert(FileType.BAM, io=self._progress)
         self.close()
 
     def _to_sam(self):
         if self.current_file is None:
             return
-        self.current_file.convert(FileType.SAM, None, io=self._progress)
+        self.current_file.convert(FileType.SAM, io=self._progress)
         self.close()
 
     def _to_cram(self):
         if self.current_file is None:
             return
-        self.current_file.convert(FileType.CRAM, None, self._progress)
+        self.current_file.convert(FileType.CRAM, io=self._progress)
         self.close()
 
     def _to_fasta(self):
         if self.current_file is None:
             return
 
-        self.current_file.convert(FileType.FASTA, None, self._progress)
+        self.current_file.convert(FileType.FASTA, io=self._progress)
         self.close()
 
     def _to_fastq(self):
@@ -124,7 +124,9 @@ class ExtractWizard(QDialog):
 
         with target.open("wt") as f:
             f.write(html_page)
+        self._progress(None, None)
         webbrowser.open(target)
+        self.close()
 
     def _to_microarray(self):
         pass
@@ -150,14 +152,10 @@ class ExtractWizard(QDialog):
         
         if self._target_format == ExtractTargetFormat.HTML:
             self._to_html()
-            self.close()
         elif self._target_format == ExtractTargetFormat.Microarray:
             self.move_to(self._microarray_selection)
         else:
             self.move_to(self._sequence_selection)
-
-    def _perform_extraction(self):
-        self._format_handlers[self._target_format]()
 
     def _sequence_selected(self):
         selected = [x.isChecked() for x in self._sequence_selection.sequencesOptions]
@@ -167,7 +165,7 @@ class ExtractWizard(QDialog):
         index = selected.index(True)
         button = self._sequence_selection.sequencesOptions[index]
         self._target_sequences = ExtractTargetSequences[button.objectName()]
-        self._perform_extraction()
+        self._format_handlers[self._target_format]()
 
     def back(self):
         if self.main.objectName() == FormatSelection.__name__:

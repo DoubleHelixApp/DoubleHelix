@@ -52,6 +52,8 @@ class WGSEWindow(QMainWindow):
         super().__init__(parent)
         self._external = external
         self.config = config
+        self.current_file = None
+        
         self.switch_to_main()
         self.ui.actionDocumentation.triggered.connect(self.on_doc)
         self.ui.actionOpen.triggered.connect(self.on_open)
@@ -76,13 +78,9 @@ class WGSEWindow(QMainWindow):
         self.ui.fileInformationTable.doubleClicked.connect(self.file_item_clicked)
         self.ui.extract.clicked.connect(self.export)
         self.ui.variant.clicked.connect(self.variant_calling)
-        self.ui.progress.hide()
-        self.ui.stop.hide()
-        self.ui.stop.clicked.connect(self.stop)
 
         self._long_operation: SimpleWorker = None
-        if self.config.last_path != None:
-            self.on_open(self.config.last_path)
+        self._prepare_ready(self.config.last_path)
 
     def variant_calling(self):
         if self.current_file is None:
@@ -123,9 +121,9 @@ class WGSEWindow(QMainWindow):
     def export(self):
         if self.current_file is None:
             return
+        self._prepare_long_operation("Exporting")
         dialog = ExtractWizard(self.current_file, progress=self._set_export_progress)
         dialog.exec()
-        self._prepare_long_operation("Exporting")
 
     def _set_export_progress(self, total, current):
         if current is None:
@@ -296,12 +294,15 @@ class WGSEWindow(QMainWindow):
         self.ui.stop.show()
         self.ui.statusbar.showMessage(message)
 
-    def _prepare_ready(self):
+    def _prepare_ready(self, path=None):
         self._long_operation = None
         self.ui.progress.hide()
         self.ui.stop.setEnabled(False)
         self.ui.stop.hide()
-        self.on_open(self.current_file.path)
+        if self.current_file is not None:
+            self.on_open(self.current_file.path)
+        elif path is not None:
+            self.on_open(path)
         self.ui.statusbar.showMessage("Ready.")
 
     def _set_index_progress(self, read_bytes, _):

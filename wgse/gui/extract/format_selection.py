@@ -2,6 +2,8 @@ import enum
 
 from PySide6.QtWidgets import QGroupBox, QRadioButton, QVBoxLayout, QWidget
 
+from wgse.data.file_type import FileType
+
 
 class ExtractTargetFormat(enum.Enum):
     Microarray = enum.auto()
@@ -15,8 +17,9 @@ class ExtractTargetFormat(enum.Enum):
 
 
 class FormatSelection(QWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, file_type: FileType):
         super().__init__(parent)
+        self.file_type = ExtractTargetFormat[file_type.name]
         self.format = QGroupBox("Select the destination format", self)
         self.inner_layout = QVBoxLayout(self.format)
 
@@ -43,6 +46,11 @@ class FormatSelection(QWidget):
         self._format_options[4].setObjectName(ExtractTargetFormat.FASTA.name)
         self._format_options[5].setObjectName(ExtractTargetFormat.FASTQ.name)
         self._format_options[6].setObjectName(ExtractTargetFormat.HTML.name)
+
+        self.options_by_type = {
+            ExtractTargetFormat[x.objectName()]: x for x in self._format_options
+        }
+        self.options_by_type[self.file_type].hide()
 
         for item in self._format_options:
             self.inner_layout.addWidget(item)

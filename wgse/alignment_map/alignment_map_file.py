@@ -100,16 +100,17 @@ class AlignmentMapFile:
         pass
 
     def _to_fasta(self, regions="", io=None):
-        input = None
-        output = None
+        input = self.path
+        suffixes = self.path.suffixes.copy()
+        suffixes[-1] = ".fasta"
+        output = self.path.with_name(self.path.stem + "".join(suffixes))
         reference = str(self.file_info.reference_genome.ready_reference.fasta)
-        faidx_opt = f"faidx {reference} {regions}"
-        consensus_opt = f"consensus {input} -o {output}"
-        if io is not None:
-            raise NotImplementedError()
-            io = lambda r,w: io(r,w)
+        faidx_opt = f'faidx "{reference}" {regions}'
+        consensus_opt = f'consensus "{input}" -o "{output}"'
+        # if io is not None:
+        #     io = lambda r,w: io(r,w)
 
-        faidx = self._external.samtools(faidx_opt, stdout=subprocess.PIPE, io=io)
+        faidx = self._external.samtools(faidx_opt, stdout=subprocess.PIPE) #io=io)
         consensus = self._external.samtools(
             shlex.split(consensus_opt), stdin=faidx.stdout
         )
@@ -121,6 +122,7 @@ class AlignmentMapFile:
         if len(suffixes) == 0:
             suffixes = [None]
         format_dependent_opt = ""
+        target_opt = ""
         if target == FileType.BAM:
             suffixes[-1] = ".bam"
             target_opt = "-b"
@@ -147,9 +149,9 @@ class AlignmentMapFile:
         if self.file_info.file_type == target:
             raise ValueError("Target and source file type for conversion are identical")
         if target == FileType.FASTA:
-            self._to_fasta(io)
+            self._to_fasta(io=io)
         if target == FileType.FASTQ:
-            self._to_fastq(io)
+            self._to_fastq(io=io)
         return self._to_alignment_map(target, regions, io=io)
 
     def _initialize_file_info(self):
