@@ -28,6 +28,14 @@ wgse
 This section explain how to configure WGSE-NG for development.
 
 _Note: The best experience for developing is with [VS Code](https://code.visualstudio.com/) as this project already contains sensible settings for VS code._
+
+This repository uses [pre-commit](https://pre-commit.com/#intro) to ensure linting, formatting, and isort are executed before commit.
+Its usage is optional but highly recommended. To install
+```
+python -m pip install pre-commit
+pre-commit install
+```
+
 #### Windows
 ```bash
 git clone https://github.com/WGSE-NG/WGSE-NG
@@ -58,15 +66,15 @@ wgse
 - [x] Index stats
 - [x] Alignment stats
 - [ ] Coverage stats
-- [x] FASTQ <-> SAM <-> BAM <-> CRAM conversion(*)
-- [x] Variant calling(*)
+- [x] FASTA <-> SAM <-> BAM <-> CRAM conversion
+- [ ] FASTQ <-> * conversion
+- [x] Variant calling
 - [x] Microarray converter(*)
 - [x] Mitochondrial data extraction(*)
 - [x] Y-DNA data extraction(*)
-- [x] Unaligned data extraction(*)
 - [x] Reference genome identification (92 references supported)
 - [ ] Installer
-- [ ] Crash stats
+- [x] Crash stats
 - [ ] Usage stats
 - [X] Reference ingestion procedure
 - [ ] Documentation
