@@ -1,4 +1,5 @@
 import enum
+
 from wgse.data.alignment_stats import AlignmentStats
 from wgse.data.tabular_data import TabularData, TabularDataRow
 

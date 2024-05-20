@@ -87,53 +87,53 @@ class AlignmentMapHeader:
         program = AlignmentMapHeaderProgram()
         for part in parts:
             if part.startswith("ID"):
-                program.id = part.split(":",1)[1]
+                program.id = part.split(":", 1)[1]
             elif part.startswith("PN"):
-                program.id = part.split(":",1)[1]
+                program.id = part.split(":", 1)[1]
             elif part.startswith("CL"):
-                program.id = part.split(":",1)[1]
+                program.id = part.split(":", 1)[1]
             elif part.startswith("PP"):
-                program.previous = part.split(":",1)[1]
+                program.previous = part.split(":", 1)[1]
                 if program.previous in [x.id for x in self.programs]:
                     prev = [x for x in self.programs if x.id == program.previous]
                     program.previous = prev[0]
             elif part.startswith("DS"):
-                program.description = part.split(":",1)[1]
+                program.description = part.split(":", 1)[1]
             elif part.startswith("VN"):
-                program.program_version = part.split(":",1)[1]
+                program.program_version = part.split(":", 1)[1]
         self.programs.append(program)
 
     def _read_group_process(self, parts: list[str]):
         read_group = AlignmentMapHeaderReadGroup()
         for part in parts:
             if part.startswith("ID"):
-                read_group.id = part.split(":",1)[1]
+                read_group.id = part.split(":", 1)[1]
             elif part.startswith("BC"):
-                read_group.barcode = part.split(":",1)[1]
+                read_group.barcode = part.split(":", 1)[1]
             elif part.startswith("CN"):
-                read_group.sequencing_center = part.split(":",1)[1]
+                read_group.sequencing_center = part.split(":", 1)[1]
             elif part.startswith("DS"):
-                read_group.description = part.split(":",1)[1]
+                read_group.description = part.split(":", 1)[1]
             elif part.startswith("DT"):
-                read_group.date = part.split(":",1)[1]
+                read_group.date = part.split(":", 1)[1]
             elif part.startswith("FO"):
-                read_group.flow_order = part.split(":",1)[1]
+                read_group.flow_order = part.split(":", 1)[1]
             elif part.startswith("KS"):
-                read_group.key_sequence = part.split(":",1)[1]
+                read_group.key_sequence = part.split(":", 1)[1]
             elif part.startswith("LB"):
-                read_group.library = part.split(":",1)[1]
+                read_group.library = part.split(":", 1)[1]
             elif part.startswith("PG"):
-                read_group.programs = part.split(":",1)[1]
+                read_group.programs = part.split(":", 1)[1]
             elif part.startswith("PI"):
-                read_group.predicted_median_insert_size = part.split(":",1)[1]
+                read_group.predicted_median_insert_size = part.split(":", 1)[1]
             elif part.startswith("PL"):
-                read_group.platform = part.split(":",1)[1]
+                read_group.platform = part.split(":", 1)[1]
             elif part.startswith("PM"):
-                read_group.platform_model = part.split(":",1)[1]
+                read_group.platform_model = part.split(":", 1)[1]
             elif part.startswith("PU"):
-                read_group.platform_unit = part.split(":",1)[1]
+                read_group.platform_unit = part.split(":", 1)[1]
             elif part.startswith("SM"):
-                read_group.sample = part.split(":",1)[1]
+                read_group.sample = part.split(":", 1)[1]
         self.read_groups.append(read_group)
 
     def _comment_process(self, parts: list[str]):
@@ -144,13 +144,13 @@ class AlignmentMapHeader:
         metadata = AlignmentMapHeaderMetadata()
         for part in parts:
             if part.startswith("VN"):
-                metadata.version = part.split(":",1)[1]
+                metadata.version = part.split(":", 1)[1]
             elif part.startswith("SO:"):
                 metadata.sorted = self._sorted(part)
             elif part.startswith("GO:"):
-                metadata.grouping = part.split(":",1)[1]
+                metadata.grouping = part.split(":", 1)[1]
             elif part.startswith("SS:"):
-                metadata.subsorting = part.split(":",1)[1]
+                metadata.subsorting = part.split(":", 1)[1]
         self.metadata = metadata
 
     def _sequence_process(self, parts: typing.List[str]):
@@ -158,25 +158,25 @@ class AlignmentMapHeader:
 
         for part in parts:
             if part.startswith("SN"):
-                entry.name = part.split(":",1)[1]
+                entry.name = part.split(":", 1)[1]
             elif part.startswith("LN"):
-                entry.length = int(part.split(":",1)[1])
+                entry.length = int(part.split(":", 1)[1])
             elif part.startswith("M5"):
-                entry.md5 = part.split(":",1)[1]
+                entry.md5 = part.split(":", 1)[1]
             elif part.startswith("UR"):
-                entry.uri = part.split(":",1)[1]
+                entry.uri = part.split(":", 1)[1]
             elif part.startswith("AH"):
-                entry.alternate_locus = part.split(":",1)[1]
+                entry.alternate_locus = part.split(":", 1)[1]
             elif part.startswith("AN"):
-                entry.alternative_names = part.split(":",1)[1].split(",")
+                entry.alternative_names = part.split(":", 1)[1].split(",")
             elif part.startswith("AS"):
-                entry.genome_assembly_identifier = part.split(":",1)[1]
+                entry.genome_assembly_identifier = part.split(":", 1)[1]
             elif part.startswith("DS"):
-                entry.description = part.split(":",1)[1]
+                entry.description = part.split(":", 1)[1]
             elif part.startswith("SP"):
-                entry.species = part.split(":",1)[1]
+                entry.species = part.split(":", 1)[1]
             elif part.startswith("TP"):
-                entry.molecule_topology = part.split(":",1)[1]
+                entry.molecule_topology = part.split(":", 1)[1]
         if entry.name == None:
             raise RuntimeError("Unable to find the name of the sequence.")
         if entry.length == None:

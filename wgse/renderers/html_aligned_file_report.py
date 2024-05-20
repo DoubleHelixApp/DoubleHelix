@@ -7,10 +7,9 @@ from wgse.adapters.alignment_stats_adapter import AlignmentStatsAdapter
 from wgse.adapters.header_adapter import HeaderAdapter
 from wgse.adapters.index_stats_adapter import IndexStatsAdapter
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
-from wgse.alignment_map.alignment_map_header import AlignmentMapHeader
 from wgse.configuration import MANAGER_CFG
 from wgse.data.tabular_data import TabularData
-from wgse.VERSION import VERSION
+from wgse.VERSION import version
 
 
 class HTMLAlignedFileReport:
@@ -57,5 +56,5 @@ class HTMLAlignedFileReport:
             read_groups_data=read_groups_data,
             programs_data=programs_data,
             comments_data=comments_data,
-            general={"now": datetime.datetime.now(), "version": VERSION},
+            general={"now": datetime.datetime.now(), "version": version},
         )

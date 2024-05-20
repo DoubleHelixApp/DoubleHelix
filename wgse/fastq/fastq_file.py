@@ -6,9 +6,7 @@ from wgse.utility.sequencers import Sequencers
 
 
 class FASTQFile:
-    def __init__(
-        self, path: Path, sequencers: Sequencers = Sequencers()
-    ) -> None:
+    def __init__(self, path: Path, sequencers: Sequencers = Sequencers()) -> None:
         self.path = path
         self._sequencers = sequencers
 

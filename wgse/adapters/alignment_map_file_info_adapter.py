@@ -3,7 +3,7 @@ from wgse.data.tabular_data import TabularData, TabularDataRow
 
 
 class AlignmentMapFileInfoAdapter:
-    def adapt(stats: AlignmentMapFileInfo):    
+    def adapt(stats: AlignmentMapFileInfo):
         label_map = {
             "path": "Path",
             "sorted": "Sorted",

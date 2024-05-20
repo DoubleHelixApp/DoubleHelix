@@ -25,16 +25,16 @@ class FileTypeChecker:
         ".gz": FileType.RAZF_GZIP,
         ".fa": FileType.DECOMPRESSED,
         ".fasta": FileType.DECOMPRESSED,
-        ".fna": FileType.DECOMPRESSED
+        ".fna": FileType.DECOMPRESSED,
     }
-    
+
     _TYPE_TO_EXT = {
         FileType.SEVENZIP: ".7z",
-        FileType.ZIP : ".zip",
+        FileType.ZIP: ".zip",
         FileType.BZIP: ".bz2",
-        FileType.RAZF_GZIP:".fa.gz",
-        FileType.GZIP:".fa.gz",
-        FileType.DECOMPRESSED: ".fa"
+        FileType.RAZF_GZIP: ".fa.gz",
+        FileType.GZIP: ".fa.gz",
+        FileType.DECOMPRESSED: ".fa",
     }
 
     _HTSFILE_TO_TYPE = {
@@ -44,7 +44,7 @@ class FileTypeChecker:
         "FASTA": FileType.DECOMPRESSED,
     }
 
-    def __init__(self, external: External=External()) -> None:
+    def __init__(self, external: External = External()) -> None:
         self._external = external
 
     def get_type(self, file: Path) -> FileType:

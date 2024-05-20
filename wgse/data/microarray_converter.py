@@ -5,6 +5,7 @@ class MicroarrayConverterExtensions(Enum):
     CSV = ".csv"
     TXT = ".txt"
 
+
 class MicroarrayConverterTarget(Enum):
     All = auto()
     Ancestry_v1 = auto()

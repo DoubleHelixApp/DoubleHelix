@@ -1,13 +1,13 @@
 from pathlib import Path
 
 from wgse.alignment_map.index_stats_calculator import SequenceStatistics
+from wgse.data.alignment_stats import AlignmentStats
 from wgse.data.chromosome_name_type import ChromosomeNameType
 from wgse.data.file_type import FileType
-from wgse.data.mitochondrial_name_type import MitochondrialNameType
-from wgse.data.mitochondrial_model_type import MitochondrialModelType
-from wgse.data.alignment_stats import AlignmentStats
-from wgse.data.sequence_type import SequenceType
 from wgse.data.gender import Gender
+from wgse.data.mitochondrial_model_type import MitochondrialModelType
+from wgse.data.mitochondrial_name_type import MitochondrialNameType
+from wgse.data.sequence_type import SequenceType
 from wgse.data.sorting import Sorting
 from wgse.fasta.reference import Reference
 
@@ -19,7 +19,7 @@ class AlignmentMapFileInfo:
         self.indexed: bool = None
         self.file_type: FileType = None
         self.reference_genome: Reference = None
-        self.content : SequenceType = None
+        self.content: SequenceType = None
         self.primary: bool = None
         self.mitochondrial_dna_model: MitochondrialModelType = None
         self.build: int = None

@@ -17,7 +17,7 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 python -m pip install -e .
 python main.py
-# If this is run from the terminal of an IDE, 
+# If this is run from the terminal of an IDE,
 # at this point you should restart the IDE as
 # there are some executables that are installed
 # by pip that otherwise won't be found by the IDE.

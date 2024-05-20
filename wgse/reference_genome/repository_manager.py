@@ -5,12 +5,12 @@ from wgse.alignment_map.alignment_map_header import AlignmentMapHeader
 from wgse.configuration import RepositoryConfig
 from wgse.data.genome import Genome
 from wgse.data.sequence import Sequence
-from wgse.utility.external import BgzipAction, External
 from wgse.fasta.reference import Reference
 from wgse.reference_genome.bgzip_compressor import BGZIPCompressor
 from wgse.reference_genome.decompressor import Decompressor
 from wgse.reference_genome.downloader import Downloader
 from wgse.reference_genome.genome_metadata_loader import GenomeMetadataLoader
+from wgse.utility.external import BgzipAction, External
 from wgse.utility.mt_dna import MtDNA
 from wgse.utility.sequence_orderer import SequenceOrderer
 

@@ -1,11 +1,10 @@
 import logging
-import debugpy
-import psutil
-
-
 import time
 from subprocess import Popen
 from threading import Thread
+
+import debugpy
+import psutil
 
 
 class ProcessIOMonitor(Thread):

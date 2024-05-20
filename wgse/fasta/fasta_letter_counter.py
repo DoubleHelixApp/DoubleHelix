@@ -24,22 +24,30 @@ class FASTALetterCounter:
         self._bases_progressbar = None
         if not self.genome.dict.exists():
             raise RuntimeError(f"Unable to find dictionary in {self.genome.dict.name}.")
-        self._dict :AlignmentMapHeader = AlignmentMapHeader.load_from_file(self.genome.dict)
+        self._dict: AlignmentMapHeader = AlignmentMapHeader.load_from_file(
+            self.genome.dict
+        )
         self._support_multiline_progress = "win32" == sys.platform
 
     @property
     def model_name(self):
         return self.genome.fasta
 
-    def _progress(self, name, current_sequence, total_sequences, current_position, total_position):
+    def _progress(
+        self, name, current_sequence, total_sequences, current_position, total_position
+    ):
         if tqdm is not None:
             # Windows Prompt does not support nested progress bar and there's nothing
             # that can be done about that. On Windows, just keep only one progress bar.
             if self._sequences_progressbar is None and self._support_multiline_progress:
-                self._sequences_progressbar = tqdm.tqdm(total=total_sequences, desc=f"Sequences")
+                self._sequences_progressbar = tqdm.tqdm(
+                    total=total_sequences, desc=f"Sequences"
+                )
             if self._bases_progressbar is None:
-                self._bases_progressbar = tqdm.tqdm(total=total_position, desc=f"{name}")
-            
+                self._bases_progressbar = tqdm.tqdm(
+                    total=total_position, desc=f"{name}"
+                )
+
             if current_sequence != 0 and self._support_multiline_progress:
                 self._sequences_progressbar.update(current_sequence)
             if current_position != 0:
@@ -98,7 +106,13 @@ class FASTALetterCounter:
                 )
                 sequences[current_sequence.name] = current_sequence
                 if progress is not None:
-                    progress(current_sequence.name, 1, len(self._dict.sequences), 0, current_sequence.length)
+                    progress(
+                        current_sequence.name,
+                        1,
+                        len(self._dict.sequences),
+                        0,
+                        current_sequence.length,
+                    )
                 position = 0
                 continue
 
@@ -128,7 +142,13 @@ class FASTALetterCounter:
                     current_sequence.close_run(match.end() + position)
             position += len(line)
             if progress is not None:
-                progress(current_sequence.name, 0,len(self._dict.sequences), len(line), current_sequence.length)
+                progress(
+                    current_sequence.name,
+                    0,
+                    len(self._dict.sequences),
+                    len(line),
+                    current_sequence.length,
+                )
 
         # File is terminated: close the current sequence and the open run (if any).
         if current_sequence is None:
@@ -143,7 +163,7 @@ class FASTALetterCounter:
     ) -> typing.List[LetterRunCollection]:
         if progress is False:
             progress = self._progress
-        
+
         with gzip.open(self.genome.fasta, "rt") as f:
             sequences = self._process_file(f, letter, progress)
         return sequences

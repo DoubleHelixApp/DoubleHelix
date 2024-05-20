@@ -1,4 +1,5 @@
 from enum import Flag, auto
+
 from wgse.configuration import MANAGER_CFG
 
 

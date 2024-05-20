@@ -25,21 +25,31 @@ class DepthAnalyzer:
         file = AlignmentMapFile(path, self._external)
 
         process = self._external.samtools(
-            ["depth", "-a", "-b", "C:\\Users\\Marco\\Documents\\Bioinformatics\\WGSExtractv4-dev\\reference\\xgen_plus_spikein.GRCh38.bed", str(path)], stdout=subprocess.PIPE
+            [
+                "depth",
+                "-a",
+                "-b",
+                "C:\\Users\\Marco\\Documents\\Bioinformatics\\WGSExtractv4-dev\\reference\\xgen_plus_spikein.GRCh38.bed",
+                str(path),
+            ],
+            stdout=subprocess.PIPE,
         )
         self.analyze_depth_lines(iter(process.stdout.readline, b""), file)
 
     def analyze_depth_lines(self, lines, file: AlignmentMapFile):
-        progress = tqdm.tqdm(
-            lines, total=39009164, smoothing=0)
-        
+        progress = tqdm.tqdm(lines, total=39009164, smoothing=0)
+
         stats = DepthStats()
         stats_by_name = {}
         sums_by_name = {}
 
-        stats_by_name = {bytes(x, "utf-8"): [0] * 4 for x in file.header.sequences.keys()}
-        sums_by_name = {bytes(x, "utf-8"): [0] * 4 for x in file.header.sequences.keys()}
-        
+        stats_by_name = {
+            bytes(x, "utf-8"): [0] * 4 for x in file.header.sequences.keys()
+        }
+        sums_by_name = {
+            bytes(x, "utf-8"): [0] * 4 for x in file.header.sequences.keys()
+        }
+
         for line in lines:
             line = line.split()
             name = line[0]

@@ -18,7 +18,7 @@ class SequenceSelection(QWidget):
         super().__init__(parent)
         self.sequences = QGroupBox(self)
         self.inner_layout = QVBoxLayout(self.sequences)
-        
+
         self.sequences.setTitle("Select the sequences to extract")
 
         self.setObjectName(SequenceSelection.__name__)

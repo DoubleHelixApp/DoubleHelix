@@ -1,8 +1,5 @@
-
 class Sequence:
-    def __init__(
-        self, name: str, length: int, md5: str = None
-    ) -> None:
+    def __init__(self, name: str, length: int, md5: str = None) -> None:
         self.name = name
         self.length = length
         self.md5 = md5

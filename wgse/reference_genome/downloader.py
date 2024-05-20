@@ -20,25 +20,30 @@ logging.getLogger("google").setLevel(logging.WARNING)
 HANDLERS = {}
 SIZE_HANDLERS = {}
 
+
 def uri_handler(uri):
     def decorator(f):
         global HANDLERS
         HANDLERS[uri] = f
         return f
+
     return decorator
+
 
 def size_handler(uri):
     def decorator(f):
         global SIZE_HANDLERS
         SIZE_HANDLERS[uri] = f
         return f
+
     return decorator
 
+
 class Downloader:
-    
+
     def __init__(
         self,
-        config = MANAGER_CFG.REPOSITORY,
+        config=MANAGER_CFG.REPOSITORY,
         file_type_checker: FileTypeChecker = FileTypeChecker(),
     ) -> None:
         if file_type_checker is None:
@@ -97,12 +102,12 @@ class Downloader:
 
     @size_handler("https://storage.cloud.google.com")
     @size_handler("gs://")
-    def size_google(self, genome : Genome):
-        chunk_size = 1024*1024
+    def size_google(self, genome: Genome):
+        chunk_size = 1024 * 1024
         storage_client = storage.Client.create_anonymous_client()
         uri = genome.fasta_url.strip()
         if not uri.startswith("gs://"):
-            uri = 'gs://' + uri.replace('https://storage.cloud.google.com/', '')
+            uri = "gs://" + uri.replace("https://storage.cloud.google.com/", "")
 
         blob = storage.Blob.from_string(uri, client=storage_client)
         blob.reload()
@@ -110,19 +115,19 @@ class Downloader:
 
     @uri_handler("https://storage.cloud.google.com")
     @uri_handler("gs://")
-    def download_google(self, genome : Genome, callback : any):
+    def download_google(self, genome: Genome, callback: any):
         storage_client = storage.Client.create_anonymous_client()
         uri = genome.fasta_url.strip()
         if not uri.startswith("gs://"):
-            uri = 'gs://' + uri.replace('https://storage.cloud.google.com/', '')
+            uri = "gs://" + uri.replace("https://storage.cloud.google.com/", "")
 
         blob = storage.Blob.from_string(uri, client=storage_client)
         blob.reload()
         if genome.download_size is None:
             genome.download_size = blob.size
-        
+
         target = self.pre_download_action(genome)
-        
+
         if target.exists():
             if target.stat().st_size == genome.download_size:
                 return self.post_download_action(genome, target)
@@ -166,9 +171,9 @@ class Downloader:
             genome.download_size = self.get_file_size(genome.fasta_url)
             if genome.download_size == None:
                 raise RuntimeError(f"Unable to download file {genome.fasta_url}")
-        
+
         target = self.pre_download_action(genome)
-        
+
         resume_from = None
         if target.exists():
             if target.stat().st_size == genome.download_size:

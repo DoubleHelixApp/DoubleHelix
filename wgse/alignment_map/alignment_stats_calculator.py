@@ -2,8 +2,7 @@ import logging
 import subprocess
 from math import sqrt
 
-from wgse.alignment_map.alignment_map_row import (AlignmentMapFlag,
-                                                  AlignmentMapRow)
+from wgse.alignment_map.alignment_map_row import AlignmentMapFlag, AlignmentMapRow
 from wgse.configuration import MANAGER_CFG
 from wgse.data.alignment_map_file_info import AlignmentMapFileInfo
 from wgse.data.alignment_stats import AlignmentStats

@@ -1,4 +1,3 @@
-
 from pathlib import Path
 from test.test_fasta import MockPath
 from test.utility import MockFile
@@ -11,35 +10,43 @@ from wgse.data.microarray_converter import MicroarrayConverterTarget
 from wgse.microarray.microarray_converter import MicroarrayConverter
 from wgse.microarray.microarray_line_formatter import TARGET_FORMATTER_MAP
 
-
 # def test_every_target_has_formatter():
 #     assert all(x in TARGET_FORMATTER_MAP for x in MicroarrayConverterTarget)
-    
+
+
 def test_inexistent_head_folder_raise():
     config = RepositoryConfig()
     config.metadata = MockPath(exists=False)
     microarray_templates = MockPath(exists=False, name="microarray_templates")
-    microarray_templates.joinpath = lambda x: MockPath([], False if x=="body" else True, x)
+    microarray_templates.joinpath = lambda x: MockPath(
+        [], False if x == "body" else True, x
+    )
     config.metadata.joinpath = lambda _: microarray_templates
     with pytest.raises(FileNotFoundError) as e:
         MicroarrayConverter(config)
     assert "template body"
-    
+
+
 def test_inexistent_head_folder_raise():
     config = RepositoryConfig()
     config.metadata = MockPath(exists=False)
     microarray_templates = MockPath(exists=False, name="microarray_templates")
-    microarray_templates.joinpath = lambda x: MockPath([], False if x=="head" else True, x)
+    microarray_templates.joinpath = lambda x: MockPath(
+        [], False if x == "head" else True, x
+    )
     config.metadata.joinpath = lambda _: microarray_templates
     with pytest.raises(FileNotFoundError) as e:
         MicroarrayConverter(config)
     assert "template head"
 
+
 def test_inexistent_head_folder_raise():
     config = RepositoryConfig()
     config.metadata = MockPath(exists=False)
     microarray_templates = MockPath(exists=False, name="microarray_templates")
-    microarray_templates.joinpath = lambda x: MockPath([], False if x=="body" else True, x)
+    microarray_templates.joinpath = lambda x: MockPath(
+        [], False if x == "body" else True, x
+    )
     config.metadata.joinpath = lambda _: microarray_templates
     with pytest.raises(FileNotFoundError) as e:
         MicroarrayConverter(config)
@@ -56,7 +63,7 @@ def test_inexistent_head_folder_raise():
 #     input_file = MockFile(["rs1\t1\t1\tAA"])
 #     output_file = MockFile([])
 #     output_file.write = lambda x: output_lines.append(x)
-    
+
 #     mock_open.side_effect = [input_file, output_file]
 #     mock_exists.side_effect = [True, True, True, True]
 #     mock_gzip_open.side_effect = [template_body]

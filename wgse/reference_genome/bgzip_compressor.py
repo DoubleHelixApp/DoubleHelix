@@ -1,12 +1,14 @@
 from pathlib import Path
 
-from wgse.utility.external import External
 from wgse.reference_genome.genome_metadata_loader import Genome
+from wgse.utility.external import External
 from wgse.utility.file_type_checker import FileType, FileTypeChecker
 
 
 class BGZIPCompressor:
-    def __init__(self, external: External = External(), file_type_checker = FileTypeChecker()) -> None:
+    def __init__(
+        self, external: External = External(), file_type_checker=FileTypeChecker()
+    ) -> None:
         self._type_checker = file_type_checker
         self._external = external
 

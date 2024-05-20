@@ -2,10 +2,11 @@ import enum
 import logging
 import shlex
 import subprocess
+
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
+from wgse.configuration import MANAGER_CFG
 from wgse.data.sequence_type import SequenceType
 from wgse.utility.external import External
-from wgse.configuration import MANAGER_CFG
 from wgse.utility.process_io_monitor import ProcessIOMonitor
 
 logger = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ class VariantCaller:
         repo_config=MANAGER_CFG.REPOSITORY,
         ext_config=MANAGER_CFG.EXTERNAL,
         external: External = External(),
-        progress=None
+        progress=None,
     ) -> None:
         self._external = external
         self._ext_config = ext_config
@@ -64,27 +65,31 @@ class VariantCaller:
 
         mapped_sequences = [x.mapped for x in self.current_file.file_info.index_stats]
         mapped_sequences = sum(mapped_sequences)
-        
+
         # 112 bytes seems to be the average bytes written for a single base
         self.pileup_bytes_write = (
             mapped_sequences
             * self.current_file.file_info.alignment_stats.average_length
             * 112
         )
-        
-        self._current_operation : subprocess.Popen = self._external.bcftools(
+
+        self._current_operation: subprocess.Popen = self._external.bcftools(
             pileup_opt,
             stdout=subprocess.PIPE,
             io=lambda r, w: self._progress("[1/2] Calling", self.pileup_bytes_write, w),
         )
 
-
-
         call = self._external.bcftools(call_opt, stdin=self._current_operation.stdout)
         call.communicate()
         if self._is_quitting:
             return
-        self._current_operation = self._external.tabix(tabix_opt, wait=True, io=lambda r, w: self._progress("[2/2] Indexing", output_file.stat().st_size, r),)
+        self._current_operation = self._external.tabix(
+            tabix_opt,
+            wait=True,
+            io=lambda r, w: self._progress(
+                "[2/2] Indexing", output_file.stat().st_size, r
+            ),
+        )
 
     def kill(self):
         self._is_quitting = True

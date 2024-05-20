@@ -19,7 +19,7 @@ class FASTAStatsFiles:
         self,
         fasta_file: FASTALetterCounter,
         long_run_threshold: int = 300,
-        buckets_number: int = 1000
+        buckets_number: int = 1000,
     ) -> None:
         self._long_run_threshold = long_run_threshold
         self._buckets_number = buckets_number
@@ -38,7 +38,7 @@ class FASTAStatsFiles:
                 row = f"{sequence.name}\t{index+1}\t{run.start:,}\t{run.length:,}\n"
                 lines.append(row)
         return lines
-    
+
     def load_bed(self):
         pass
 
@@ -54,7 +54,7 @@ class FASTAStatsFiles:
                 row = f"{sequence.name}\t{run.start}\t{run.start+run.length}\n"
                 lines.append(row)
         return lines
-    
+
     def load_nbuc(self):
         entries = list()
         with open(self._fasta_file.genome.nbuc, "r") as f:
@@ -62,13 +62,13 @@ class FASTAStatsFiles:
             for row in reader:
                 entries.append
                 sequence = LetterRunCollection(row[0], row[1])
-                
-                n_count= row[0]
-                NumNreg= row[0]
-                NregSizeMean= row[0]
-                NregSizeStdDev= row[0]
-                SmlNreg= row[0]
-                BuckSize= row[0]
+
+                n_count = row[0]
+                NumNreg = row[0]
+                NregSizeMean = row[0]
+                NregSizeStdDev = row[0]
+                SmlNreg = row[0]
+                BuckSize = row[0]
 
     def save_nbuc(self, sequences: typing.List[LetterRunCollection]):
         lines = [
@@ -114,16 +114,20 @@ class FASTAStatsFiles:
         with path.open("wt", encoding="utf8") as f:
             f.writelines(lines)
 
-    def _generate_files(self, sequences: typing.Dict[str, typing.List[LetterRunCollection]]):
+    def _generate_files(
+        self, sequences: typing.Dict[str, typing.List[LetterRunCollection]]
+    ):
         self._generate_file(self._fasta_file.genome.nbuc, self.save_nbuc(sequences))
         self._generate_file(self._fasta_file.genome.bed, self.save_bed(sequences))
         self._generate_file(self._fasta_file.genome.nbin, self.save_nbin(sequences))
-        
+
     def _load_files(self):
         pass
 
     def generate_stats(self):
         logging.info(f"{self._fasta_file.genome.final_name.name}: Counting Ns.")
         sequences = self._fasta_file.count_letters("N")
-        logging.info(f"{self._fasta_file.genome.final_name.name}: Finished counting Ns.")
+        logging.info(
+            f"{self._fasta_file.genome.final_name.name}: Finished counting Ns."
+        )
         self._generate_files(sequences)

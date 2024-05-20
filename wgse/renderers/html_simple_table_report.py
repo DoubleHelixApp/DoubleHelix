@@ -1,4 +1,5 @@
 from jinja2 import Environment, FileSystemLoader
+
 from wgse.configuration import MANAGER_CFG
 from wgse.data.tabular_data import TabularData
 

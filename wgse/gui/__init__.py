@@ -10,6 +10,7 @@ def main():
     widget = WGSEWindow()
     widget.show()
     sys.exit(app.exec())
-    
+
+
 if __name__ == "__main__":
     main()

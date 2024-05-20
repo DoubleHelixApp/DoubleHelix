@@ -9,7 +9,7 @@ assignees: chaplin89
 
 Hi.
 I'd like WGSE-NG to support a new reference:
-- [URL](https://url to FASTA here): 
+- [URL](https://url to FASTA here):
 - Build (e.g., 37, 38)
 
 Thank you,

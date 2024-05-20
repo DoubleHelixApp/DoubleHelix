@@ -12,7 +12,7 @@ from wgse.utility.sequence_orderer import SequenceOrderer
 
 
 class MicroarrayConverter:
-    def __init__(self, config= MANAGER_CFG.REPOSITORY) -> None:
+    def __init__(self, config=MANAGER_CFG.REPOSITORY) -> None:
         self._config = config
         self._template_folder = self._config.metadata.joinpath("microarray_templates")
         self._head_folder = self._template_folder.joinpath("head")
@@ -106,7 +106,9 @@ class MicroarrayConverter:
             for position, entry in positions.items():
                 if len(entry) != 1:
                     lines.append(f"{len(entry)},{chromosome},{position}\n")
-        print(f"Target {target.name} has a total of {len(lines)-2} duplicate coordinates.")
+        print(
+            f"Target {target.name} has a total of {len(lines)-2} duplicate coordinates."
+        )
 
         with duplicate_coords.open("wt") as file:
             file.writelines(lines)
@@ -138,8 +140,10 @@ class MicroarrayConverter:
 
         with non_sequential.open("wt") as file:
             file.writelines(lines)
-        
-        print(f"Target {target.name} has a total of {len(lines)-2} non sequential entries.")
+
+        print(
+            f"Target {target.name} has a total of {len(lines)-2} non sequential entries."
+        )
 
         lines = []
         lines.append("# Same RSID different coordinates\n")
@@ -168,8 +172,10 @@ class MicroarrayConverter:
         with same_rsid_different_c.open("wt") as file:
             file.writelines(lines)
 
-        print(f"Target {target.name} has a total of {len(lines)-2} entries with same rsID but different coordinates.")
-        
+        print(
+            f"Target {target.name} has a total of {len(lines)-2} entries with same rsID but different coordinates."
+        )
+
         lines = []
         lines.append("# Same coordinates different RSID\n")
         lines.append("# RSID,Chromosome,Position\n")
@@ -188,11 +194,13 @@ class MicroarrayConverter:
                 lines.append(
                     f"{broken_element.id},{broken_element.chromosome},{broken_element.position}\n"
                 )
-        
+
         with same_c_different_rsid.open("wt") as file:
             file.writelines(lines)
-        
-        print(f"Target {target.name} has a total of {len(lines)-2} entries with same coordinate but different rsIDs.")
+
+        print(
+            f"Target {target.name} has a total of {len(lines)-2} entries with same coordinate but different rsIDs."
+        )
 
     def convert(self, input: Path, target: MicroarrayConverterTarget):
         header_path = self._head_folder.joinpath(target.name).with_suffix(".txt")

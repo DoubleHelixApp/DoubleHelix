@@ -1,11 +1,11 @@
 import enum
 import inspect
 import logging
-from logging.handlers import TimedRotatingFileHandler
 import subprocess
-import wgse.utility.external
+from logging.handlers import TimedRotatingFileHandler
 from subprocess import Popen
 
+import wgse.utility.external
 from wgse.configuration import MANAGER_CFG
 from wgse.utility.external import External
 
@@ -56,18 +56,20 @@ class CheckPrerequisites:
         logger.setLevel(logging.DEBUG)
         for handler in logger.handlers:
             logger.removeHandler(handler)
-            
+
         formatter = logging.Formatter(
             "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         )
-        
+
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.DEBUG)
         console_handler.setFormatter(formatter)
         logger.addHandler(console_handler)
 
-        log_file = self._repo.log_path.joinpath('app.log')
-        handler = TimedRotatingFileHandler(log_file, when='midnight', interval=1, backupCount=10)
+        log_file = self._repo.log_path.joinpath("app.log")
+        handler = TimedRotatingFileHandler(
+            log_file, when="midnight", interval=1, backupCount=10
+        )
         handler.suffix = "%Y-%m-%d"
         handler.setLevel(logging.DEBUG)
         handler.setFormatter(formatter)

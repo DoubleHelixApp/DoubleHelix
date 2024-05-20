@@ -1,6 +1,7 @@
+from wgse.configuration import MANAGER_CFG
 from wgse.data.mitochondrial_model_type import MitochondrialModelType
 from wgse.data.sequence import Sequence
-from wgse.configuration import MANAGER_CFG
+
 
 class MitochondrialModel:
     def __init__(self, sequence, url, type, config=MANAGER_CFG.REPOSITORY) -> None:

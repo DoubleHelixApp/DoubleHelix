@@ -19,7 +19,7 @@ class LetterRunBuckets:
         self._long_run_threshold: int = long_run_threshold
         self._sequence: LetterRunCollection = sequence
         self.buckets = items
-        
+
         if self.buckets is None:
             self.buckets = self._make_buckets()
 
@@ -41,7 +41,7 @@ class LetterRunBuckets:
             index_bucket_start = int(math.floor(start / bucket_size))
             index_bucket_end = int(math.floor(end / bucket_size))
 
-            # Iterate over each bucket determining how many elements are in 
+            # Iterate over each bucket determining how many elements are in
             # each bucket.
             for bucket in range(index_bucket_start, index_bucket_end + 1):
                 start_bucket_offset = max(bucket * bucket_size, start)

@@ -19,10 +19,11 @@ class GenomeMetadataLoader:
     Returns:
         _type_: _description_
     """
-    
+
     class _CircularReferenceEncoder(json.JSONEncoder):
         """Helps with the serialization of metadata, ensuring
         that is serialized only what's really needed."""
+
         def __init__(self, **kwargs) -> None:
             self.seen = set()
             super().__init__()
@@ -46,15 +47,12 @@ class GenomeMetadataLoader:
                 return {k: v for k, v in obj_dict.items() if not k.startswith("_")}
             return super().default(obj)
 
-    def __init__(
-        self,
-        config= MANAGER_CFG.REPOSITORY
-    ):
+    def __init__(self, config=MANAGER_CFG.REPOSITORY):
         self._config = config
         self.genome_root = self._config.genomes
         self.references_path = self._config.metadata.joinpath("references.json")
         self.sources_path = self._config.metadata.joinpath("sources.json")
-        
+
         if not self.genome_root.is_dir():
             raise FileNotFoundError(
                 f"Unable to find {str(self.genome_root)} or is not a directory."

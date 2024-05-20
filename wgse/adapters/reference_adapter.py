@@ -24,13 +24,13 @@ class ReferenceAdapter:
         max_index = 0
         rows = []
         for key, value in ref_map.items():
-            row = [None for x in range(max_columns+1)]
+            row = [None for x in range(max_columns + 1)]
             row[0] = key
             for sequence in value:
                 if sequence.parent not in genome_index_map:
                     genome_index_map[sequence.parent] = max_index
                     headers.append(str(sequence.parent))
                     max_index += 1
-                row[genome_index_map[sequence.parent]+1] = sequence
+                row[genome_index_map[sequence.parent] + 1] = sequence
             rows.append([str(x) for x in row])
         return TabularData(headers, [TabularDataRow(None, x) for x in rows])

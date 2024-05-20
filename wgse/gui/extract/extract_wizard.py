@@ -14,7 +14,10 @@ from wgse.alignment_map.alignment_map_file import AlignmentMapFile
 from wgse.data.file_type import FileType
 from wgse.gui.extract.format_selection import ExtractTargetFormat, FormatSelection
 from wgse.gui.extract.microarray_selection import MicroarraySelection
-from wgse.gui.extract.sequence_selection import ExtractTargetSequences, SequenceSelection
+from wgse.gui.extract.sequence_selection import (
+    ExtractTargetSequences,
+    SequenceSelection,
+)
 from wgse.renderers.html_aligned_file_report import HTMLAlignedFileReport
 
 
@@ -43,7 +46,9 @@ class ExtractWizard(QDialog):
         self.next_button = QPushButton("Next", self)
         self.next_button.setObjectName("nextButton")
 
-        self._format_selection = FormatSelection(self,self.current_file.file_info.file_type)
+        self._format_selection = FormatSelection(
+            self, self.current_file.file_info.file_type
+        )
         self._sequence_selection = SequenceSelection(self)
         self._microarray_selection = MicroarraySelection(self)
 
@@ -146,7 +151,7 @@ class ExtractWizard(QDialog):
         index = selected.index(True)
         button = self._format_selection._format_options[index]
         self._target_format = ExtractTargetFormat[button.objectName()]
-        
+
         if self._target_format == ExtractTargetFormat.HTML:
             self._to_html()
         elif self._target_format == ExtractTargetFormat.Microarray:

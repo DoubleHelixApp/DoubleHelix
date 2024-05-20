@@ -58,8 +58,10 @@ class IndexStatsCalculator:
             else:
                 chromosome_type = SequenceType.Other
 
-            stats.append(SequenceStatistics(
-                chromosome_type, name, reference_length, mapped, unmapped
-            ))
+            stats.append(
+                SequenceStatistics(
+                    chromosome_type, name, reference_length, mapped, unmapped
+                )
+            )
 
         return stats

@@ -1,6 +1,7 @@
+# import sentry_sdk
+
 import wgse.gui
-from wgse.utility.check_prerequisites import (CheckPrerequisites)
-import sentry_sdk
+from wgse.utility.check_prerequisites import CheckPrerequisites
 
 
 def main():
@@ -12,6 +13,7 @@ def main():
     # )
     CheckPrerequisites().check_prerequisites()
     wgse.gui.main()
-    
+
+
 if __name__ == "__main__":
     main()

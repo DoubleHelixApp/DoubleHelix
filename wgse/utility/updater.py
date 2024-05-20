@@ -1,6 +1,6 @@
 import subprocess
 import sys
-from importlib.metadata import version 
+from importlib.metadata import version
 
 
 class Updater:
@@ -8,10 +8,7 @@ class Updater:
     def __init__(self) -> None:
         self.packages = ["WGSE-NG", "WGSE-NG-3rd-party"]
         # Package Name -> (Current v., Latest v.)
-        self.versions = {
-            x: (version(x), self.check(x))
-            for x in self.packages
-        }
+        self.versions = {x: (version(x), self.check(x)) for x in self.packages}
 
     def check(self, package_name):
         latest_version = subprocess.check_output(
@@ -24,13 +21,11 @@ class Updater:
         subprocess.check_call(
             [sys.executable, "-m", "pip", "install", "--upgrade", package_name]
         )
-        print(
-            f"Upgraded {package_name} from {versions[0]} to {versions[1]}"
-        )
-        
+        print(f"Upgraded {package_name} from {versions[0]} to {versions[1]}")
+
         sys.exit()
+
 
 if __name__ == "__main__":
     a = Updater()
     pass
-    

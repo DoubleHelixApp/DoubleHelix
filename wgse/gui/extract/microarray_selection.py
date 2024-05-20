@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+
 from wgse.microarray.microarray_converter import MicroarrayConverterTarget
 
 

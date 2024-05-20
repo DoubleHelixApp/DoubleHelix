@@ -1,4 +1,3 @@
-
 from wgse.data.read_type import ReadType
 
 

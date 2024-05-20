@@ -4,9 +4,9 @@ import time
 from pathlib import Path
 
 from wgse.data.genome import Genome
-from wgse.utility.external import External
 from wgse.fasta.fasta_letter_counter import FASTALetterCounter
 from wgse.fasta.fasta_stats_files import FASTAStatsFiles
+from wgse.utility.external import External
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(__name__)
@@ -40,21 +40,29 @@ if __name__ == "__main__":
         type=Path,
         default=None,
     )
-    parser.add_argument("--verbose", help="Set logging level", choices=["INFO", "DEBUG", "WARNING", "ERROR"], type=str, default="INFO")
+    parser.add_argument(
+        "--verbose",
+        help="Set logging level",
+        choices=["INFO", "DEBUG", "WARNING", "ERROR"],
+        type=str,
+        default="INFO",
+    )
     args = parser.parse_args()
-    
+
     logging.getLogger().setLevel(logging.__dict__[args.verbose])
 
     start = time.time()
     genome = Genome(args.reference)
-    
+
     if not genome.dict.exists():
         external = External(args.external)
         external.make_dictionary(args.reference, genome.dict)
-    
+
     fasta_file = FASTALetterCounter(genome)
     unknown_bases_stats = FASTAStatsFiles(
-        fasta_file, args.long_run_threshold, args.buckets_number,
+        fasta_file,
+        args.long_run_threshold,
+        args.buckets_number,
     )
     unknown_bases_stats.generate_stats()
     end = time.time()

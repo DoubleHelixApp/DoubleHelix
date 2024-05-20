@@ -18,7 +18,7 @@ class MockPath:
         stem="foo.fa",
         parent="bar",
         suffix=".gz",
-        files = [],
+        files=[],
         **kwargs
     ) -> None:
         self.lines = lines
@@ -26,7 +26,7 @@ class MockPath:
         self.stem = stem
         self.parent = parent
         self.suffix = suffix
-        self.files : list[MockPath] = files
+        self.files: list[MockPath] = files
         self._exists = exists
         self.__dict__.update(kwargs)
 
@@ -38,6 +38,6 @@ class MockPath:
         joined = [x for x in self.files if x.name == name]
         assert len(joined) == 1
         return joined[1]
-    
+
     def exists(self):
         return self._exists

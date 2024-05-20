@@ -10,17 +10,15 @@ from wgse.alignment_map.index_stats_calculator import (
     SequenceStatistics,
 )
 from wgse.configuration import MANAGER_CFG
+from wgse.data.alignment_map_file_info import AlignmentMapFileInfo
 from wgse.data.file_type import FileType
-from wgse.data.mitochondrial_model_type import MitochondrialModelType
-from wgse.data.alignment_map_file_info import (
-    AlignmentMapFileInfo,
-)
-from wgse.data.sequence_type import SequenceType
 from wgse.data.gender import Gender
+from wgse.data.mitochondrial_model_type import MitochondrialModelType
+from wgse.data.sequence_type import SequenceType
 from wgse.data.sorting import Sorting
-from wgse.utility.external import External
 from wgse.fasta.reference import Reference
 from wgse.reference_genome.repository_manager import RepositoryManager
+from wgse.utility.external import External
 from wgse.utility.mt_dna import MtDNA
 from wgse.utility.sequence_orderer import SequenceOrderer
 

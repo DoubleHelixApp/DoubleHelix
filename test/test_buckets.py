@@ -16,13 +16,14 @@ def test_single_bucket():
     assert 0 in sut
     assert len(sut) == 1
     assert sut[0] == 99
-    
+
+
 def test_more_run_in_single_bucket():
     # Arrange
     sequence = LetterRunCollection("Foo", 1000)
     sequence.open_run(0)
     sequence.close_run(50)
-    
+
     sequence.open_run(51)
     sequence.close_run(60)
     # Act
@@ -32,7 +33,8 @@ def test_more_run_in_single_bucket():
     assert 0 in sut
     assert len(sut) == 1
     assert sut[0] == 59
-    
+
+
 def test_run_in_multiple_buckets():
     # Arrange
     sequence = LetterRunCollection("Foo", 1000)
@@ -45,9 +47,10 @@ def test_run_in_multiple_buckets():
     assert 0 in sut
     assert 1 in sut
     assert len(sut) == 2
-    assert sut[0] == 99 # 0 -> 99
-    assert sut[1] == 50 # 99 -> 151
-    
+    assert sut[0] == 99  # 0 -> 99
+    assert sut[1] == 50  # 99 -> 151
+
+
 def test_too_many_buckets():
     sequence = LetterRunCollection("Foo", 1000)
 
@@ -59,7 +62,8 @@ def test_too_many_buckets():
 
     sut = LetterRunBuckets(sequence, 1001, 0).buckets
     assert len(sut) == 0
-    
+
+
 def test_run_end_to_end_divisible():
     sequence = LetterRunCollection("Foo", 1000)
 
@@ -79,9 +83,9 @@ def test_run_end_to_end_non_divisible():
     sut = LetterRunBuckets(sequence, 3, 0).buckets
     assert 0 in sut
     assert 1 in sut
-    assert 2 in sut    
+    assert 2 in sut
     assert 3 in sut
-    
+
     assert len(sut) == 4
     assert sut[0] == 332
     assert sut[1] == 332

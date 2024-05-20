@@ -36,6 +36,7 @@ dependencies = [
     "jinja2",
     "vcf_parser",
     "WGSE-NG-3rd-party",
+    "sentry-sdk"
 ]
 
 [project.urls]
@@ -67,3 +68,14 @@ wgse = "wgse.main:main"
 
 [tool.setuptools_scm]
 version_file = "wgse/VERSION.py"
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--strict-markers"
+testpaths = [
+    "test"
+]

@@ -36,7 +36,9 @@ def exe(f, interpreter=[]):
         f (Callable): function to decorate.
     """
 
-    def execute_binary(self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None):
+    def execute_binary(
+        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+    ):
         args = [*interpreter, shutil.which(f.__name__), *[str(x) for x in args]]
 
         if wait:
@@ -45,14 +47,16 @@ def exe(f, interpreter=[]):
             stdout = subprocess.PIPE
             stderr = subprocess.PIPE
         logger.debug(f"Calling: {shlex.join(args)}")
-        
+
         # Force windows to hide the prompt window
-        startup_info=None
+        startup_info = None
         if sys.platform == "win32":
             startup_info = subprocess.STARTUPINFO()
             startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-            
-        output = subprocess.Popen(args, stdout=stdout, stdin=stdin, stderr=stderr, startupinfo=startup_info)
+
+        output = subprocess.Popen(
+            args, stdout=stdout, stdin=stdin, stderr=stderr, startupinfo=startup_info
+        )
         if io is not None:
             monitor = ProcessIOMonitor(output, io)
             monitor.start()
@@ -220,7 +224,9 @@ class External:
                 if target.exists():
                     target.unlink()
                 if not inferred_gzi_filename.exists():
-                    raise FileNotFoundError(f"BGZIP index not found for {inferred_gzi_filename.name}")
+                    raise FileNotFoundError(
+                        f"BGZIP index not found for {inferred_gzi_filename.name}"
+                    )
                 inferred_gzi_filename.rename(target)
         return output
 
@@ -248,45 +254,61 @@ class External:
         raise FileNotFoundError()
 
     @exe
-    def samtools(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
+    def samtools(
+        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+    ):
         raise FileNotFoundError()
 
     @exe
-    def bwa(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
+    def bwa(self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None):
         raise FileNotFoundError()
 
     @exe
-    def bwamem2(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
+    def bwamem2(
+        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+    ):
         raise FileNotFoundError()
 
     @exe
-    def minimap2(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
+    def minimap2(
+        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+    ):
         raise FileNotFoundError()
 
     @exe
-    def fastp(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
+    def fastp(self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None):
         raise FileNotFoundError()
 
     @exe
-    def bcftools(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
+    def bcftools(
+        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+    ):
         raise FileNotFoundError()
 
     @exe
-    def tabix(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
+    def tabix(self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None):
         raise FileNotFoundError()
 
     @jar
-    def haplogrep(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
+    def haplogrep(
+        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+    ):
         raise FileNotFoundError()
 
     @jar
-    def FastQC(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
+    def FastQC(
+        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+    ):
         raise FileNotFoundError()
 
     @jar
-    def picard(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
+    def picard(
+        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+    ):
         raise FileNotFoundError()
 
     @jar
-    def DISCVRSeq(self, args=[], stdout=None, stdin=None, stderr=None, wait=False,io=None):
+    def DISCVRSeq(
+        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+    ):
         raise FileNotFoundError()

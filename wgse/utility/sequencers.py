@@ -16,7 +16,7 @@ class Sequencer:
 class Sequencers:
     def __init__(
         self,
-        config = MANAGER_CFG.REPOSITORY,
+        config=MANAGER_CFG.REPOSITORY,
     ) -> None:
         self._config = config
         self.data = self._load()

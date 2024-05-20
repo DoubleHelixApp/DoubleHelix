@@ -17,9 +17,7 @@ class IndexStatsAdapter:
             "Others",
             [
                 "Others",
-                sum(
-                    x.reference_length for x in stats if x.type == SequenceType.Other
-                ),
+                sum(x.reference_length for x in stats if x.type == SequenceType.Other),
                 sum(x.mapped for x in stats if x.type == SequenceType.Other),
                 sum(x.unmapped for x in stats if x.type == SequenceType.Other),
             ],

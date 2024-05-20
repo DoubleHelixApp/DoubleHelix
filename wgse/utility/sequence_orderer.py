@@ -25,7 +25,9 @@ class SequenceOrderer:
 
         """
         for sequence in self.ordered_sequences:
-            yield self.sequence_map[sequence], SequenceOrderer.convert(sequence, self.target)
+            yield self.sequence_map[sequence], SequenceOrderer.convert(
+                sequence, self.target
+            )
 
     def _get_ordered(self):
         autosome = self._get_autosome()
@@ -64,8 +66,8 @@ class SequenceOrderer:
 
     def canonicalize(sequence_name: str) -> str:
         return SequenceOrderer.convert(sequence_name, ChromosomeNameType.Number)
-    
-    def convert(input : str, target : ChromosomeNameType):
+
+    def convert(input: str, target: ChromosomeNameType):
         normalized = input.lower()
         if normalized.startswith("chr"):
             normalized = normalized.replace("chr", "", 1)
@@ -78,5 +80,7 @@ class SequenceOrderer:
         elif target == ChromosomeNameType.Number:
             return normalized
         elif target == ChromosomeNameType.Accession:
-            raise NotImplementedError("Converting to Accession is not supported at the moment.")
+            raise NotImplementedError(
+                "Converting to Accession is not supported at the moment."
+            )
         raise ValueError(f"Converting to unrecognized target format: {target.name}")

@@ -1,5 +1,7 @@
-from wgse.data.microarray_converter import (MicroarrayConverterExtensions,
-                                            MicroarrayConverterTarget)
+from wgse.data.microarray_converter import (
+    MicroarrayConverterExtensions,
+    MicroarrayConverterTarget,
+)
 
 TARGET_FORMATTER_MAP: dict[
     MicroarrayConverterTarget, tuple[callable, MicroarrayConverterExtensions]

@@ -3,12 +3,11 @@ import logging
 import multiprocessing
 from pathlib import Path
 
+import wgse
+
 # Why third_party is not recognized by the IDE?
 # See wgse/__init__.py
-from wgse import third_party
-from wgse import mtDNA
-from wgse import metadata
-import wgse
+from wgse import metadata, mtDNA, third_party
 
 logger = logging.getLogger("configuration")
 logging.getLogger().setLevel(logging.DEBUG)
@@ -81,7 +80,7 @@ class RepositoryConfig:
     def __init__(self) -> None:
         self.genomes: Path = Path(WGSEDefaults.LOCAL_FOLDER, "genomes")
         self.temporary: Path = Path(WGSEDefaults.LOCAL_FOLDER, "temp")
-        self.log_path: Path = Path(WGSEDefaults.LOCAL_FOLDER,"logs")
+        self.log_path: Path = Path(WGSEDefaults.LOCAL_FOLDER, "logs")
         self.metadata: Path = Path(metadata.__file__).parent
         self.mtdna: Path = Path(mtDNA.__file__).parent
 

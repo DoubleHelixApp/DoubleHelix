@@ -46,7 +46,7 @@ class Genome:
         # Not serialized as it depends on the config
         self.__parent_folder = parent_folder
         # Not serialized as it's populated at runtime
-        self.__parent : Build = None
+        self.__parent: Build = None
 
     @property
     def parent_folder(self):
@@ -128,4 +128,3 @@ class Genome:
 
     def __str__(self) -> str:
         return self.__repr__()
-

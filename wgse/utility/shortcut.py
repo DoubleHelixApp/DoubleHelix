@@ -1,27 +1,31 @@
 import os
-from pathlib import Path
 import platform
+from pathlib import Path
+
 try:
     from win32com.client import Dispatch
 except:
     pass
 import importlib.metadata
 
+
 class Shortcut:
     def __init__(self) -> None:
-        distribution =importlib.metadata.distribution("WGSE-NG")
+        distribution = importlib.metadata.distribution("WGSE-NG")
         entry_point = distribution.entry_points["wgse"]
         self.path = entry_point.dist.locate_file(entry_point.dist.files[0])
         self.desktop = Path.home().joinpath("Desktop")
-        
+
     def _create_win(self):
         path = str(self.desktop.joinpath("WGSE-NG.lnk"))
-        shell = Dispatch('WScript.Shell')
+        shell = Dispatch("WScript.Shell")
         shortcut = shell.CreateShortCut(path)
         shortcut.TargetPath = str(self.path)
         shortcut.WorkingDirectory = str(Path.home().joinpath("Documents"))
         shortcut.IconLocation = str(self.path)
-        shortcut.Description = "Genome file manipulation tool, https://github.com/WGSE-NG/WGSE-NG"
+        shortcut.Description = (
+            "Genome file manipulation tool, https://github.com/WGSE-NG/WGSE-NG"
+        )
         shortcut.save()
         return path
 
@@ -49,7 +53,7 @@ class Shortcut:
             file.write(desktop_entry)
         os.chmod(shortcut_path, 0o755)
         return str(shortcut_path)
-    
+
     def create(self):
         os_type = platform.system()
         if os_type == "Windows":

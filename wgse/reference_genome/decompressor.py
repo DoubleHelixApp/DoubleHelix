@@ -6,9 +6,9 @@ import typing
 import zipfile
 from pathlib import Path
 
-from wgse.utility.external import BgzipAction, External
 from wgse.reference_genome.genome_metadata_loader import Genome
-from wgse.utility.file_type_checker import FileTypeChecker, FileType
+from wgse.utility.external import BgzipAction, External
+from wgse.utility.file_type_checker import FileType, FileTypeChecker
 
 
 class Decompressor:
@@ -87,7 +87,7 @@ class Decompressor:
     def perform(self, genome: Genome, downloaded: Path = None):
         if not self.decompression_needed(genome, downloaded):
             return downloaded
-        
+
         target = downloaded.with_suffix(".fa")
         if not self.decompression_needed(genome, target):
             return target
@@ -107,7 +107,9 @@ class Decompressor:
         )
         handler(self, downloaded, target)
         if not target.exists():
-            raise RuntimeError(f"Error during the decompression of {str(genome)}. Decompressed file is not present.")
+            raise RuntimeError(
+                f"Error during the decompression of {str(genome)}. Decompressed file is not present."
+            )
 
         if genome.decompressed_size is None:
             genome.decompressed_size = target.stat().st_size

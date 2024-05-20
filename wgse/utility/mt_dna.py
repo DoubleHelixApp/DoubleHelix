@@ -1,11 +1,11 @@
 import json
-from pathlib import Path
 import re
+from pathlib import Path
 
 from wgse.configuration import MANAGER_CFG
+from wgse.data.mitochondrial_model import MitochondrialModel
 from wgse.data.mitochondrial_model_type import MitochondrialModelType
 from wgse.data.sequence import Sequence
-from wgse.data.mitochondrial_model import MitochondrialModel
 
 
 class MtDNA:
@@ -25,9 +25,7 @@ class MtDNA:
         for model in json_models:
             sequence = Sequence(model["name"], int(model["length"]), model["md5"])
             model = MitochondrialModel(
-                sequence,
-                model["url"],
-                MitochondrialModelType[model["name"]]
+                sequence, model["url"], MitochondrialModelType[model["name"]]
             )
             models.append(model)
 
@@ -39,7 +37,7 @@ class MtDNA:
                 return model
         return None
 
-    def get_by_length(self, length:int):
+    def get_by_length(self, length: int):
         for model in self.data:
             if model.sequence.length == length:
                 return model

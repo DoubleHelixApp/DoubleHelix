@@ -1,4 +1,5 @@
 import webbrowser
+
 from wgse.adapters.alignment_map_file_info_adapter import AlignmentMapFileInfoAdapter
 from wgse.adapters.alignment_stats_adapter import AlignmentStatsAdapter
 from wgse.adapters.header_adapter import HeaderAdapter
@@ -7,9 +8,8 @@ from wgse.alignment_map.alignment_map_file import AlignmentMapFile
 from wgse.configuration import MANAGER_CFG
 from wgse.renderers.html_aligned_file_report import HTMLAlignedFileReport
 
-
 if __name__ == "__main__":
-    """This script will generate a report for 
+    """This script will generate a report for
     the last file that was opened by WGSE."""
     input = MANAGER_CFG.GENERAL.last_path
     if input is None:
@@ -18,7 +18,7 @@ if __name__ == "__main__":
         exit()
     if not input.is_file():
         exit()
-    
+
     file = AlignmentMapFile(input)
 
     file_info_adapted = AlignmentMapFileInfoAdapter.adapt(file.file_info)
@@ -38,7 +38,7 @@ if __name__ == "__main__":
         header_adapted.programs,
         header_adapted.comments,
     )
-    
+
     extensions = "".join(MANAGER_CFG.GENERAL.last_path.suffixes[:-1])
     name = MANAGER_CFG.GENERAL.last_path.stem + extensions + ".html"
     target = input.with_name(name)

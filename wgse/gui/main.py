@@ -4,14 +4,21 @@ import webbrowser
 from pathlib import Path
 
 from PySide6.QtCore import QModelIndex
-from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow,
-                               QMessageBox, QTableWidgetItem, QApplication, QMainWindow)
+from PySide6.QtWidgets import (
+    QApplication,
+    QFileDialog,
+    QMainWindow,
+    QMessageBox,
+    QTableWidgetItem,
+)
 
 from wgse.adapters.alignment_stats_adapter import AlignmentStatsAdapter
-from wgse.adapters.header_adapter import (HeaderCommentsAdapter,
-                                          HeaderProgramsAdapter,
-                                          HeaderReadGroupAdapter,
-                                          HeaderSequenceAdapter)
+from wgse.adapters.header_adapter import (
+    HeaderCommentsAdapter,
+    HeaderProgramsAdapter,
+    HeaderReadGroupAdapter,
+    HeaderSequenceAdapter,
+)
 from wgse.adapters.index_stats_adapter import IndexStatsAdapter
 from wgse.adapters.reference_adapter import ReferenceAdapter
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
