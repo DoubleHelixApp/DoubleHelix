@@ -25,3 +25,4 @@ jobs:
       with:
         name: WGSE
         path: ./dist/windows/WGSE-NG.exe 
+        retention-days: 1
