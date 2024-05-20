@@ -5,12 +5,9 @@ from PySide6.QtCore import QMetaObject, Qt
 from PySide6.QtWidgets import (
     QDialog,
     QGridLayout,
-    QGroupBox,
     QPushButton,
-    QRadioButton,
     QSizePolicy,
     QSpacerItem,
-    QVBoxLayout,
 )
 
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile

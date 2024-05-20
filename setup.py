@@ -9,7 +9,6 @@ DEPENDENCIES = [
     "google-cloud-storage",
     "sphinx",
     "pytest",
-    "pyqt6",
     "pyinstaller",
     "PySide6",
     "jinja2",

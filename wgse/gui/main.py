@@ -3,10 +3,9 @@ import sys
 import webbrowser
 from pathlib import Path
 
-from PyQt6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QModelIndex
 from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow,
-                               QMessageBox, QTableWidgetItem)
+                               QMessageBox, QTableWidgetItem, QApplication, QMainWindow)
 
 from wgse.adapters.alignment_stats_adapter import AlignmentStatsAdapter
 from wgse.adapters.header_adapter import (HeaderCommentsAdapter,
