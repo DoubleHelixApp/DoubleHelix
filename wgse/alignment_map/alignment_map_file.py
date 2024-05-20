@@ -110,7 +110,7 @@ class AlignmentMapFile:
         # if io is not None:
         #     io = lambda r,w: io(r,w)
 
-        faidx = self._external.samtools(faidx_opt, stdout=subprocess.PIPE) #io=io)
+        faidx = self._external.samtools(faidx_opt, stdout=subprocess.PIPE)  # io=io)
         consensus = self._external.samtools(
             shlex.split(consensus_opt), stdin=faidx.stdout
         )
@@ -130,22 +130,24 @@ class AlignmentMapFile:
             suffixes[-1] = ".cram"
             target_opt = "-C"
             if self.file_info.reference_genome.ready_reference is None:
-                raise RuntimeError("Reference genome was not found but is mandatory for CRAM files.")
+                raise RuntimeError(
+                    "Reference genome was not found but is mandatory for CRAM files."
+                )
             reference = self.file_info.reference_genome.ready_reference.fasta
             format_dependent_opt = f'-T "{reference}"'
         elif target == FileType.SAM:
             suffixes[-1] = ".sam"
             target_opt = ""
         output = self.path.with_name(self.path.stem + "".join(suffixes))
-        
+
         view_opt = f'view {target_opt} {format_dependent_opt} "{self.path!s}" {region} -o "{output}"'
         view_opt = shlex.split(view_opt)
-        progress=None
+        progress = None
         if io is not None:
-            progress = lambda r,w: io(self.path.stat().st_size, r)
+            progress = lambda r, w: io(self.path.stat().st_size, r)
         return self._external.samtools(view_opt, io=progress)
 
-    def convert(self, target: FileType, regions = "", io=None):
+    def convert(self, target: FileType, regions="", io=None):
         if self.file_info.file_type == target:
             raise ValueError("Target and source file type for conversion are identical")
         if target == FileType.FASTA:
@@ -167,7 +169,9 @@ class AlignmentMapFile:
         file_info.reference_genome = self._repo.find(
             list(self.header.sequences.values())
         )
-        file_info.mitochondrial_dna_model = self.get_mitochondrial_dna_type(file_info.reference_genome)
+        file_info.mitochondrial_dna_model = self.get_mitochondrial_dna_type(
+            file_info.reference_genome
+        )
 
         # Compute IndexStats automatically only if it's inexpensive to do so.
         # Otherwise, let the caller explicitly request them.
@@ -184,7 +188,7 @@ class AlignmentMapFile:
         # If file is not sorted computing AlignmentStats is expensive.
         # Let the caller request them.
         if file_info.sorted == Sorting.Coordinate:
-            is_cram = file_info.file_type == FileType.CRAM 
+            is_cram = file_info.file_type == FileType.CRAM
             has_reference = file_info.reference_genome.ready_reference is not None
             if is_cram and has_reference or not is_cram:
                 calculator = AlignmentStatsCalculator(file_info)
@@ -201,7 +205,7 @@ class AlignmentMapFile:
         if "M" not in sequences:
             return MitochondrialModelType.Unknown
         mito_md5 = None
-        # If the sequence does not have MD5, we still have 
+        # If the sequence does not have MD5, we still have
         # the chance to get it from the reference genome.
         # TODO: finish this thing
         # if sequences["M"].md5 is None:
