@@ -25,7 +25,7 @@ class FASTALetterCounter:
         if not self.genome.dict.exists():
             raise RuntimeError(f"Unable to find dictionary in {self.genome.dict.name}.")
         self._dict :AlignmentMapHeader = AlignmentMapHeader.load_from_file(self.genome.dict)
-        self._support_multiline_progress = "win" not in sys.platform
+        self._support_multiline_progress = "win32" == sys.platform
 
     @property
     def model_name(self):

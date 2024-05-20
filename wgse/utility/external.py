@@ -12,7 +12,7 @@ from wgse.utility.process_io_monitor import ProcessIOMonitor
 
 logger = logging.getLogger(__name__)
 
-if "win" in sys.platform:
+if sys.platform == "win32":
     third_party = str(MANAGER_CFG.EXTERNAL.root)
     if third_party not in os.environ["PATH"]:
         os.environ["PATH"] += ";" + third_party
@@ -48,7 +48,7 @@ def exe(f, interpreter=[]):
         
         # Force windows to hide the prompt window
         startup_info=None
-        if "win" in sys.platform:
+        if sys.platform == "win32":
             startup_info = subprocess.STARTUPINFO()
             startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             
