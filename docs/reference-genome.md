@@ -1,6 +1,9 @@
 # Reference genome
 
-In some cases WGSE-NG needs to access the reference genome that was used to create an alignment-map file. Since this is information is not contained in an alignment-map file, WGSE-NG needs to deduct it somehow. The biggest hint for identifying the reference genome is the header of an alignment-map file. The header contains a list of sequences contained in the reference used to do the alignment.
+In some cases WGSE-NG needs to access the reference genome that was used to create an alignment-map file. Since this is information is not contained in an alignment-map file, WGSE-NG needs to deduct it somehow. This document explain how WGSE-NG solves this problem and what can go wrong.
+
+## Introduction
+ The biggest hint for identifying the reference genome is the header of an alignment-map file. The header contains a list of sequences contained in the reference used to do the alignment.
 
 WGSE-NG solves the issue of identifying the reference by maintaining a list of meta-information about a number of reference genomes. In this way it can identify a reference if it's present in this list. The list can be modified and new references can be suggested by using this [GitHub issue template](https://github.com/WGSE-NG/WGSE-NG/issues/new?assignees=chaplin89&labels=reference&projects=&template=add-a-new-reference.md&title=%5BReference%5D+Please+add+a+new+reference) or by submitting a PR using the instruction below.
 
