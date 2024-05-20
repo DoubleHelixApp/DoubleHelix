@@ -1,8 +1,7 @@
 # Basic-usage
 
 ## Introduction
-WGSE (pronounced _wigsee_) is a tool designed for manipulating and extracting data from files representing whole-sequenced human genomes. It provides functionality to efficiently load, parse, filter, transform, and analyze genomic data.
-The name WGSE is an acronym that stands for "Whole Genome Sequencing Extract".
+WGSE-NG is a tool designed for manipulating and extracting data from files representing whole-sequenced human genomes. It provides functionality to efficiently load, parse, filter, transform, and analyze genomic data. WGSE-NG is an attempt to re-engineering an existing tool called [WGSE](https://wgse.io). The name WGSE is an acronym that stands for "Whole Genome Sequencing Extract".
 
 ## OS support
 WGSE runs on Windows, Linux, MacOS. Follow the installation procedure below according to your OS.
