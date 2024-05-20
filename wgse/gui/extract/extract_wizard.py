@@ -15,9 +15,9 @@ from PySide6.QtWidgets import (
 
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
 from wgse.data.file_type import FileType
-from wgse.gui.format_selection import ExtractTargetFormat, FormatSelection
-from wgse.gui.microarray_selection import MicroarraySelection
-from wgse.gui.sequence_selection import ExtractTargetSequences, SequenceSelection
+from wgse.gui.extract.format_selection import ExtractTargetFormat, FormatSelection
+from wgse.gui.extract.microarray_selection import MicroarraySelection
+from wgse.gui.extract.sequence_selection import ExtractTargetSequences, SequenceSelection
 from wgse.renderers.html_aligned_file_report import HTMLAlignedFileReport
 
 
@@ -27,7 +27,7 @@ class ExtractTargetSteps(enum.Enum):
     MicroarraySelection = enum.auto()
 
 
-class ExtractDialog(QDialog):
+class ExtractWizard(QDialog):
     def __init__(self, current_file, parent=None, progress=None) -> None:
         self.current_file: AlignmentMapFile = current_file
         super().__init__(parent, Qt.WindowType.Dialog)
@@ -85,26 +85,26 @@ class ExtractDialog(QDialog):
     def _to_bam(self):
         if self.current_file is None:
             return
-        self.current_file.convert(FileType.BAM, io=self._progress)
+        self.current_file.convert(FileType.BAM, None, io=self._progress)
         self.close()
 
     def _to_sam(self):
         if self.current_file is None:
             return
-        self.current_file.convert(FileType.SAM, io=self._progress)
+        self.current_file.convert(FileType.SAM, None, io=self._progress)
         self.close()
 
     def _to_cram(self):
         if self.current_file is None:
             return
-        self.current_file.convert(FileType.CRAM, self._progress)
+        self.current_file.convert(FileType.CRAM, None, self._progress)
         self.close()
 
     def _to_fasta(self):
         if self.current_file is None:
             return
 
-        self.current_file.convert(FileType.FASTA, self._progress)
+        self.current_file.convert(FileType.FASTA, None, self._progress)
         self.close()
 
     def _to_fastq(self):

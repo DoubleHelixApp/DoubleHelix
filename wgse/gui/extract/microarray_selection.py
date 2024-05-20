@@ -17,10 +17,11 @@ class MicroarraySelection(QWidget):
         super().__init__(parent)
         self.setObjectName(MicroarraySelection.__name__)
         self.main_group_box = QGroupBox("Select microarray format", parent)
-        self.group_box_layout = QVBoxLayout(self.main_group_box)
+        self.inner_layout = QVBoxLayout(self.main_group_box)
+        self.main_layout = QVBoxLayout()
 
         self.main_group_box.setObjectName("mainGroupBox")
-        self.group_box_layout.setObjectName("mainLayout")
+        self.inner_layout.setObjectName("innerLayout")
 
         self.combined_checkboxes = None
         self.genealogy_checkboxes = None
@@ -32,12 +33,18 @@ class MicroarraySelection(QWidget):
         self.health_group = self._create_health_group_box(self.main_group_box)
         self.ancient_group = self._create_ancient_dna_group_box(self.main_group_box)
 
-        self.group_box_layout.addWidget(self.combined_group)
-        self.group_box_layout.addWidget(self.genealogy_group)
-        self.group_box_layout.addWidget(self.health_group)
-        self.group_box_layout.addWidget(self.ancient_group)
+        self.checkboxes = [
+            *self.combined_checkboxes,
+            *self.genealogy_checkboxes,
+            *self.health_checkboxes,
+            *self.ancient_dna_checkboxes,
+        ]
 
-        self.main_layout = QVBoxLayout()
+        self.inner_layout.addWidget(self.combined_group)
+        self.inner_layout.addWidget(self.genealogy_group)
+        self.inner_layout.addWidget(self.health_group)
+        self.inner_layout.addWidget(self.ancient_group)
+
         self.main_layout.addWidget(self.main_group_box)
         self.setLayout(self.main_layout)
         self.hide()

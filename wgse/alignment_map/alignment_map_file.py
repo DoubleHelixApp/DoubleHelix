@@ -138,6 +138,7 @@ class AlignmentMapFile:
         
         view_opt = f'view {target_opt} {format_dependent_opt} "{self.path!s}" {region} -o "{output}"'
         view_opt = shlex.split(view_opt)
+        progress=None
         if io is not None:
             progress = lambda r,w: io(self.path.stat().st_size, r)
         return self._external.samtools(view_opt, io=progress)

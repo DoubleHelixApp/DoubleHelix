@@ -27,7 +27,7 @@ from wgse.alignment_map.index_stats_calculator import IndexStatsCalculator
 from wgse.configuration import MANAGER_CFG
 from wgse.data.gender import Gender
 from wgse.data.sorting import Sorting
-from wgse.gui.extract import ExtractDialog
+from wgse.gui.extract.extract_wizard import ExtractWizard
 from wgse.gui.table_dialog import ListTableDialog, TableDialog
 from wgse.gui.ui_form import Ui_MainWindow
 from wgse.utility.external import External
@@ -123,10 +123,10 @@ class WGSEWindow(QMainWindow):
     def export(self):
         if self.current_file is None:
             return
-        dialog = ExtractDialog(self.current_file, progress=self._set_export_progress)
+        dialog = ExtractWizard(self.current_file, progress=self._set_export_progress)
         dialog.exec()
         self._prepare_long_operation("Exporting")
-        
+
     def _set_export_progress(self, total, current):
         if current is None:
             self._prepare_ready()
@@ -301,7 +301,7 @@ class WGSEWindow(QMainWindow):
         self.ui.progress.hide()
         self.ui.stop.setEnabled(False)
         self.ui.stop.hide()
-        self.reload()
+        self.on_open(self.current_file.path)
         self.ui.statusbar.showMessage("Ready.")
 
     def _set_index_progress(self, read_bytes, _):
@@ -312,42 +312,38 @@ class WGSEWindow(QMainWindow):
         print(int(percentage * 100))
         self.ui.progress.setValue(int(percentage * 100))
 
-    def reload(self):
-        self.ui.progress.hide()
-        self.ui.stop.hide()
-        self.ui.statusbar.showMessage("Ready")
-        self.on_open(self.current_file.path)
+    def _yn_message_box(self, title, text, info):
+        prompt = QMessageBox()
+        prompt.setWindowTitle(title)
+        prompt.setText(text)
+        if info is not None:
+            prompt.setInformativeText(info)
+        
+        buttons = QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        prompt.setStandardButtons(buttons)
+        prompt.setDefaultButton(QMessageBox.StandardButton.Yes)
+        return QMessageBox.StandardButton(prompt.exec())
 
     def _show_index_stats(self):
         if self.current_file is None:
             return
+
         if not self.current_file.file_info.indexed:
-            prompt = QMessageBox()
-            prompt.setWindowTitle("File is not indexed")
-            prompt.setText("Index stats are not available if the file is not indexed.")
-            prompt.setInformativeText(
-                "Do you want to index the file? This may take a while."
-            )
-            prompt.setStandardButtons(
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-            )
-            prompt.setDefaultButton(QMessageBox.StandardButton.No)
-            choice = QMessageBox.StandardButton(prompt.exec())
             if choice == QMessageBox.StandardButton.No:
                 return
+            choice = self._yn_message_box(
+                "File is not indexed",
+                "Index stats are not available if the file is not indexed.",
+                "Do you want to index the file? This may take a while.",
+            )
             self._do_indexing(user_informed=True)
+
         if self.current_file.file_info.index_stats is None:
-            prompt = QMessageBox()
-            prompt.setWindowTitle("Index stats not available")
-            prompt.setText("Index stats needs to be calculated for this file.")
-            prompt.setInformativeText(
-                "Do you want to calculate the stats? This may take a while."
+            choice = self._yn_message_box(
+                "Index stats not available",
+                "Index stats needs to be calculated for this file.",
+                "Do you want to calculate the stats? This may take a while.",
             )
-            prompt.setStandardButtons(
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-            )
-            prompt.setDefaultButton(QMessageBox.StandardButton.No)
-            choice = QMessageBox.StandardButton(prompt.exec())
             if choice == QMessageBox.StandardButton.No:
                 return
 
