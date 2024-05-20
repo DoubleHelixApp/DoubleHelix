@@ -75,7 +75,7 @@ line_length = 88
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "--strict-markers -p no:warnings --no-header --no-summary -x"
+addopts = "--strict-markers -p no:warnings "
 testpaths = [
     "test"
 ]
