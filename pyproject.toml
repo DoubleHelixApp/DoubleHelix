@@ -52,13 +52,9 @@ include = ["wgse", "wgse.*"]
 [tool.setuptools]
 include-package-data = true
 
-[tool.setuptools.package-data]
-"wgse.mtDNA" = ["*.*"]
-"wgse.metadata" = ["*.*"]
+[tool.setuptools.exclude-package-data]
 "wgse.metadata.microarray_templates.head" = ["*.*"]
 "wgse.metadata.microarray_templates.body" = ["*.*"]
-"wgse.metadata.bed_templates" = ["*.*"]
-"wgse.metadata.report_templates" = ["*.*"]
 
 [project.scripts]
 wgse_cli = "wgse.main:main"
