@@ -5,21 +5,14 @@ from pathlib import Path
 
 from PyQt6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QModelIndex
-from PySide6.QtWidgets import (
-    QApplication,
-    QFileDialog,
-    QMainWindow,
-    QMessageBox,
-    QTableWidgetItem,
-)
+from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow,
+                               QMessageBox, QTableWidgetItem)
 
 from wgse.adapters.alignment_stats_adapter import AlignmentStatsAdapter
-from wgse.adapters.header_adapter import (
-    HeaderCommentsAdapter,
-    HeaderProgramsAdapter,
-    HeaderReadGroupAdapter,
-    HeaderSequenceAdapter,
-)
+from wgse.adapters.header_adapter import (HeaderCommentsAdapter,
+                                          HeaderProgramsAdapter,
+                                          HeaderReadGroupAdapter,
+                                          HeaderSequenceAdapter)
 from wgse.adapters.index_stats_adapter import IndexStatsAdapter
 from wgse.adapters.reference_adapter import ReferenceAdapter
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
@@ -53,7 +46,7 @@ class WGSEWindow(QMainWindow):
         self._external = external
         self.config = config
         self.current_file = None
-        
+
         self.switch_to_main()
         self.ui.actionDocumentation.triggered.connect(self.on_doc)
         self.ui.actionOpen.triggered.connect(self.on_open)
@@ -319,7 +312,7 @@ class WGSEWindow(QMainWindow):
         prompt.setText(text)
         if info is not None:
             prompt.setInformativeText(info)
-        
+
         buttons = QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         prompt.setStandardButtons(buttons)
         prompt.setDefaultButton(QMessageBox.StandardButton.Yes)
@@ -330,13 +323,13 @@ class WGSEWindow(QMainWindow):
             return
 
         if not self.current_file.file_info.indexed:
-            if choice == QMessageBox.StandardButton.No:
-                return
             choice = self._yn_message_box(
                 "File is not indexed",
                 "Index stats are not available if the file is not indexed.",
                 "Do you want to index the file? This may take a while.",
             )
+            if choice == QMessageBox.StandardButton.No:
+                return
             self._do_indexing(user_informed=True)
 
         if self.current_file.file_info.index_stats is None:
@@ -354,46 +347,48 @@ class WGSEWindow(QMainWindow):
                 self.current_file.file_info.index_stats
             )
 
+        index_stats = self.current_file.file_info.index_stats
         dialog = TableDialog("Index Statistics", self)
-        dialog.set_data(
-            IndexStatsAdapter.adapt(self.current_file.file_info.index_stats)
-        )
+        dialog.set_data(IndexStatsAdapter.adapt(index_stats))
         dialog.exec()
 
     def _show_coverage_stats(self):
         return
 
     def _show_reference(self):
-        adapted = ReferenceAdapter.adapt(self.current_file.file_info.reference_genome)
+        if self.current_file is None:
+            return
+        reference = self.current_file.file_info.reference_genome
         dialog = TableDialog("Reference genome", self)
-        dialog.set_data(adapted)
+        dialog.set_data(ReferenceAdapter.adapt(reference))
         dialog.exec()
 
     def _show_alignment_stats(self):
         if self.current_file is None:
             return
+        alignment_stats = self.current_file.file_info.alignment_stats
         dialog = TableDialog("Alignment statistics", self)
-        dialog.set_data(
-            AlignmentStatsAdapter.adapt(self.current_file.file_info.alignment_stats)
-        )
+        dialog.set_data(AlignmentStatsAdapter.adapt(alignment_stats))
         dialog.exec()
 
     def _show_header(self):
         if self.current_file is None:
             return
 
+        sequences = self.current_file.header.sequences.values()
+        programs = self.current_file.header.programs
+        read_groups = self.current_file.header.read_groups
+        comments = self.current_file.header.comments
+
         dialog = ListTableDialog("Header", self)
-        data = {
-            "Sequences": HeaderSequenceAdapter.adapt(
-                self.current_file.header.sequences.values()
-            ),
-            "Programs": HeaderProgramsAdapter.adapt(self.current_file.header.programs),
-            "Read groups": HeaderReadGroupAdapter.adapt(
-                self.current_file.header.read_groups
-            ),
-            "Comments": HeaderCommentsAdapter.adapt(self.current_file.header.comments),
-        }
-        dialog.set_data(data)
+        dialog.set_data(
+            {
+                "Sequences": HeaderSequenceAdapter.adapt(sequences),
+                "Programs": HeaderProgramsAdapter.adapt(programs),
+                "Read groups": HeaderReadGroupAdapter.adapt(read_groups),
+                "Comments": HeaderCommentsAdapter.adapt(comments),
+            }
+        )
         dialog.exec()
 
     def _gender_determined(self, gender: Gender):
