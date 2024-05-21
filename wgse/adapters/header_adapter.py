@@ -1,7 +1,11 @@
-from wgse.alignment_map.alignment_map_header import (
-    AlignmentMapHeader,
+from wgse.alignment_map.alignment_map_header import AlignmentMapHeader
+from wgse.data.alignment_map.alignment_map_header_program import (
     AlignmentMapHeaderProgram,
+)
+from wgse.data.alignment_map.alignment_map_header_read_group import (
     AlignmentMapHeaderReadGroup,
+)
+from wgse.data.alignment_map.alignment_map_header_sequence import (
     AlignmentMapHeaderSequence,
 )
 from wgse.data.tabular_data import TabularData, TabularDataRow

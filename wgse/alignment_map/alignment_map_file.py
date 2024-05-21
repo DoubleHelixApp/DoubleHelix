@@ -10,7 +10,7 @@ from wgse.alignment_map.index_stats_calculator import (
     SequenceStatistics,
 )
 from wgse.configuration import MANAGER_CFG
-from wgse.data.alignment_map_file_info import AlignmentMapFileInfo
+from wgse.data.alignment_map.alignment_map_file_info import AlignmentMapFileInfo
 from wgse.data.file_type import FileType
 from wgse.data.gender import Gender
 from wgse.data.mitochondrial_model_type import MitochondrialModelType

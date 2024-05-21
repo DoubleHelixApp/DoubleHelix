@@ -4,14 +4,12 @@ from math import sqrt
 
 from wgse.alignment_map.alignment_map_row import AlignmentMapFlag, AlignmentMapRow
 from wgse.configuration import MANAGER_CFG
-from wgse.data.alignment_map_file_info import AlignmentMapFileInfo
+from wgse.data.alignment_map.alignment_map_file_info import AlignmentMapFileInfo
 from wgse.data.alignment_stats import AlignmentStats
 from wgse.data.file_type import FileType
 from wgse.data.read_type import ReadType
 from wgse.utility.external import External
 from wgse.utility.sequencers import Sequencers
-
-logger = logging.getLogger(__name__)
 
 
 class AlignmentStatsCalculator:
@@ -21,11 +19,13 @@ class AlignmentStatsCalculator:
         config=MANAGER_CFG.ALIGNMENT_STATS,
         external: External = External(),
         sequencers: Sequencers = Sequencers(),
+        logger=logging.getLogger(__name__),
     ) -> None:
         self.aligned_file = path
         self._config = config
         self._external = external
         self._sequencers = sequencers
+        self._logger = logger
 
     def get_stats(self):
         samples = self._read_samples(self._config.skip, self._config.samples)
@@ -72,7 +72,7 @@ class AlignmentStatsCalculator:
         considered_samples = 0
 
         if len(samples) == 0:
-            logger.error("Cannot compute alignment stats as the file is empty")
+            self._logger.error("Cannot compute alignment stats as the file is empty")
             return
 
         # Process the template name for 1st sample to determine the sequencer
@@ -146,22 +146,22 @@ class AlignmentStatsCalculator:
             read_type = ReadType.Single
 
         if count_length <= 2:
-            logger.error(
+            self._logger.error(
                 "Unable to compute read length stats as the number of valid samples is less than 2."
             )
             return None
         if count_insert_size <= 2 and read_type == ReadType.Paired:
-            logger.error(
+            self._logger.error(
                 "Unable to compute insert size stats as the number of valid samples is less than 2."
             )
             return None
         if count_quality <= 2:
-            logger.error(
+            self._logger.error(
                 "Unable to compute alignment quality stats as the number of valid samples is less than 2."
             )
             return None
         if read_type == ReadType.Unknown:
-            logger.error(
+            self._logger.error(
                 "Unable to determine read type as there's a similar number of single vs paired reads."
             )
             return None

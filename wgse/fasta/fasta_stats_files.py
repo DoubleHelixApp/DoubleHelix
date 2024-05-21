@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# coding: utf8
 import csv
 import logging
 import math
@@ -125,9 +123,7 @@ class FASTAStatsFiles:
         pass
 
     def generate_stats(self):
-        logging.info(f"{self._fasta_file.genome.final_name.name}: Counting Ns.")
+        logging.info(f"{self._fasta_file.genome!s}: Counting Ns.")
         sequences = self._fasta_file.count_letters("N")
-        logging.info(
-            f"{self._fasta_file.genome.final_name.name}: Finished counting Ns."
-        )
+        logging.info(f"{self._fasta_file.genome!s}: Finished counting Ns.")
         self._generate_files(sequences)

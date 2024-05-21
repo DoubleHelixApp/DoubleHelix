@@ -5,8 +5,6 @@ from collections import OrderedDict
 from wgse.data.genome import Genome
 from wgse.data.sequence import Sequence
 
-logger = logging.getLogger(__name__)
-
 
 class ReferenceStatus(enum.Enum):
     Available = enum.auto()
@@ -18,13 +16,18 @@ class ReferenceStatus(enum.Enum):
 class Reference:
     """This class represent a reference genome."""
 
-    def __init__(self, reference_map: OrderedDict[Sequence, list[Sequence]]):
+    def __init__(
+        self,
+        reference_map: OrderedDict[Sequence, list[Sequence]],
+        logger=logging.getLogger(__name__),
+    ):
+        self._logger = logger
         self.reference_map = reference_map
         self._genome_map = self._index_by_genome()
         self.matching: list[Genome] = self._get_matching_genomes()
         self.build = set(x.build for x in self.matching)
         if len(self.build) > 1:
-            logger.warn(
+            self._logger.warn(
                 "Found more than one valid builds for the reference of the file. "
                 + "This is likely an issue with the reference genome metadata. "
                 + "Please open a bug report."
@@ -108,7 +111,7 @@ class Reference:
                     matching = False
                     break
             if matching:
-                logger.info(f"{genome!s} is a perfect match.")
+                self._logger.info(f"{genome!s} is a perfect match.")
                 match_list.append(genome)
         return match_list
 

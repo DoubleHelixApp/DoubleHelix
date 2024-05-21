@@ -1,14 +1,9 @@
-from pathlib import Path
 from test.test_fasta import MockPath
-from test.utility import MockFile
-from unittest.mock import patch
 
 import pytest
 
 from wgse.configuration import RepositoryConfig
-from wgse.data.microarray_converter import MicroarrayConverterTarget
 from wgse.microarray.microarray_converter import MicroarrayConverter
-from wgse.microarray.microarray_line_formatter import TARGET_FORMATTER_MAP
 
 # def test_every_target_has_formatter():
 #     assert all(x in TARGET_FORMATTER_MAP for x in MicroarrayConverterTarget)

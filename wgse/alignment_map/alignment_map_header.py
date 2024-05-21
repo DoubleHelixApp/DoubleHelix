@@ -3,65 +3,21 @@ import typing
 from collections import OrderedDict
 from pathlib import Path
 
+from wgse.data.alignment_map.alignment_map_header_metadata import (
+    AlignmentMapHeaderMetadata,
+)
+from wgse.data.alignment_map.alignment_map_header_program import (
+    AlignmentMapHeaderProgram,
+)
+from wgse.data.alignment_map.alignment_map_header_read_group import (
+    AlignmentMapHeaderReadGroup,
+)
+from wgse.data.alignment_map.alignment_map_header_sequence import (
+    AlignmentMapHeaderSequence,
+)
 from wgse.data.chromosome_name_type import ChromosomeNameType
 from wgse.data.mitochondrial_name_type import MitochondrialNameType
 from wgse.data.sorting import Sorting
-
-
-class AlignmentMapHeaderProgram:
-    def __init__(self) -> None:
-        self.id: str = None
-        self.name: str = None
-        self.command_line: str = None
-        self.previous: AlignmentMapHeaderProgram = None
-        self.description: str = None
-        self.program_version: str = None
-
-
-class AlignmentMapHeaderSequence:
-    def __init__(self) -> None:
-        self.name: str = None
-        self.length: int = None
-        self.md5: str = None
-        self.uri: str = None
-        self.alternate_locus: str = None
-        self.molecule_topology: str = None
-        self.species: str = None
-        self.alternative_names: str = None
-        self.genome_assembly_identifier: str = None
-        self.description: str = None
-
-    def __str__(self) -> str:
-        return f"{self.name}: Length {self.length}bp, MD5: {self.md5}"
-
-    def __repr__(self) -> str:
-        return self.__str__()
-
-
-class AlignmentMapHeaderReadGroup:
-    def __init__(self) -> None:
-        self.id: str = None
-        self.barcode: str = None
-        self.sequencing_center: str = None
-        self.description: str = None
-        self.date: str = None
-        self.flow_order: str = None
-        self.key_sequence: str = None
-        self.library: str = None
-        self.programs: str = None
-        self.predicted_median_insert_size: int = None
-        self.platform: str = None
-        self.platform_model: str = None
-        self.platform_unit: str = None
-        self.sample: str = None
-
-
-class AlignmentMapHeaderMetadata:
-    def __init__(self) -> None:
-        self.version: str = None
-        self.sorted: Sorting = None
-        self.grouping: str = None
-        self.subsorting: str = None
 
 
 class AlignmentMapHeader:

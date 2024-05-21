@@ -5,11 +5,7 @@ import subprocess
 
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
 from wgse.configuration import MANAGER_CFG
-from wgse.data.sequence_type import SequenceType
 from wgse.utility.external import External
-from wgse.utility.process_io_monitor import ProcessIOMonitor
-
-logger = logging.getLogger(__name__)
 
 
 class VariantCallingType(enum.Enum):
@@ -25,6 +21,7 @@ class VariantCaller:
         ext_config=MANAGER_CFG.EXTERNAL,
         external: External = External(),
         progress=None,
+        logger=logging.getLogger(__name__),
     ) -> None:
         self._external = external
         self._ext_config = ext_config
@@ -32,6 +29,7 @@ class VariantCaller:
         self._is_quitting = False
         self._current_operation = None
         self._progress = progress
+        self._logger = logger
 
     def call(self, aligned_file: AlignmentMapFile, type=VariantCallingType.Both):
         if aligned_file.file_info.index_stats is None:
@@ -40,7 +38,7 @@ class VariantCaller:
             raise RuntimeError("Reference cannot be None for variant calling")
         self.current_file = aligned_file
         reference = str(aligned_file.file_info.reference_genome.ready_reference.fasta)
-        logger.info(
+        self._logger.info(
             f"Calling variants with {aligned_file.file_info.reference_genome.ready_reference}"
         )
         input_file = aligned_file.path

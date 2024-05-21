@@ -1,4 +1,4 @@
-from wgse.data.alignment_map_file_info import AlignmentMapFileInfo
+from wgse.data.alignment_map.alignment_map_file_info import AlignmentMapFileInfo
 from wgse.data.tabular_data import TabularData, TabularDataRow
 
 
