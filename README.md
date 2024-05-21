@@ -17,24 +17,20 @@ This is my attempt to improve [WGSE](https://github.com/WGSExtract/WGSExtract-De
 
 ### Launch
 The only currently supported way to install `WGSE-NG` is with a pypi package.
-This require python and pip installed. The procedure is the same on every supported OSs. Note WGSE-NG is still in alpha state and many things are not working or they may broke unexpectedly.
+This require python and pip installed. The procedure is the same on every supported OSs. Note WGSE-NG is still in alpha state and many things are not working or they may broke unexpectedly. A long term goal is get a [pyinstaller]() executable/installer for each supported platform. As of today, the GitHub action is there but it build a broken executable (and is for windows only).
 
 ```bash
+sudo apt install libqt6waylandclient6 samtools bcftools -y # Only for Linux
 python -m pip install wgse-ng
 wgse
 ```
+
+NOTE: on Windows all the executables needed beside WGSE-NG are shipped with another PyPI package upon which WGSE-NG depends. Installing through `pip` is hence sufficient to get `wgse-ng` working. On Linux `wgse-ng` expects all the executables to be available under `PATH`, consequentely there may be dependencies that need to be installed manually. The snippet above provide the dependencies list for Ubuntu, on other distro the command may change.
 
 ### Development
 This section explain how to configure WGSE-NG for development.
 
 _Note: The best experience for developing is with [VS Code](https://code.visualstudio.com/) as this project already contains sensible settings for VS code._
-
-This repository uses [pre-commit](https://pre-commit.com/#intro) to ensure linting, formatting, and isort are executed before commit.
-Its usage is optional but highly recommended. To install
-```
-python -m pip install pre-commit
-pre-commit install
-```
 
 #### Windows
 ```bash
@@ -54,6 +50,14 @@ python -m venv .venv
 source ./.venv/bin/activate
 python -m pip install -e .
 wgse
+```
+
+#### pre-commit 
+This repository uses [pre-commit](https://pre-commit.com/#intro) to ensure linting, formatting, and isort are executed before commit.
+Its usage is optional but highly recommended. To install
+```
+python -m pip install pre-commit
+pre-commit install
 ```
 
 ## Troubleshooting
