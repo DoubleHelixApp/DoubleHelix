@@ -10,6 +10,7 @@ class ReferenceStatus(enum.Enum):
     Available = enum.auto()
     Downloadable = enum.auto()
     Buildable = enum.auto()
+    Ambiguous = enum.auto()
     Unknown = enum.auto()
 
 
@@ -25,7 +26,18 @@ class Reference:
         self.reference_map = reference_map
         self._genome_map = self._index_by_genome()
         self.matching: list[Genome] = self._get_matching_genomes()
-        self.build = set(x.build for x in self.matching)
+        sorted = list([x for x in self._genome_map.keys() if x is not None])
+        sorted.sort(
+            key=lambda x: len(
+                [y for y in self._genome_map[x].values() if y is not None]
+            )
+        )
+        self.build = []
+        if len(self.matching) > 0:
+            self.build = set(x.build for x in self.matching)
+        elif len(sorted) > 0:
+            self.build = [f"Likely {sorted[-1].build}"]
+
         if len(self.build) > 1:
             self._logger.warn(
                 "Found more than one valid builds for the reference of the file. "
@@ -72,19 +84,11 @@ class Reference:
                     genome_map[parent] = {x: None for x in parent.sequences}
             for match in reference_match:
                 genome_map[match.parent][match] = query
-
-        # Remove genomes that match only by 1 sequence.
-        # It's likely to be an mtDNA sequence and it can create
-        # a lot of noise. We don't care about them anyway as
-        # MtDNA sequences are shipped with the software itself.
-        # TODO: improve this procedure to make sure we're really
-        # removing an MtDNA sequence and not a random one.
-        genome_map_no_mitochondrial = {}
-        for key, value in genome_map.items():
-            valid = len([x for x in value.values() if x is not None])
-            if valid > 1:
-                genome_map_no_mitochondrial[key] = value
-        return genome_map_no_mitochondrial
+            if len(reference_match) == 0:
+                if None not in genome_map:
+                    genome_map[None] = []
+                genome_map[None].append(query)
+        return genome_map
 
     def _get_matching_genomes(self):
         """Return a list of genomes that are guaranteed to match the input sequence
@@ -94,6 +98,12 @@ class Reference:
             list[Genome]: list of matching genomes.
         """
         match_list = []
+        # None is a special key for all the sequences
+        # that have 0 matches among all the known references.
+        # If None is in _genome_map means we didn't find a
+        # reference and is not possible to build it.
+        if None in self._genome_map:
+            return match_list
         for genome, matches in self._genome_map.items():
             matching = True
             for genome_sequence, query_sequence in matches.items():

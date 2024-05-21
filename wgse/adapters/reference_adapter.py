@@ -22,7 +22,7 @@ class ReferenceAdapter:
         max_index = 0
         rows = []
         for key, value in ref_map.items():
-            row = [None for x in range(max_columns + 1)]
+            row = [None for x in range(max_columns + 2)]
             row[0] = key
             for sequence in value:
                 if sequence.parent not in genome_index_map:
