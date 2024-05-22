@@ -117,7 +117,7 @@ class Reference:
                     if genome_sequence.md5 != query_sequence.md5:
                         matching = False
                         break
-                if query_sequence.length != query_sequence.length:
+                if genome_sequence.length != query_sequence.length:
                     matching = False
                     break
             if matching:

@@ -55,7 +55,60 @@ def test_genome_is_superset():
         ]
     )
 
-    assert Reference(query_sequences).status == ReferenceStatus.Buildable
+    ref = Reference(query_sequences)
+    assert ref.status == ReferenceStatus.Buildable
+    assert len(ref.matching) == 0
+
+
+def test_genome_has_different_md5():
+    genome_1 = Genome("https://reference_1.com/fasta.fa", source="Fake", build="38")
+    sequences_1 = [
+        Sequence("chr1", 123, "a", genome_1),
+    ]
+
+    genome_1.sequences = sequences_1
+
+    query_sequences = OrderedDict(
+        [
+            (Sequence("chr1", 123, "b"), [sequences_1[0]]),
+        ]
+    )
+
+    assert len(Reference(query_sequences).matching) == 0
+
+
+def test_genome_has_different_length():
+    genome_1 = Genome("https://reference_1.com/fasta.fa", source="Fake", build="38")
+    sequences_1 = [
+        Sequence("chr1", 122, "a", genome_1),
+    ]
+
+    genome_1.sequences = sequences_1
+
+    query_sequences = OrderedDict(
+        [
+            (Sequence("chr1", 123, None), [sequences_1[0]]),
+        ]
+    )
+
+    assert len(Reference(query_sequences).matching) == 0
+
+
+def test_genome_has_different_length_and_md5():
+    genome_1 = Genome("https://reference_1.com/fasta.fa", source="Fake", build="38")
+    sequences_1 = [
+        Sequence("chr1", 123, "a", genome_1),
+    ]
+
+    genome_1.sequences = sequences_1
+
+    query_sequences = OrderedDict(
+        [
+            (Sequence("chr1", 122, "b"), [sequences_1[0]]),
+        ]
+    )
+
+    assert len(Reference(query_sequences).matching) == 0
 
 
 def test_no_matches():
