@@ -1,4 +1,5 @@
 import logging
+import pickle
 import shlex
 import subprocess
 from pathlib import Path
@@ -48,6 +49,7 @@ class AlignmentMapFile:
             raise RuntimeError(f"Unrecognized file extension: {path.name}")
 
         self.path: Path = path
+        self.meta_file: Path = self.path.with_suffix(".pickle")
         self._repo = repository
         self._external = external
         self._mtdna = mtdna
@@ -154,7 +156,31 @@ class AlignmentMapFile:
             self._to_fastq(io=io)
         return self._to_alignment_map(target, regions, io=io)
 
+    def load_meta(self):
+        try:
+            if self.meta_file.exists():
+                with self.meta_file.open("rb") as f:
+                    return pickle.load(f)
+        except Exception as e:
+            logger.error(
+                f"Error when loading meta-information for {self.meta_file.name}: {e!s}"
+            )
+        return None
+
+    def save_meta(self):
+        try:
+
+            with self.meta_file.open("wb") as f:
+                pickle.dump(self.file_info, f)
+        except Exception as e:
+            logger.error(
+                f"Error when saving meta-information for {self.meta_file.name}: {e!s}"
+            )
+
     def _initialize_file_info(self):
+        meta = self.load_meta()
+        if meta is not None:
+            return meta
         file_info = AlignmentMapFileInfo()
         file_info.path = self.path
         file_info.file_type = AlignmentMapFile.SUPPORTED_FILES[self.path.suffix.lower()]
@@ -191,6 +217,7 @@ class AlignmentMapFile:
             if is_cram and has_reference or not is_cram:
                 calculator = AlignmentStatsCalculator(file_info)
                 file_info.alignment_stats = calculator.get_stats()
+        self.save_meta()
         return file_info
 
     def get_mitochondrial_dna_type(self, reference: Reference):

@@ -53,6 +53,8 @@ class TableDialog(QDialog):
 
 
 class ListTableDialog(TableDialog):
+    """A simple dialog that is showing a list and a table"""
+
     def __init__(self, title="Dialog", parent=None, f=Qt.WindowType.Dialog) -> None:
         super().__init__(title, parent, f)
         self.itemList = QComboBox(self)

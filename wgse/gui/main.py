@@ -24,7 +24,6 @@ from wgse.adapters.reference_adapter import ReferenceAdapter
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
 from wgse.alignment_map.index_stats_calculator import IndexStatsCalculator
 from wgse.configuration import MANAGER_CFG
-from wgse.data.gender import Gender
 from wgse.data.sorting import Sorting
 from wgse.gui.extract.extract_wizard import ExtractWizard
 from wgse.gui.table_dialog import ListTableDialog, TableDialog
@@ -120,9 +119,9 @@ class WGSEWindow(QMainWindow):
     def export(self):
         if self.current_file is None:
             return
-        self._prepare_long_operation("Exporting")
         dialog = ExtractWizard(self.current_file, progress=self._set_export_progress)
         dialog.exec()
+        self._prepare_long_operation("Exporting")
 
     def _set_export_progress(self, total, current):
         if current is None:
@@ -184,10 +183,12 @@ class WGSEWindow(QMainWindow):
         if not info.indexed:
             indexed_string += " (Click to index)"
             gender_string += " (File is not indexed)"
-        else:
-            self._gender_determined(info.gender)
         click_to_open = "(Click here to open)"
 
+        reference_str = (
+            f"{info.reference_genome.build}, {info.reference_genome.status.name} "
+        )
+        reference_str += f"(Click for details)"
         size = self.current_file.path.stat().st_size
         size /= 1024**3
         size = f"{size:.1f} GB"
@@ -197,10 +198,7 @@ class WGSEWindow(QMainWindow):
             ("Filename", str(self.current_file.path.name)),
             ("Size", size),
             ("File Type", info.file_type.name),
-            (
-                "Reference",
-                f"{info.reference_genome.build} ({info.reference_genome.status.name})",
-            ),
+            ("Reference", reference_str),
             ("Gender", gender_string),
             ("Sorted", sorted_string),
             ("Indexed", indexed_string),
@@ -352,6 +350,7 @@ class WGSEWindow(QMainWindow):
             self.current_file.file_info.gender = self.current_file.get_gender(
                 self.current_file.file_info.index_stats
             )
+            self.current_file.save_meta()
 
         index_stats = self.current_file.file_info.index_stats
         dialog = TableDialog("Index Statistics", self)
@@ -396,6 +395,3 @@ class WGSEWindow(QMainWindow):
             }
         )
         dialog.exec()
-
-    def _gender_determined(self, gender: Gender):
-        pass

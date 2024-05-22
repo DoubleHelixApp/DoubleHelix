@@ -4,9 +4,10 @@ from wgse.fasta.reference import Reference
 
 class ReferenceAdapter:
     def adapt(stats: Reference):
-        # We've at least a match, build a table with it
         ref_map = {}
         if len(stats.matching) > 0:
+            # If We've at least a perfect match,
+            # build a table with it
             for match in stats.matching:
                 for key, value in stats.reference_map.items():
                     for sequence in value:
@@ -15,6 +16,8 @@ class ReferenceAdapter:
                                 ref_map[key] = []
                             ref_map[key].append(sequence)
         else:
+            # Otherwise, consider every reference that
+            # matches at least by one sequence
             ref_map = stats.reference_map
         max_columns = max([len(x) for x in ref_map.values()])
         genome_index_map = {}

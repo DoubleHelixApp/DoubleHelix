@@ -26,7 +26,7 @@ class SimpleWorker(Thread):
     def kill(self):
         process = self.process
         if process is None:
-            logging.debug("Trying to kill a SimpleWorker but there's nothing to kill.")
+            logging.error("Trying to kill a SimpleWorker but there's nothing to kill.")
             return
         if not isinstance(process, Popen):
             raise RuntimeError("Trying to kill a process that is not a Popen object.")
