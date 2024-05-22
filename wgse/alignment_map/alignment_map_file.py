@@ -67,11 +67,11 @@ class AlignmentMapFile:
             reference = self.file_info.reference_genome.ready_reference
             if reference is None:
                 raise FileNotFoundError(
-                    f"Reference genome was not found but is mandatory for CRAM files"
+                    "Reference genome was not found but is mandatory for CRAM files"
                 )
             format_dependent_opt = f'-C -T "{reference.fasta!s}"'
         elif self.file_info.file_type == FileType.BAM:
-            format_dependent_opt = f"-b"
+            format_dependent_opt = "-b"
 
         output = self.path.with_stem(f"{self.path.stem}_{percentage}_percent")
         input = self.path
@@ -144,7 +144,7 @@ class AlignmentMapFile:
         view_opt = shlex.split(view_opt)
         progress = None
         if io is not None:
-            progress = lambda r, w: io(self.path.stat().st_size, r)
+            progress = lambda r, w: io(self.path.stat().st_size, r)  # NOQA
         return self._external.samtools(view_opt, io=progress)
 
     def convert(self, target: FileType, regions="", io=None):
@@ -244,7 +244,7 @@ class AlignmentMapFile:
         return model.type
 
     def _indexed(self, type=None):
-        if type == None:
+        if type is None:
             type = self.file_info.file_type
 
         file = str(self.path)

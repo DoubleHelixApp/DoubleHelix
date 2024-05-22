@@ -60,7 +60,7 @@ def exe(f, interpreter=[]):
         if io is not None:
             monitor = ProcessIOMonitor(output, io)
             monitor.start()
-        if wait == True:
+        if wait is True:
             out, err = output.communicate()
             if output.returncode != 0:
                 raise RuntimeError(f"Call to {f.__name__} failed: {err.decode()}")

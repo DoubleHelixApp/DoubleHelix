@@ -103,7 +103,6 @@ class Downloader:
     @size_handler("https://storage.cloud.google.com")
     @size_handler("gs://")
     def size_google(self, genome: Genome):
-        chunk_size = 1024 * 1024
         storage_client = storage.Client.create_anonymous_client()
         uri = genome.fasta_url.strip()
         if not uri.startswith("gs://"):
@@ -169,7 +168,7 @@ class Downloader:
     def download_pycurl(self, genome: Genome, callback: any):
         if genome.download_size is None:
             genome.download_size = self.get_file_size(genome.fasta_url)
-            if genome.download_size == None:
+            if genome.download_size is None:
                 raise RuntimeError(f"Unable to download file {genome.fasta_url}")
 
         target = self.pre_download_action(genome)

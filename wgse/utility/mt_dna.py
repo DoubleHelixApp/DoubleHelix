@@ -1,6 +1,4 @@
 import json
-import re
-from pathlib import Path
 
 from wgse.configuration import MANAGER_CFG
 from wgse.data.mitochondrial_model import MitochondrialModel

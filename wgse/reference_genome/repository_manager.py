@@ -12,7 +12,6 @@ from wgse.reference_genome.downloader import Downloader
 from wgse.reference_genome.genome_metadata_loader import GenomeMetadataLoader
 from wgse.utility.external import BgzipAction, External
 from wgse.utility.mt_dna import MtDNA
-from wgse.utility.sequence_orderer import SequenceOrderer
 
 
 class RepositoryManager:
@@ -103,18 +102,18 @@ class RepositoryManager:
         if genome.fai_url is None:
             fai_url = genome.fasta_url + ".fai"
             fai_size = self._downloader.get_file_size(fai_url)
-            if fai_size != None:
+            if fai_size is not None:
                 genome.fai_url = fai_url
 
         if genome.gzi_url is None:
             gzi_url = genome.fasta_url + ".gzi"
             gzi_size = self._downloader.get_file_size(gzi_url)
-            if gzi_size != None:
+            if gzi_size is not None:
                 genome.gzi_url = gzi_url
 
         if genome.download_size is None:
             size = self._downloader.get_file_size(genome.fasta_url)
-            if size != None:
+            if size is not None:
                 genome.download_size = size
             else:
                 raise RuntimeError(
@@ -188,10 +187,10 @@ class RepositoryManager:
     def ingest(
         self, url: str = None, source: str = None, build: str = None, force=False
     ):
-        logging.info(f"Ingesting {genome}.")
         genome = Genome(
             url, source=source, build=build, parent_folder=self._config.genomes
         )
+        logging.info(f"Ingesting {genome}.")
         genome = self.download(genome, force)
         genome.sequences = self._get_sequences(genome)
         return genome

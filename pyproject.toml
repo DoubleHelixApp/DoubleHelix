@@ -67,7 +67,7 @@ version_file = "wgse/VERSION.py"
 
 [tool.isort]
 profile = "black"
-line_length = 88
+line_length = 120
 
 [tool.pytest.ini_options]
 minversion = "6.0"

@@ -85,7 +85,7 @@ class WGSEWindow(QMainWindow):
     def variant_calling(self):
         if self.current_file is None:
             return
-        self._prepare_long_operation(f"Variant calling.")
+        self._prepare_long_operation("Variant calling.")
         self._long_operation = VariantCaller(progress=self._set_calling_progress)
         self._worker = SimpleWorker(
             self._long_operation.call,
@@ -151,7 +151,7 @@ class WGSEWindow(QMainWindow):
             type += "Unaligned file (*.fastq);;"
             type += "References (*.fa *.gz *.fna *.fasta)"
             last_path = str(Path.home())
-            if self.config.last_path != None:
+            if self.config.last_path is not None:
                 if self.config.last_path.is_dir():
                     last_path = str(self.config.last_path)
                 else:
@@ -190,7 +190,7 @@ class WGSEWindow(QMainWindow):
         reference_str = (
             f"{info.reference_genome.build}, {info.reference_genome.status.name} "
         )
-        reference_str += f"(Click for details)"
+        reference_str += "(Click for details)"
         size = self.current_file.path.stat().st_size
         size /= 1024**3
         size = f"{size:.1f} GB"

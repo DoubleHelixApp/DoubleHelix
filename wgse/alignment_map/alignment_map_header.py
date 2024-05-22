@@ -133,9 +133,9 @@ class AlignmentMapHeader:
                 entry.species = part.split(":", 1)[1]
             elif part.startswith("TP"):
                 entry.molecule_topology = part.split(":", 1)[1]
-        if entry.name == None:
+        if entry.name is None:
             raise RuntimeError("Unable to find the name of the sequence.")
-        if entry.length == None:
+        if entry.length is None:
             raise RuntimeError("Unable to find the length of the sequence.")
 
         self.sequences[entry.name] = entry

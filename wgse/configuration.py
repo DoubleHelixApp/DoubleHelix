@@ -3,8 +3,6 @@ import logging
 import multiprocessing
 from pathlib import Path
 
-import wgse
-
 # Why third_party is not recognized by the IDE?
 # See wgse/__init__.py
 from wgse import metadata, mtDNA, third_party
@@ -144,9 +142,9 @@ class ConfigurationManager:
         for var_name, var_value in ConfigurationManager.__dict__.items():
             if var_name.startswith("__"):
                 continue
-            if getattr(var_value, "__dict__") == None:
+            if getattr(var_value, "__dict__") is None:
                 continue
-            if type(var_value) == type(ConfigurationManager.load):
+            if type(var_value) is type(ConfigurationManager.load):
                 continue
 
             section = var_name.lower()
@@ -165,9 +163,9 @@ class ConfigurationManager:
         for var_name, var_value in ConfigurationManager.__dict__.items():
             if var_name.startswith("__"):
                 continue
-            if getattr(var_value, "__dict__") == None:
+            if getattr(var_value, "__dict__") is None:
                 continue
-            if type(var_value) == type(ConfigurationManager.load):
+            if type(var_value) is type(ConfigurationManager.load):
                 continue
 
             default_item = type(var_value)()

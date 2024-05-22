@@ -35,7 +35,7 @@ class GenomeMetadataLoader:
                 for key, value in obj.__dict__.items():
                     if id(value) in self.seen:
                         del obj_dict[key]
-                    elif value == None:
+                    elif value is None:
                         del obj_dict[key]
                     else:
                         # Trivial types (i.e., str) may share the same id()

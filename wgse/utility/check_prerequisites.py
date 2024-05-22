@@ -182,7 +182,7 @@ class CheckPrerequisites:
                     stderr=subprocess.PIPE,
                 )
                 result.communicate()
-            except FileNotFoundError as e:
+            except FileNotFoundError:
                 m = PrerequisiteIssue(
                     PrerequisiteIssueSeverity.ERROR,
                     PrerequisiteIssueType.MISSING_BINARY,

@@ -4,7 +4,7 @@ from pathlib import Path
 
 try:
     from win32com.client import Dispatch
-except:
+except Exception:
     pass
 import importlib.metadata
 
@@ -31,9 +31,9 @@ class Shortcut:
 
     def _create_mac(self):
         script = (
-            f'tell application "Finder"\n'
+            'tell application "Finder"\n'
             + f'make alias file to POSIX file "{self.path!s}" at POSIX file "{self.desktop!s}"\n'
-            + f"end tell"
+            + "end tell"
         )
         os.system(f"osascript -e '{script}'")
         return str(self.desktop)

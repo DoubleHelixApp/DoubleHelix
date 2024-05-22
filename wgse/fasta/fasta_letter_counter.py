@@ -10,7 +10,7 @@ from wgse.fasta.letter_run_collection import LetterRunCollection
 
 try:
     import tqdm
-except:
+except Exception:
     tqdm = None
 
 from wgse.reference_genome.genome_metadata_loader import Genome
@@ -41,7 +41,7 @@ class FASTALetterCounter:
             # that can be done about that. On Windows, just keep only one progress bar.
             if self._sequences_progressbar is None and self._support_multiline_progress:
                 self._sequences_progressbar = tqdm.tqdm(
-                    total=total_sequences, desc=f"Sequences"
+                    total=total_sequences, desc="Sequences"
                 )
             if self._bases_progressbar is None:
                 self._bases_progressbar = tqdm.tqdm(

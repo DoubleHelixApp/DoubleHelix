@@ -52,7 +52,7 @@ python -m pip install -e .
 wgse
 ```
 
-#### pre-commit 
+#### pre-commit
 This repository uses [pre-commit](https://pre-commit.com/#intro) to ensure linting, formatting, and isort are executed before commit.
 Its usage is optional but highly recommended. To install
 ```
