@@ -25,9 +25,11 @@ from wgse.alignment_map.alignment_map_file import AlignmentMapFile
 from wgse.alignment_map.index_stats_calculator import IndexStatsCalculator
 from wgse.configuration import MANAGER_CFG
 from wgse.data.sorting import Sorting
+from wgse.fasta.reference import ReferenceStatus
 from wgse.gui.extract.extract_wizard import ExtractWizard
 from wgse.gui.table_dialog import ListTableDialog, TableDialog
 from wgse.gui.ui_form import Ui_MainWindow
+from wgse.reference_genome.repository_manager import RepositoryManager
 from wgse.utility.external import External
 from wgse.utility.shortcut import Shortcut
 from wgse.utility.simple_worker import SimpleWorker
@@ -364,9 +366,33 @@ class WGSEWindow(QMainWindow):
         if self.current_file is None:
             return
         reference = self.current_file.file_info.reference_genome
+        if (
+            reference.ready_reference is None
+            and reference.status == ReferenceStatus.Downloadable
+        ):
+            choice = self._yn_message_box(
+                "Reference is not on disk",
+                "A matching reference genome for this aligned file is available to be downloaded",
+                "Would you like to download it?",
+            )
+            if choice == QMessageBox.StandardButton.Yes:
+                self._perform_reference_download()
+        reference = self.current_file.file_info.reference_genome
         dialog = TableDialog("Reference genome", self)
         dialog.set_data(ReferenceAdapter.adapt(reference))
         dialog.exec()
+
+    def _perform_reference_download(self):
+        if self.current_file is None:
+            return
+        if (
+            self.current_file.file_info.reference_genome.status
+            != ReferenceStatus.Downloadable
+        ):
+            return
+        reference = self.current_file.file_info.reference_genome
+        for match in reference.matching:
+            RepositoryManager().download(match)
 
     def _show_alignment_stats(self):
         if self.current_file is None:

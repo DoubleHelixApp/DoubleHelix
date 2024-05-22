@@ -157,12 +157,7 @@ class RepositoryManager:
                 except Exception as e:
                     logging.critical(e)
 
-    def ingest(
-        self, url: str = None, source: str = None, build: str = None, force=False
-    ):
-        genome = Genome(
-            url, source=source, build=build, parent_folder=self._config.genomes
-        )
+    def download(self, genome: Genome, force=False):
         downloader = Downloader()
         decompressor = Decompressor()
         compressor = BGZIPCompressor()
@@ -170,7 +165,6 @@ class RepositoryManager:
         if genome.fasta.exists() and not force:
             logging.info(f"File {genome.fasta.name} already exist. Re-using it.")
             self._create_companion_files(genome, force)
-            genome.sequences = self._get_sequences(genome)
             return genome
         elif genome.fasta.exists() and force:
             genome.fasta.unlink()
@@ -181,7 +175,6 @@ class RepositoryManager:
             genome.download_size = None
             genome.decompressed_size = None
 
-        logging.info(f"Ingesting {genome}.")
         logging.info(f"1/4: Downloading fasta from: {genome.fasta_url}.")
         download_output = downloader.perform(genome)
         logging.info(f"2/4: Decompressing: {download_output.name}.")
@@ -190,5 +183,15 @@ class RepositoryManager:
         compressor_output = compressor.perform(genome, decompressor_output)
         logging.info(f"4/4: Extracting sequence data: {compressor_output.name}.")
         self._create_companion_files(genome)
+        return genome
+
+    def ingest(
+        self, url: str = None, source: str = None, build: str = None, force=False
+    ):
+        logging.info(f"Ingesting {genome}.")
+        genome = Genome(
+            url, source=source, build=build, parent_folder=self._config.genomes
+        )
+        genome = self.download(genome, force)
         genome.sequences = self._get_sequences(genome)
         return genome
