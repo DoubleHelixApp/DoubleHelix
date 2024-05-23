@@ -76,18 +76,20 @@ class Reference:
         Returns:
             dict[Genome, dict[Sequence, Sequence]]: Map Genome <-> Sequences.
         """
-        genome_map = {}
-        for query, reference_match in self.reference_map.items():
-            unique_parents: set[Genome] = set(x.parent for x in reference_match)
-            for parent in unique_parents:
-                if parent not in genome_map:
-                    genome_map[parent] = {x: None for x in parent.sequences}
-            for match in reference_match:
-                genome_map[match.parent][match] = query
-            if len(reference_match) == 0:
-                if None not in genome_map:
-                    genome_map[None] = []
-                genome_map[None].append(query)
+        parents: set[Genome] = set(
+            x.parent for y in self.reference_map.values() for x in y
+        )
+        genome_map = {x: {y: None for y in x.sequences} for x in parents}
+        for parent in parents:
+            genome_map[parent][None] = []
+            for sequence in parent.sequences:
+                for query_sequence, match_sequences in self.reference_map.items():
+                    if sequence in match_sequences:
+                        genome_map[parent][sequence] = query_sequence
+                        break
+            for query_sequence in self.reference_map.keys():
+                if query_sequence not in genome_map[parent].values():
+                    genome_map[parent][None].append(query_sequence)
         return genome_map
 
     def _get_matching_genomes(self):
@@ -101,12 +103,14 @@ class Reference:
         # None is a special key for all the sequences
         # that have 0 matches among all the known references.
         # If None is in _genome_map means we didn't find a
-        # reference and is not possible to build it.
-        if None in self._genome_map:
-            return match_list
+        # reference.
         for genome, matches in self._genome_map.items():
+            if len(matches[None]) > 0:
+                continue
             matching = True
             for genome_sequence, query_sequence in matches.items():
+                if genome_sequence is None:
+                    continue
                 if query_sequence is None:
                     matching = False
                     break
