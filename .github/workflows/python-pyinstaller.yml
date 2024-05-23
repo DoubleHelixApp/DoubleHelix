@@ -30,7 +30,7 @@ jobs:
         pip install pyinstaller
     - name: Make pyinstaller release
       run: |
-        pyinstaller .\\wgse\\main.py --clean -y --collect-all wgse --log-level=WARN --add-data .\\wgse\\metadata\\*.*:.\\wgse\\metadata --add-data .\\wgse\\metadata\\report_templates\\*.*:.\\wgse\\metadata\\report_templates --windowed --onefile
+        pyinstaller ./wgse/main.py --clean -y --collect-all wgse --log-level=WARN --add-data ./wgse/metadata/*.*:./wgse/metadata --add-data ./wgse/metadata/report_templates/*.*:./wgse/metadata/report_templates --windowed --onefile
     - uses: actions/upload-artifact@v2
       with:
         name: WGSE
