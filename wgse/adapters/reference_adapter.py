@@ -19,13 +19,14 @@ class ReferenceAdapter:
             # Otherwise, consider every reference that
             # matches at least by one sequence
             ref_map = stats.reference_map
-        max_columns = max([len(x) for x in ref_map.values()])
+        parents = set(x.parent for y in stats.reference_map.values() for x in y)
+        max_columns = len(parents)
         genome_index_map = {}
         headers = ["Loaded file"]
         max_index = 0
         rows = []
         for key, value in ref_map.items():
-            row = [None for x in range(max_columns + 2)]
+            row = [None for x in range(max_columns + 1)]
             row[0] = key
             for sequence in value:
                 if sequence.parent not in genome_index_map:
