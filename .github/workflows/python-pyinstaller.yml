@@ -34,5 +34,5 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: WGSE
-        path: ./dist/main.exe
+        path: ./dist/main
         retention-days: 1
