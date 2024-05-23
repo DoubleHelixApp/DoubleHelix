@@ -21,4 +21,8 @@ class Sequence:
         return self.__str__()
 
     def __str__(self) -> str:
-        return f"{self.name}: Length: {self.length}bp, MD5: {self.md5}"
+        if self.md5 is None:
+            return f"{self.name}, {self.length}bp"
+        else:
+            max_length = min(len(self.md5), 6)
+            return f"{self.name}, {self.length}bp, ..{self.md5[-max_length:]}"

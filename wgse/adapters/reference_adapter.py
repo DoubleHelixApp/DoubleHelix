@@ -19,7 +19,7 @@ class ReferenceAdapter:
             # Otherwise, consider every reference that
             # matches at least by one sequence
             ref_map = stats.reference_map
-        parents = set(x.parent for y in stats.reference_map.values() for x in y)
+        parents = set(x.parent for y in ref_map.values() for x in y)
         max_columns = len(parents)
         genome_index_map = {}
         headers = ["Loaded file"]

@@ -167,11 +167,12 @@ class AlignmentMapFile:
             )
         return None
 
-    def save_meta(self):
+    def save_meta(self, file_info=None):
         try:
-
+            if file_info is None:
+                file_info = self.file_info
             with self.meta_file.open("wb") as f:
-                pickle.dump(self.file_info, f)
+                pickle.dump(file_info, f)
         except Exception as e:
             logger.error(
                 f"Error when saving meta-information for {self.meta_file.name}: {e!s}"
@@ -217,7 +218,7 @@ class AlignmentMapFile:
             if is_cram and has_reference or not is_cram:
                 calculator = AlignmentStatsCalculator(file_info)
                 file_info.alignment_stats = calculator.get_stats()
-        self.save_meta()
+        self.save_meta(file_info)
         return file_info
 
     def get_mitochondrial_dna_type(self, reference: Reference):

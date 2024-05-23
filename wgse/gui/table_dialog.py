@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
-    QHeaderView,
+    # QHeaderView,
 )
 
 from wgse.data.tabular_data import TabularData
@@ -20,9 +20,9 @@ class TableDialog(QDialog):
         self.resize(640, 480)
 
         self.tableWidget = QTableWidget(self)
-        self.tableWidget.horizontalHeader().setSectionResizeMode(
-            QHeaderView.ResizeMode.ResizeToContents
-        )
+        # self.tableWidget.horizontalHeader().setSectionResizeMode(
+        #     QHeaderView.ResizeMode.ResizeToContents
+        # )
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         self.verticalLayout = QVBoxLayout(self)
