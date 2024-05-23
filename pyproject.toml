@@ -37,7 +37,8 @@ dependencies = [
     "vcf_parser",
     "WGSE-NG-3rd-party",
     "sentry-sdk",
-    "debugpy"
+    "debugpy",
+    "psutil"
 ]
 
 [project.urls]
