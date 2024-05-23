@@ -239,7 +239,8 @@ class WGSEWindow(QMainWindow):
         handlers[item.text()]()
 
     def _open_dir(self):
-        os.startfile(self.current_file.file_info.path.parent)
+        if getattr(os, "startfile", None):
+            os.startfile(self.current_file.file_info.path.parent)
 
     def _do_sorting(self):
         if self.current_file is None:
@@ -396,6 +397,14 @@ class WGSEWindow(QMainWindow):
 
     def _show_alignment_stats(self):
         if self.current_file is None:
+            return
+
+        if self.current_file.file_info.alignment_stats is None:
+            self._yn_message_box(
+                "Alignment stats not available",
+                "Cannot compute alignment stats if there are no references available.",
+                "",
+            )
             return
         alignment_stats = self.current_file.file_info.alignment_stats
         dialog = TableDialog("Alignment statistics", self)
