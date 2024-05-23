@@ -7,7 +7,7 @@
 [![Python application](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-app.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-app.yml/badge.svg)
 [![Python Publish](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-publish.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-publish.yml/badge.svg)
 [![Python Publish](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller.yml/badge.svg)
-
+ 
 This is my attempt to improve [WGSE](https://github.com/WGSExtract/WGSExtract-Dev). Still under heavy development. Don't expect anything working.
 
 [PyPi Package](https://pypi.org/project/WGSE-NG/)
