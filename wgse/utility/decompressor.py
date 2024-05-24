@@ -6,8 +6,9 @@ import typing
 import zipfile
 from pathlib import Path
 
+from wgse.utility.bgzip_compressor import BGZIPCompressor, BgzipAction
 from wgse.reference_genome.genome_metadata_loader import Genome
-from wgse.utility.external import BgzipAction, External
+from wgse.utility.external import External
 from wgse.utility.file_type_checker import FileType, FileTypeChecker
 
 
@@ -16,7 +17,9 @@ class Decompressor:
         self,
         type_checker: FileTypeChecker = FileTypeChecker(),
         external: External = External(),
+        bgzip_compressor=BGZIPCompressor(),
     ) -> None:
+        self._bgzip_compressor = bgzip_compressor
         self._external = external
         self._type_checker = type_checker
 
@@ -52,7 +55,9 @@ class Decompressor:
                 extracted.rename(output_file)
 
     def razf_gzip(self, input_file: Path, output_file: Path):
-        self._external.gzip(input_file, output_file, BgzipAction.Decompress)
+        self._bgzip_compressor.bgzip_wrapper(
+            input_file, output_file, BgzipAction.Decompress
+        )
 
     def calculate_md5_hash(self, filename: Path, chunk_size=4096):
         md5_hash = hashlib.md5()

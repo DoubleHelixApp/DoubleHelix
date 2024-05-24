@@ -19,6 +19,12 @@ MD5 indicates an MD5 string calculated in a reliable way (that account for case-
 
 The lenghts indicate the length of the sequences expressed in base-pair. The lengths itself cannot identify reliably a single sequence as it's totally possible (and happening in practices) to have the same lengths for sequences having a completely different content. What's surely more reliable is to use the whole set of sequences to identify a reference. The set of the lengths contained in a reference happens to be pretty unique for each reference, and it's the current way used by WGSE-NG to identify a reference. It's still possible that two references have a perfectly identical set of lengths having a different content. In this case, if the alignment-map file was associated by WGSE-NG to a reference falling in this situation, WGSE-NG will present a choice to the user. Since it's impossible to reliably determine which reference was used without other information, the user have to choose which reference it's the correct one.
 
+TODO: Ambiguous lengths sequences:
+:1) https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/analysisSet/hg38.analysisSet.fa.gz
+:1) https://ftp.ncbi.nlm.nih.gov/genomes/archive/old_genbank/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh38/seqs_for_alignment_pipelines/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz
+:2) https://ftp.ensembl.org/pub/release-55/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.55.dna.toplevel.fa.gz
+:2) https://ftp.ensembl.org/pub/release-56/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.56.dna.toplevel.fa.gz
+
 ## Add a new reference
 
 It's possible to onboard a new reference to WGSE-NG either by opening a GitHub issue with [this template](https://github.com/WGSE-NG/WGSE-NG/issues/new?assignees=chaplin89&labels=reference&projects=&template=add-a-new-reference.md&title=%5BReference%5D+Please+add+a+new+reference) or by using the following code:

@@ -6,7 +6,7 @@ from pathlib import Path
 from wgse.data.genome import Genome
 from wgse.fasta.fasta_letter_counter import FASTALetterCounter
 from wgse.fasta.fasta_stats_files import FASTAStatsFiles
-from wgse.utility.external import External
+from wgse.utility.samtools import Samtools
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(__name__)
@@ -55,8 +55,8 @@ if __name__ == "__main__":
     genome = Genome(args.reference)
 
     if not genome.dict.exists():
-        external = External(args.external)
-        external.make_dictionary(args.reference, genome.dict)
+        samtools = Samtools()
+        samtools.make_dictionary(args.reference, genome.dict)
 
     fasta_file = FASTALetterCounter(genome)
     unknown_bases_stats = FASTAStatsFiles(

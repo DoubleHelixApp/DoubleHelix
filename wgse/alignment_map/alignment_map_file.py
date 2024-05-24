@@ -19,8 +19,8 @@ from wgse.data.sequence_type import SequenceType
 from wgse.data.sorting import Sorting
 from wgse.fasta.reference import Reference
 from wgse.reference_genome.repository_manager import RepositoryManager
-from wgse.utility.external import External
 from wgse.utility.mt_dna import MtDNA
+from wgse.utility.samtools import Samtools
 from wgse.utility.sequence_orderer import SequenceOrderer
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class AlignmentMapFile:
     def __init__(
         self,
         path: Path,
-        external: External = External(),
+        samtools=Samtools(),
         repository: RepositoryManager = RepositoryManager(),
         mtdna: MtDNA = MtDNA(),
         config=MANAGER_CFG.EXTERNAL,
@@ -51,7 +51,7 @@ class AlignmentMapFile:
         self.path: Path = path
         self.meta_file: Path = self.path.with_suffix(".pickle")
         self._repo = repository
-        self._external = external
+        self._samtools = samtools
         self._mtdna = mtdna
         self._config = config
         self.header = self._load_header()
@@ -62,39 +62,28 @@ class AlignmentMapFile:
             raise RuntimeError(
                 f"Percentage needs to be between 0 and 100 to produce a subset but was {percentage}"
             )
-        format_dependent_opt = ""
+
+        output = self.path.with_stem(f"{self.path.stem}_{percentage}_percent")
+        percentage /= 100
+        reference = None
         if self.file_info.file_type == FileType.CRAM:
             reference = self.file_info.reference_genome.ready_reference
             if reference is None:
                 raise FileNotFoundError(
                     "Reference genome was not found but is mandatory for CRAM files"
                 )
-            format_dependent_opt = f'-C -T "{reference.fasta!s}"'
-        elif self.file_info.file_type == FileType.BAM:
-            format_dependent_opt = "-b"
 
-        output = self.path.with_stem(f"{self.path.stem}_{percentage}_percent")
-        input = self.path
-
-        percentage /= 100
-        view_opt = shlex.split(
-            f'view -bh -s {percentage:.1f} {format_dependent_opt} -@ {self._config.threads} -o "{output}" "{input}"'
+        self._samtools.view(
+            self.path, output, subsample=percentage, reference=reference
         )
-        index_opt = shlex.split(f'index "{output}"')
-
-        self._external.samtools(view_opt, wait=True)
-        self._external.samtools(index_opt, wait=True)
+        self._samtools.index(output)
 
         if not output.exists():
             raise RuntimeError(f"Unable to find the subset file at {output}")
         return AlignmentMapFile(output)
 
     def _load_header(self) -> AlignmentMapHeader:
-        lines = self._external.samtools(
-            ["view", "-H", "--no-PG", self.path], stdout=subprocess.PIPE, wait=True
-        )
-        lines = lines.decode().split("\n")
-        return AlignmentMapHeader(lines)
+        return AlignmentMapHeader(self._samtools.header(self.path))
 
     def _to_fastq(self, io):
         pass
@@ -110,8 +99,8 @@ class AlignmentMapFile:
         # if io is not None:
         #     io = lambda r,w: io(r,w)
 
-        faidx = self._external.samtools(faidx_opt, stdout=subprocess.PIPE)  # io=io)
-        consensus = self._external.samtools(
+        faidx = self._samtools.fasta_index(faidx_opt, stdout=subprocess.PIPE)  # io=io)
+        consensus = self._samtools.samtools(
             shlex.split(consensus_opt), stdin=faidx.stdout
         )
         consensus.communicate()
@@ -121,31 +110,26 @@ class AlignmentMapFile:
         suffixes = self.path.suffixes.copy()
         if len(suffixes) == 0:
             suffixes = [None]
-        format_dependent_opt = ""
-        target_opt = ""
+
         if target == FileType.BAM:
             suffixes[-1] = ".bam"
-            target_opt = "-b"
         elif target == FileType.CRAM:
             suffixes[-1] = ".cram"
-            target_opt = "-C"
             if self.file_info.reference_genome.ready_reference is None:
                 raise RuntimeError(
                     "Reference genome was not found but is mandatory for CRAM files."
                 )
             reference = self.file_info.reference_genome.ready_reference.fasta
-            format_dependent_opt = f'-T "{reference}"'
         elif target == FileType.SAM:
             suffixes[-1] = ".sam"
-            target_opt = ""
         output = self.path.with_name(self.path.stem + "".join(suffixes))
 
-        view_opt = f'view {target_opt} {format_dependent_opt} "{self.path!s}" {region} -o "{output}"'
-        view_opt = shlex.split(view_opt)
         progress = None
         if io is not None:
             progress = lambda r, w: io(self.path.stat().st_size, r)  # NOQA
-        return self._external.samtools(view_opt, io=progress)
+        return self._samtools.view(
+            self.path, target, output, region, reference, io=progress
+        )
 
     def convert(self, target: FileType, regions="", io=None):
         if self.file_info.file_type == target:

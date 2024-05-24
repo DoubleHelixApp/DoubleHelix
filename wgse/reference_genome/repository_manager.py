@@ -6,12 +6,12 @@ from wgse.configuration import RepositoryConfig
 from wgse.data.genome import Genome
 from wgse.data.sequence import Sequence
 from wgse.fasta.reference import Reference
-from wgse.reference_genome.bgzip_compressor import BGZIPCompressor
-from wgse.reference_genome.decompressor import Decompressor
+from wgse.utility.bgzip_compressor import BGZIPCompressor, BgzipAction
+from wgse.utility.decompressor import Decompressor
 from wgse.reference_genome.downloader import Downloader
 from wgse.reference_genome.genome_metadata_loader import GenomeMetadataLoader
-from wgse.utility.external import BgzipAction, External
 from wgse.utility.mt_dna import MtDNA
+from wgse.utility.samtools import Samtools
 
 
 class RepositoryManager:
@@ -62,16 +62,19 @@ class RepositoryManager:
             seq_md5 = ",".join([x.md5 for x in genome.sequences])
             if seq_lengths not in different_md5s_same_lengths:
                 different_md5s_same_lengths[seq_lengths] = []
-            if seq_md5 not in different_md5s_same_lengths[seq_lengths]:
-                different_md5s_same_lengths[seq_lengths].append(seq_md5)
+            if seq_md5 not in [x[0] for x in different_md5s_same_lengths[seq_lengths]]:
+                different_md5s_same_lengths[seq_lengths].append((seq_md5, genome))
 
         ambiguous = len(
             [x for x, y in different_md5s_same_lengths.items() if len(y) > 1]
         )
-        logging.debug(f"Found {ambiguous} ambiguous genomes.")
+        logging.debug(f"Found {ambiguous} possible ambiguous sequences of lengths:")
+        index = 0
         for different_md5_same_length, md5s in different_md5s_same_lengths.items():
             if len(md5s) > 1:
-                logging.debug("")
+                for md5, genome in md5s:
+                    logging.debug(f"{index+1}) {genome.fasta_url!s}")
+                index += 1
 
     def find(self, sequences: list[Sequence]):
         md5_available = all([x.md5 is not None for x in sequences])
@@ -129,17 +132,18 @@ class RepositoryManager:
         return sequences
 
     def _create_companion_files(self, genome: Genome, force=False):
-        _external = External()
+        samtools = Samtools()
+        bgzip = BGZIPCompressor()
         logging.info(f"{genome}: Starting post-download tasks.")
         if not genome.gzi.exists():
             logging.info(f"{genome}: Generating bgzip index.")
-            _external.bgzip_wrapper(genome.fasta, genome.gzi, BgzipAction.Reindex)
+            bgzip.bgzip_wrapper(genome.fasta, genome.gzi, BgzipAction.Reindex)
         else:
             logging.info(f"{genome}: bgzip index exists.")
 
         if not genome.dict.exists():
             logging.info(f"{genome}: Generating dictionary file.")
-            _external.make_dictionary(genome.fasta, genome.dict)
+            samtools.make_dictionary(genome.fasta, genome.dict)
         else:
             logging.info(f"{genome}: Dictionary file exists.")
 
