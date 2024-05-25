@@ -25,6 +25,7 @@ class Genome:
         downloaded_md5: str = None,
         decompressed_md5: str = None,
         bgzip_md5: str = None,
+        mitochondrial_model=None,
         parent_folder=Path("."),
     ) -> None:
         self.fasta_url = fasta_url
@@ -43,6 +44,7 @@ class Genome:
         self.downloaded_md5 = downloaded_md5
         self.decompressed_md5 = decompressed_md5
         self.bgzip_md5 = bgzip_md5
+        self.mitochondrial_model = mitochondrial_model
         # Not serialized as it depends on the config
         self.__parent_folder = parent_folder
         # Not serialized as it's populated at runtime
