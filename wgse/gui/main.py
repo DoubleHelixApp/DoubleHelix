@@ -191,6 +191,7 @@ class WGSEWindow(QMainWindow):
             f"{info.reference_genome.build}, {info.reference_genome.status.name} "
         )
         reference_str += "(Click for details)"
+
         size = self.current_file.path.stat().st_size
         size /= 1024**3
         size = f"{size:.1f} GB"
@@ -251,15 +252,11 @@ class WGSEWindow(QMainWindow):
         ]:
             return
 
-        prompt = QMessageBox()
-        prompt.setWindowTitle("File is not sorted")
-        prompt.setText("Do you want to sort the file?")
-        prompt.setInformativeText("This may take a while.")
-        prompt.setStandardButtons(
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        choice = self._yn_message_box(
+            "File is not sorted",
+            "Do you want to sort the file?",
+            "This may take a while.",
         )
-        prompt.setDefaultButton(QMessageBox.StandardButton.No)
-        choice = QMessageBox.StandardButton(prompt.exec())
         if choice == QMessageBox.StandardButton.No:
             return
 
@@ -269,15 +266,11 @@ class WGSEWindow(QMainWindow):
         if self.current_file.file_info.indexed:
             return
         if not user_informed:
-            prompt = QMessageBox()
-            prompt.setWindowTitle("File is not indexed")
-            prompt.setText("Do you want to index the file?")
-            prompt.setInformativeText("This may take a while.")
-            prompt.setStandardButtons(
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            choice = self._yn_message_box(
+                "File is not indexed",
+                "Do you want to index the file?",
+                "This may take a while.",
             )
-            prompt.setDefaultButton(QMessageBox.StandardButton.No)
-            choice = QMessageBox.StandardButton(prompt.exec())
             if choice == QMessageBox.StandardButton.No:
                 return
         self._prepare_long_operation("Indexing")

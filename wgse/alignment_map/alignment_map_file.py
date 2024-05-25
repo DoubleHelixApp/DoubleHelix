@@ -17,11 +17,10 @@ from wgse.data.gender import Gender
 from wgse.data.mitochondrial_model_type import MitochondrialModelType
 from wgse.data.sequence_type import SequenceType
 from wgse.data.sorting import Sorting
-from wgse.fasta.reference import Reference
+from wgse.fasta.reference import Reference, ReferenceStatus
 from wgse.reference_genome.repository_manager import RepositoryManager
 from wgse.utility.mt_dna import MtDNA
 from wgse.utility.samtools import Samtools
-from wgse.utility.sequence_orderer import SequenceOrderer
 
 logger = logging.getLogger(__name__)
 
@@ -206,27 +205,14 @@ class AlignmentMapFile:
         return file_info
 
     def get_mitochondrial_dna_type(self, reference: Reference):
-        if self.header.sequences is None:
-            return MitochondrialModelType.Unknown
-        sequences = {
-            SequenceOrderer.canonicalize(x.name): x
-            for x in self.header.sequences.values()
-        }
-        if "M" not in sequences:
-            return MitochondrialModelType.Unknown
-        mito_md5 = None
-        # If the sequence does not have MD5, we still have
-        # the chance to get it from the reference genome.
-        # TODO: finish this thing
-        # if sequences["M"].md5 is None:
-        #     ref_sequences = [x.sequences for x in reference.matching]
-        #     for sequence in ref_sequences:
-        #         names = [x.name for x in SequenceOrderer(sequence) if names]
-
-        model = self._mtdna.get_by_length(sequences["M"].length)
-        if model is None:
-            return MitochondrialModelType.Unknown
-        return model.type
+        mitochondrial_dna_model = MitochondrialModelType.Unknown
+        if reference.status == ReferenceStatus.Available:
+            matching = reference.matching[0]
+            if matching.mitochondrial_model is not None:
+                mitochondrial_dna_model = MitochondrialModelType[
+                    matching.mitochondrial_model
+                ]
+        return mitochondrial_dna_model
 
     def _indexed(self, type=None):
         if type is None:

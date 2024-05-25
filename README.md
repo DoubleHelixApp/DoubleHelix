@@ -8,7 +8,7 @@
 [![Python Publish](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-publish.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-publish.yml/badge.svg)
 [![PyInstaller release for Linux](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller-linux.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller-linux.yml)
 [![PyInstaller release for Windows](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller-win.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller-win.yml)
- 
+
 This is my attempt to improve [WGSE](https://github.com/WGSExtract/WGSExtract-Dev). Still under heavy development. Don't expect anything working.
 
 [PyPi Package](https://pypi.org/project/WGSE-NG/)
