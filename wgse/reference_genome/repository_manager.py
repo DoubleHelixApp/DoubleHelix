@@ -10,7 +10,7 @@ from wgse.utility.bgzip_compressor import BGZIPCompressor, BgzipAction
 from wgse.utility.decompressor import Decompressor
 from wgse.reference_genome.downloader import Downloader
 from wgse.reference_genome.genome_metadata_loader import GenomeMetadataLoader
-from wgse.utility.mt_dna import MtDNA
+from wgse.mtDNA.mt_dna import MtDNA
 from wgse.utility.samtools import Samtools
 
 

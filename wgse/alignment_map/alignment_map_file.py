@@ -19,7 +19,7 @@ from wgse.data.sequence_type import SequenceType
 from wgse.data.sorting import Sorting
 from wgse.fasta.reference import Reference, ReferenceStatus
 from wgse.reference_genome.repository_manager import RepositoryManager
-from wgse.utility.mt_dna import MtDNA
+from wgse.mtDNA.mt_dna import MtDNA
 from wgse.utility.samtools import Samtools
 
 logger = logging.getLogger(__name__)
