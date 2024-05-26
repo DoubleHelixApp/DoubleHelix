@@ -1,13 +1,14 @@
 from wgse.alignment_map.index_stats_calculator import SequenceStatistics
 from wgse.data.sequence_type import SequenceType
 from wgse.data.tabular_data import TabularData, TabularDataRow
+from wgse.sequence_naming.converter import Converter
 
 
 class IndexStatsAdapter:
     def adapt(stats: list[SequenceStatistics]):
         header = [
-            "Chromosome",
-            "Type",
+            "Canonical Name",
+            "Sequence Type",
             "Reference length",
             "Mapped length",
             "Unmapped length",
@@ -17,6 +18,7 @@ class IndexStatsAdapter:
             "Others",
             [
                 "Others",
+                "Others",
                 sum(x.reference_length for x in stats if x.type == SequenceType.Other),
                 sum(x.mapped for x in stats if x.type == SequenceType.Other),
                 sum(x.unmapped for x in stats if x.type == SequenceType.Other),
@@ -25,17 +27,17 @@ class IndexStatsAdapter:
 
         percentage_mapped = ""
         percentage_unmapped = ""
-        if grouped_others.columns[1] != 0:
+        if grouped_others.columns[2] != 0:
             percentage_mapped = (
-                f" ({(grouped_others.columns[2]/grouped_others.columns[1])*100:.1f}%)"
+                f" ({(grouped_others.columns[3]/grouped_others.columns[2])*100:.1f}%)"
             )
             percentage_unmapped = (
-                f" ({(grouped_others.columns[3]/grouped_others.columns[1])*100:.1f}%)"
+                f" ({(grouped_others.columns[4]/grouped_others.columns[2])*100:.1f}%)"
             )
 
-        grouped_others.columns[2] = f"{grouped_others.columns[2]}{percentage_mapped}"
-        grouped_others.columns[3] = f"{grouped_others.columns[3]}{percentage_unmapped}"
-        grouped_others.columns[1] = str(grouped_others.columns[1])
+        grouped_others.columns[3] = f"{grouped_others.columns[3]}{percentage_mapped}"
+        grouped_others.columns[4] = f"{grouped_others.columns[4]}{percentage_unmapped}"
+        grouped_others.columns[2] = str(grouped_others.columns[2])
 
         for stat in stats:
             if stat.type == SequenceType.Other:
@@ -53,6 +55,7 @@ class IndexStatsAdapter:
                 TabularDataRow(
                     stat.name,
                     [
+                        Converter.canonicalize(stat.name),
                         stat.type.name,
                         str(stat.reference_length),
                         f"{stat.mapped}{percentage_mapped}",

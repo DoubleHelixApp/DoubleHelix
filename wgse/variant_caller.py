@@ -96,9 +96,3 @@ class VariantCaller:
     def _stats(self, operation, read, write):
         if write is not None:
             print(f"{operation}: {(write/self.pileup_bytes_write)*100}")
-
-
-if __name__ == "__main__":
-    file = AlignmentMapFile(MANAGER_CFG.GENERAL.last_path)
-    caller = VariantCaller()
-    caller.call(file)

@@ -178,7 +178,7 @@ class AlignmentMapHeader:
 
     def chromosome_name_type(self):
         patterns_type = {
-            ChromosomeNameType.Accession: ["CM0", "CP", "J0", "NC_"],
+            ChromosomeNameType.GenBank: ["CM0", "CP", "J0", "NC_"],
             ChromosomeNameType.Chr: ["chr"],
             ChromosomeNameType.Number: ["1"],
         }
@@ -201,7 +201,7 @@ class AlignmentMapHeader:
             if any([x in self.sequences.keys() for x in patterns]):
                 return type
 
-        if self.chromosome_name_type() == ChromosomeNameType.Accession:
+        if self.chromosome_name_type() == ChromosomeNameType.GenBank:
             return MitochondrialNameType.Accession
         return MitochondrialNameType.Unknown
 

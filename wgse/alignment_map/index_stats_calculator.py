@@ -3,7 +3,7 @@ from pathlib import Path
 
 from wgse.data.sequence_type import SequenceType
 from wgse.utility.external import External
-from wgse.utility.sequence_orderer import SequenceOrderer
+from wgse.sequence_naming.converter import Converter
 
 
 class SequenceStatistics:
@@ -43,20 +43,7 @@ class IndexStatsCalculator:
             mapped = int(elements[2])
             unmapped = int(elements[3])
 
-            name_normalized: str = SequenceOrderer.canonicalize(name)
-
-            if name_normalized.isnumeric():
-                chromosome_type = SequenceType.Autosome
-            elif name_normalized == "M":
-                chromosome_type = SequenceType.Mitochondrial
-            elif name_normalized == "X":
-                chromosome_type = SequenceType.X
-            elif name_normalized == "Y":
-                chromosome_type = SequenceType.Y
-            elif name_normalized == "*":
-                chromosome_type = SequenceType.Unmapped
-            else:
-                chromosome_type = SequenceType.Other
+            chromosome_type = Converter.get_type(name)
 
             stats.append(
                 SequenceStatistics(

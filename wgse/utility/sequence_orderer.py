@@ -2,34 +2,6 @@ import typing
 
 from wgse.data.chromosome_name_type import ChromosomeNameType
 
-accession_to_num = {
-    "CM000663": "1",
-    "CM000664": "2",
-    "CM000665": "3",
-    "CM000666": "4",
-    "CM000667": "5",
-    "CM000668": "6",
-    "CM000669": "7",
-    "CM000670": "8",
-    "CM000671": "9",
-    "CM000672": "10",
-    "CM000673": "11",
-    "CM000674": "12",
-    "CM000675": "13",
-    "CM000676": "14",
-    "CM000677": "15",
-    "CM000678": "16",
-    "CM000679": "17",
-    "CM000680": "18",
-    "CM000681": "19",
-    "CM000682": "20",
-    "CM000683": "21",
-    "CM000684": "22",
-    "CM000685": "X",
-    "CM000686": "Y",
-    "J01415": "M",
-}
-
 
 class SequenceOrderer:
     def __init__(
@@ -107,7 +79,7 @@ class SequenceOrderer:
             return normalized
         elif target == ChromosomeNameType.Number:
             return normalized
-        elif target == ChromosomeNameType.Accession:
+        elif target == ChromosomeNameType.GenBank:
             raise NotImplementedError(
                 "Converting to Accession is not supported at the moment."
             )

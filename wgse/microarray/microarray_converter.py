@@ -8,6 +8,7 @@ from wgse.configuration import MANAGER_CFG
 from wgse.data.microarray_converter import MicroarrayConverterTarget
 from wgse.microarray.microarray_line_formatter import TARGET_FORMATTER_MAP
 from wgse.microarray.raw_file import RawEntry, RawFile
+from wgse.sequence_naming.converter import Converter
 from wgse.utility.sequence_orderer import SequenceOrderer
 
 
@@ -32,7 +33,7 @@ class MicroarrayConverter:
     ) -> OrderedDict[str, OrderedDict[int, list[RawEntry]]]:
         grouped: OrderedDict[str, OrderedDict[int, list[RawEntry]]] = OrderedDict()
         for entry in RawFile(path):
-            chromosome = SequenceOrderer.canonicalize(entry.chromosome)
+            chromosome = Converter.canonicalize(entry.chromosome)
             if chromosome not in grouped:
                 grouped[chromosome] = OrderedDict()
             if entry.position not in grouped[chromosome]:
@@ -121,7 +122,7 @@ class MicroarrayConverter:
         last_chromosome = None
         last_position = None
         for entry in RawFile(body_path):
-            chromosome = SequenceOrderer.canonicalize(entry.chromosome)
+            chromosome = Converter.canonicalize(entry.chromosome)
             if chromosome != last_chromosome:
                 last_chromosome = chromosome
                 last_position = 0
