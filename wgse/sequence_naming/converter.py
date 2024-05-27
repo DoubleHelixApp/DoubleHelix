@@ -14,6 +14,19 @@ from wgse.sequence_naming.lookup_tables import (
 
 class Converter:
     def canonicalize(sequence_name: str) -> str:
+        """Convert a sequence name into a "canonical" form,
+        which is essentially the Number format:
+        - Digits only for autosome
+        - X/Y for sexual
+        - M for mitochondrial
+        - Other sequences are not touched
+
+        Args:
+            sequence_name (str): Sequence to convert
+
+        Returns:
+            str: Converted name sequence.
+        """
         return Converter.convert(sequence_name, ChromosomeNameType.Number)
 
     def get_type(sequence_name: str) -> str:
@@ -39,14 +52,17 @@ class Converter:
         return normalized
 
     def convert(input: str, target: ChromosomeNameType) -> str:
-        # Convert the input to Number format:
-        # chr1 -> 1; chrMT/MT->M; NC_000001 -> 1
+        # Chr to Number (e.g., chr1 -> 1; chrMT->MT)
         normalized = input.upper()
         if normalized.startswith("CHR"):
             normalized = normalized.replace("CHR", "", 1)
+
+        # MT->M. This accounts also for the translation chrMT -> M,
+        # since it's executed after the previous if.
         if normalized.startswith("MT"):
             normalized = normalized.replace("MT", "M", 1)
 
+        #  Accession to Number (e.g., NC_000001 -> 1)
         if input.startswith("NC_"):
             normalized = Converter._find_in_table(normalized, REFSEQ_TO_NUMBER)
             normalized = Converter._find_in_table(normalized, REFSEQ_T2T_TO_NUMBER)
