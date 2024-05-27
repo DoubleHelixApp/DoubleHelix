@@ -1,5 +1,18 @@
+# This file contains some lookup tables to convert forth and back
+# between various accession naming systems and the "Number format"
+# (i.e., digit only for autosomes, X/Y for sexual, M for mitochondrial).
+# NOTE: There's a test that ensure values are unique and the dictionary can be
+# reversed.
+
+
+def __reverse(dictionary: dict):
+    """Take a dictionary and swap keys with values"""
+    return {v: k for k, v in dictionary.items()}
+
+
 # Lookup table to convert from NCBI accession to
 # Number format. Applies to gapped references.
+# Source: https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000001405.29/
 REFSEQ_TO_NUMBER = {
     "NC_000001": "1",
     "NC_000002": "2",
@@ -27,9 +40,11 @@ REFSEQ_TO_NUMBER = {
     "NC_000024": "Y",
     "NC_012920": "M",
 }
+NUMBER_TO_REFSEQ = __reverse(REFSEQ_TO_NUMBER)
 
-# Lookup table to convert between GenBank/INSDC
+# Lookup table to convert from GenBank/INSDC
 # accession to Number. Applies to gapped references.
+# Source: https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000001405.29/
 GENBANK_TO_NUMBER = {
     "CM000663": "1",
     "CM000664": "2",
@@ -57,9 +72,11 @@ GENBANK_TO_NUMBER = {
     "CM000686": "Y",
     "J01415": "M",
 }
+NUMBER_TO_GENBANK = __reverse(GENBANK_TO_NUMBER)
 
 # Lookup table to convert from GenBank accession
-# to Number format. Applies to T2T references.
+# to Number. Applies to T2T references.
+# Source: https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_009914755.1/
 REFSEQ_T2T_TO_NUMBER = {
     "NC_060925": "1",
     "NC_060926": "2",
@@ -86,8 +103,11 @@ REFSEQ_T2T_TO_NUMBER = {
     "NC_060947": "X",
     "NC_060948": "Y",
 }
+NUMBER_TO_REFSEQ_T2T = __reverse(REFSEQ_T2T_TO_NUMBER)
+
 # Lookup table to convert from GenBank accession
-# to Number format. Applies to T2T references.
+# to Number. Applies to T2T references.
+# Source: https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_009914755.1/
 GENBANK_T2T_TO_NUMBER = {
     "CP068277": "1",
     "CP068276": "2",
@@ -115,3 +135,19 @@ GENBANK_T2T_TO_NUMBER = {
     "CP086569": "Y",
     "CP068254": "MT",
 }
+NUMBER_TO_GENBANK_T2T = __reverse(GENBANK_T2T_TO_NUMBER)
+
+
+ACCESSION_TO_NUMBER = [
+    REFSEQ_TO_NUMBER,
+    REFSEQ_T2T_TO_NUMBER,
+    GENBANK_TO_NUMBER,
+    GENBANK_T2T_TO_NUMBER,
+]
+
+NUMBER_TO_ACCESSION = [
+    NUMBER_TO_REFSEQ,
+    NUMBER_TO_REFSEQ_T2T,
+    NUMBER_TO_GENBANK,
+    NUMBER_TO_GENBANK_T2T,
+]

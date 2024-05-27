@@ -1,5 +1,6 @@
 from wgse.data.chromosome_name_type import ChromosomeNameType
 from wgse.sequence_naming.converter import Converter
+from wgse.sequence_naming.lookup_tables import ACCESSION_TO_NUMBER
 
 
 def test_convert_to_number():
@@ -70,3 +71,8 @@ def test_convert_to_accession():
     assert converted_x == "CM000685"
     assert converted_chry == "CM000686"
     assert converted_y == "CM000686"
+
+
+def test_lookup_values_uniqueness():
+    for table in ACCESSION_TO_NUMBER:
+        assert len(set(x for x in table.values())) == len(table)

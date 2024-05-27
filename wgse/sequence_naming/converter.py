@@ -3,6 +3,10 @@ from wgse.data.sequence_type import SequenceType
 from wgse.sequence_naming.lookup_tables import (
     GENBANK_T2T_TO_NUMBER,
     GENBANK_TO_NUMBER,
+    NUMBER_TO_GENBANK,
+    NUMBER_TO_GENBANK_T2T,
+    NUMBER_TO_REFSEQ,
+    NUMBER_TO_REFSEQ_T2T,
     REFSEQ_T2T_TO_NUMBER,
     REFSEQ_TO_NUMBER,
 )
@@ -25,12 +29,6 @@ class Converter:
         elif canonical_name == "*":
             return SequenceType.Unmapped
         return SequenceType.Other
-
-    def _reverse_find_in_table(input, table):
-        converted = [x for x, y in table.items() if y == input]
-        if len(converted) != 1:
-            return None
-        return converted[0]
 
     def _find_in_table(input, table):
         normalized = input
@@ -66,11 +64,11 @@ class Converter:
         elif target == ChromosomeNameType.Number:
             return normalized
         elif target == ChromosomeNameType.GenBank:
-            return Converter._reverse_find_in_table(normalized, GENBANK_TO_NUMBER)
+            return NUMBER_TO_GENBANK.get(normalized, None)
         elif target == ChromosomeNameType.RefSeq:
-            return Converter._reverse_find_in_table(normalized, REFSEQ_TO_NUMBER)
+            return NUMBER_TO_REFSEQ.get(normalized, None)
         elif target == ChromosomeNameType.RefSeqT2T:
-            return Converter._reverse_find_in_table(normalized, REFSEQ_T2T_TO_NUMBER)
+            return NUMBER_TO_REFSEQ_T2T.get(normalized, None)
         elif target == ChromosomeNameType.GenBankT2T:
-            return Converter._reverse_find_in_table(normalized, GENBANK_T2T_TO_NUMBER)
+            return NUMBER_TO_GENBANK_T2T.get(normalized, None)
         raise ValueError(f"Converting to unrecognized target format: {target.name}")
