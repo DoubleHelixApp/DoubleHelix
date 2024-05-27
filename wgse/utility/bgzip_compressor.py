@@ -42,7 +42,8 @@ class BGZIPCompressor:
                     f"Unable to determine decompressed filename, invalid filename {str(input)} (no extensions)."
                 )
             ext = "".join(input.suffixes[:-1])
-            return input.with_name(input.stem + ext)
+            name = input.name.removesuffix("".join(input.suffixes))
+            return input.with_name(name + ext)
         elif action == BgzipAction.Reindex:
             return Path(str(input) + ".gzi")
         else:
