@@ -198,3 +198,49 @@ class RepositoryManager:
         genome = self.download(genome, force)
         genome.sequences = self._get_sequences(genome)
         return genome
+
+
+if __name__ == "__main__":
+    import tempfile
+    import hashlib
+    from os import close
+    import pathlib
+
+    genomes = GenomeMetadataLoader().load()
+    decompressor = BGZIPCompressor()
+    for genome in genomes:
+        if genome.decompressed_md5 is None:
+            continue
+        if genome.fasta.exists():
+            temp = tempfile.mkstemp(suffix=None, prefix=None, dir=None, text=False)
+            close(temp[0])
+            temp_file = pathlib.Path(temp[1])
+            temp_file.unlink()
+            decompressor.bgzip_wrapper(genome.fasta, temp_file, BgzipAction.Decompress)
+            md5_hash = hashlib.md5()
+            with temp_file.open("rb") as f:
+                while True:
+                    chunk = f.read(4096 * 1000)
+                    if not chunk:
+                        break
+                    md5_hash.update(chunk)
+            genome.decompressed_md5 = md5_hash.hexdigest()
+            temp_file.unlink()
+    GenomeMetadataLoader().save(genomes)
+    exit()
+
+    genomes = GenomeMetadataLoader().load()
+    genomes = [x for x in genomes if x.decompressed_md5 is not None]
+    for genome in genomes:
+        target = genome.fasta.with_name(genome.decompressed_md5)
+        target = target.with_suffix("".join(genome.fasta.suffixes))
+        target_dict = genome.dict.with_name(genome.decompressed_md5)
+        target_dict = target_dict.with_suffix("".join(genome.dict.suffixes))
+        target_gzi = genome.gzi.with_name(genome.decompressed_md5)
+        target_gzi = target_gzi.with_suffix("".join(genome.gzi.suffixes))
+        if not target.exists() and genome.fasta.exists():
+            genome.fasta.rename(target)
+        if not target_dict.exists() and genome.dict.exists():
+            genome.dict.rename(target_dict)
+        if not target_gzi.exists() and genome.gzi.exists():
+            genome.gzi.rename(target_gzi)
