@@ -30,7 +30,13 @@ class AlignmentStatsCalculator:
     def get_stats(self):
         samples = self._read_samples(self._config.skip, self._config.samples)
         stats = self._process_samples(samples)
-        # TODO: handle long reads
+        if stats.average_length > 410 and "Nanopore" in stats.sequencer:
+            samples.extend(
+                self._read_samples(
+                    self._config.skip + self._config.samples, self._config.samples * 29
+                )
+            )
+            stats = self._process_samples(samples)
         return stats
 
     def _read_samples(self, skip, samples_count):
@@ -120,12 +126,12 @@ class AlignmentStatsCalculator:
 
             # Compute stats for insertion size
             if sample.mate_sequence_name == "=":
-                abs_template_length = abs(sample.template_length)
-                if abs_template_length < 50000:
+                template_length = sample.template_length
+                if 0 < template_length < 50000:
                     count_insert_size += 1
-                    delta_insert_size = abs_template_length - average_insert_size
+                    delta_insert_size = template_length - average_insert_size
                     average_insert_size += delta_insert_size / count_insert_size
-                    new_delta_insert_size = abs_template_length - average_insert_size
+                    new_delta_insert_size = template_length - average_insert_size
                     squared_deviation_insert_size += (
                         delta_insert_size * new_delta_insert_size
                     )
@@ -173,18 +179,23 @@ class AlignmentStatsCalculator:
         stats.duplicate = duplicate_count
         stats.sequencer = sequencer
 
+        if stats.read_type == ReadType.Paired:
+            stats.count_insert_size = count_insert_size
+            stats.average_insert_size = average_insert_size
+            stats.standard_dev_insert_size = sqrt(
+                squared_deviation_insert_size / (count_insert_size - 1)
+            )
+        else:
+            stats.count_insert_size = 0
+            stats.average_insert_size = 0
+            stats.standard_dev_insert_size = 0
+
         stats.count_length = count_length
-        stats.count_insert_size = count_insert_size
-        stats.count_quality = count_quality
-
         stats.average_length = average_length
-        stats.average_quality = average_quality
-        stats.average_insert_size = average_insert_size
-
         stats.standard_dev_length = sqrt(squared_deviation_length / (count_length - 1))
-        stats.standard_dev_insert_size = sqrt(
-            squared_deviation_insert_size / (count_insert_size - 1)
-        )
+
+        stats.count_quality = count_quality
+        stats.average_quality = average_quality
         stats.standard_dev_quality = sqrt(
             squared_deviation_quality / (count_quality - 1)
         )

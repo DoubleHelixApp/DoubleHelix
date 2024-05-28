@@ -16,7 +16,7 @@ class SequenceStatistics:
 
 
 class IndexStatsCalculator:
-    def __init__(self, file: Path, external: External = External()) -> None:
+    def __init__(self, file: Path, external=External()) -> None:
         if not file.exists():
             raise RuntimeError(f"Unable to find file {file.name}")
 

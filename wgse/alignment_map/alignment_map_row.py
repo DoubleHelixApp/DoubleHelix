@@ -87,6 +87,10 @@ class AlignmentMapOptionalField:
 
 
 class AlignmentMapRow:
+    """Parser for a SAM row.
+    Reference: https://samtools.github.io/hts-specs/SAMv1.pdf, Page 7+
+    """
+
     def __init__(self, row: str) -> None:
         self.__row: str = row
         self.__values: list[str] = None
@@ -112,48 +116,65 @@ class AlignmentMapRow:
 
     @property
     def query_template_name(self):
+        """ID for a specific read, * if unavailable.
+        Usually this ID is unique except few cases.
+        See the reference for more details."""
         if self.__query_template_name is None:
             self.__query_template_name = self.values[0]
         return self.__query_template_name
 
     @property
     def flag(self):
+        """Combination of bitwise flags for this read"""
         if self.__flag is None:
             self.__flag = AlignmentMapFlag(int(self.values[1]))
         return self.__flag
 
     @property
     def reference_sequence_name(self):
+        """Name of the sequence. Either a value contained in the
+        header or * if unmapped."""
         if self.__reference_sequence_name is None:
             self.__reference_sequence_name = self.values[2]
         return self.__reference_sequence_name
 
     @property
     def position(self):
+        """1-based position of the 1st CIGAR op that "consumes"
+        a reference base (see specific for CIGAR at page 8).
+        '*' if unmapped."""
         if self.__position is None:
             self.__position = int(self.values[3])
         return self.__position
 
     @property
     def mapping_quality(self):
+        """Mapping quality, equal to -10log_10 Pr{mapping position is wrong}"""
         if self.__mapping_quality is None:
             self.__mapping_quality = int(self.values[4])
         return self.__mapping_quality
 
     @property
     def cigar(self):
+        """CIGAR string"""
         if self.__cigar is None:
             self.__cigar = self.values[5]
         return self.__cigar
 
     @property
     def mate_sequence_name(self):
+        """Reference sequence name of the primary alignment of the mate read.
+        * if unavailable, = if identical to current reference sequence name.
+        Should match reference sequence name of the mate if it has one primary
+        mapping."""
         if self.__mate_sequence_name is None:
             self.__mate_sequence_name = self.values[6]
         return self.__mate_sequence_name
 
     @property
     def mate_position(self):
+        """1-based position of the primary alignment of the mate read in the template.
+        0 if unavailable. Should match the position of the mate read."""
         if self.__mate_position is None:
             self.__mate_position = int(self.values[7])
         return self.__mate_position
@@ -166,18 +187,21 @@ class AlignmentMapRow:
 
     @property
     def sequence(self):
+        """The sequence of bases for this read"""
         if self.__sequence is None:
             self.__sequence = self.values[9]
         return self.__sequence
 
     @property
     def quality(self):
+        """Defined as -10 log_10 Pr{base is wrong}. One number for each base."""
         if self.__quality is None:
             self.__quality = [ord(x) - 33 for x in self.values[10]]
         return self.__quality
 
     @property
     def optional(self):
+        """Optional fields"""
         if self.__optional is None:
             if len(self.values) <= 10:
                 return []

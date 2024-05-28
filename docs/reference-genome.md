@@ -1,9 +1,9 @@
 # Reference genome
 
-In some cases WGSE-NG needs to access the reference genome that was used to create an alignment-map file. Since this is information is not contained in an alignment-map file, WGSE-NG needs to deduct it somehow. This document explain how WGSE-NG solves this problem and what can go wrong.
+In some cases WGSE-NG needs to access the reference genome that was used to create an alignment-map file. Since this is information is not contained in an alignment-map file, WGSE-NG needs to guess it. This document explain how WGSE-NG solves this problem and what can go wrong.
 
 ## Introduction
- The biggest hint for identifying the reference genome is the header of an alignment-map file. The header contains a list of sequences contained in the reference used to do the alignment.
+The biggest hint for identifying the reference genome is the header of an alignment-map file. The header contains a list of sequences contained in the reference used to do the alignment.
 
 WGSE-NG solves the issue of identifying the reference by maintaining a list of meta-information about a number of reference genomes. In this way it can identify a reference if it's present in this list. The list can be modified and new references can be suggested by using this [GitHub issue template](https://github.com/WGSE-NG/WGSE-NG/issues/new?assignees=chaplin89&labels=reference&projects=&template=add-a-new-reference.md&title=%5BReference%5D+Please+add+a+new+reference) or by submitting a PR using the instruction below.
 
@@ -15,11 +15,11 @@ The identification can works in two different ways, depending on the information
 - Using MD5 of sequences
 - Using lengths of sequences
 
-MD5 indicates an MD5 string calculated in a reliable way (that account for case-differences inside the sequence) and is the preferred way and lengths are used only as a fallback when MD5s are not available. Unfortunately, despite MD5 of sequences being part of the [SAM specification standard]() they are not mandatory. Most alignment-map files won't have this field populated.
+MD5 indicates an MD5 string calculated in a reliable way (that account for case-differences inside the sequence) over the content of a sequence. The procedure to calculate the MD5 is described at page 6 of the SAM standard. An MD5 is able to identify unequivocally a specific sequence and it's the preferred method to find a reference. If MD5 of the reference sequences are available it's easy to find the reference looking in the meta-data list of reference genomes that WGSE-NG maintain. Lengths are used only as a fallback when MD5s are not available. Unfortunately, this situation is the most common one. Despite MD5 of sequences being part of the SAM specification standard they are not mandatory. Most alignment-map files won't have this field populated.
 
-The lenghts indicate the length of the sequences expressed in base-pair. The lengths itself cannot identify reliably a single sequence as it's totally possible (and happening in practices) to have the same lengths for sequences having a completely different content. What's surely more reliable is to use the whole set of sequences to identify a reference. The set of the lengths contained in a reference happens to be pretty unique for each reference, and it's the current way used by WGSE-NG to identify a reference. It's still possible that two references have a perfectly identical set of lengths having a different content. In this case, if the alignment-map file was associated by WGSE-NG to a reference falling in this situation, WGSE-NG will present a choice to the user. Since it's impossible to reliably determine which reference was used without other information, the user have to choose which reference it's the correct one.
+The lenghts indicate the length of the sequences expressed in base-pair. A length itself cannot reliably identify a sequence as it's totally possible (and happening in practices) to have the same lengths for sequences having a completely different content (and hence a different MD5). What's more reliable is to use the whole set of sequences to identify a reference. The sequence of lengths contained in a reference is pretty unique for each reference, and it's the current way used by WGSE-NG to identify a reference when the MD5 are not available. It's still possible that two references have a perfectly identical set of lengths having a different sequence of MD5s. In this case, if the alignment-map file was associated by WGSE-NG to a reference falling in this situation, WGSE-NG will present a choice to the user. Since it's impossible to reliably determine which reference was used without other information, the user have to choose which reference it's the correct one.
 
-TODO: Ambiguous lengths sequences:
+This is a list of ambiguous lengths sequences (will be updated at every commit):
 :1) https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/analysisSet/hg38.analysisSet.fa.gz
 :1) https://ftp.ncbi.nlm.nih.gov/genomes/archive/old_genbank/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh38/seqs_for_alignment_pipelines/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz
 :2) https://ftp.ensembl.org/pub/release-55/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.55.dna.toplevel.fa.gz
@@ -34,7 +34,7 @@ manager = RepositoryManager()
 manager.genomes.append(
     manager.ingest(
         "https://source/reference.fa",
-        "NIH", # Anything that matches an entry in sources.json
+        "NIH", # Anything that matches an entry in sources.json, otherwise add an entry there
         "38",  # Only 38 or 19
     )
 )

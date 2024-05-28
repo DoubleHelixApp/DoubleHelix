@@ -38,7 +38,8 @@ dependencies = [
     "WGSE-NG-3rd-party",
     "sentry-sdk",
     "debugpy",
-    "psutil"
+    "psutil",
+    "pydantic"
 ]
 
 [project.urls]

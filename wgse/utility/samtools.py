@@ -35,6 +35,11 @@ class Samtools:
             ["index", "-@", self._config.threads, "-b", str(path)], wait=wait, io=io
         )
 
+    def index_stats(self, path: Path, wait=True, io=None):
+        self._external.samtools(
+            ["idxstats", path, "-@", self._config.threads], wait=wait, io=io
+        )
+
     def view(
         self,
         file: Path,
