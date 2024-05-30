@@ -9,7 +9,7 @@ from google.cloud import storage
 
 from wgse.configuration import MANAGER_CFG
 from wgse.reference_genome.genome_metadata_loader import Genome
-from wgse.utility.file_type_checker import FileTypeChecker
+from wgse.files.file_type_checker import FileTypeChecker
 
 logger = logging.getLogger(__name__)
 # There libs are very chatty for everything less than WARNING

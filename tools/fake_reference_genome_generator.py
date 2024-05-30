@@ -3,7 +3,7 @@ import textwrap
 from pathlib import Path
 
 from wgse.alignment_map.alignment_map_header import AlignmentMapHeader
-from wgse.reference_genome.genome_metadata_loader import GenomeMetadataLoader
+from wgse.reference_genome.genome_metadata_loader import MetadataLoader
 
 
 class FakeReferenceGenomeGenerator:
@@ -39,7 +39,7 @@ class FakeReferenceGenomeGenerator:
 
 # Example usage:
 if __name__ == "__main__":
-    metadata = GenomeMetadataLoader()
+    metadata = MetadataLoader()
 
     generator = FakeReferenceGenomeGenerator(Path("reference_genome.fa.dict"), 150)
     generator.generate_fasta(100000)

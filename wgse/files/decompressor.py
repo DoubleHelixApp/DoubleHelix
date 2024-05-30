@@ -6,10 +6,10 @@ import typing
 import zipfile
 from pathlib import Path
 
-from wgse.utility.bgzip_compressor import BGZIPCompressor, BgzipAction
+from wgse.files.bgzip_compressor import BGZIPCompressor, BgzipAction
 from wgse.reference_genome.genome_metadata_loader import Genome
 from wgse.utility.external import External
-from wgse.utility.file_type_checker import FileType, FileTypeChecker
+from wgse.files.file_type_checker import FileType, FileTypeChecker
 
 
 class Decompressor:

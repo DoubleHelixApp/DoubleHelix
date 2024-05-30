@@ -31,7 +31,7 @@ from wgse.gui.extract.extract_wizard import ExtractWizard
 from wgse.gui.table_dialog import ListTableDialog, TableDialog
 from wgse.gui.ui_form import Ui_MainWindow
 from wgse.progress.base_progress_calculator import BaseProgressCalculator
-from wgse.reference_genome.repository_manager import RepositoryManager
+from wgse.reference_genome.repository_manager import Repository
 from wgse.utility.external import External
 from wgse.utility.shortcut import Shortcut
 from wgse.utility.simple_worker import SimpleWorker
@@ -372,7 +372,7 @@ class WGSEWindow(QMainWindow):
             return
         reference = self.current_file.file_info.reference_genome
         for match in reference.matching:
-            RepositoryManager().download(match)
+            Repository().download(match)
 
     def _show_alignment_stats(self):
         if self.current_file is None:

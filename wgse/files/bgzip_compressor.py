@@ -4,7 +4,7 @@ from pathlib import Path
 from wgse.configuration import MANAGER_CFG
 from wgse.reference_genome.genome_metadata_loader import Genome
 from wgse.utility.external import External
-from wgse.utility.file_type_checker import FileType, FileTypeChecker
+from wgse.files.file_type_checker import FileType, FileTypeChecker
 
 
 class BgzipAction(enum.Enum):

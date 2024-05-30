@@ -8,7 +8,7 @@ from wgse.data.sequence import Sequence
 from wgse.data.source import Source
 
 
-class GenomeMetadataLoader:
+class MetadataLoader:
     """Manage metadata related to reference genomes.
 
     Raises:
@@ -110,6 +110,6 @@ class GenomeMetadataLoader:
             json.dump(
                 source,
                 f,
-                cls=GenomeMetadataLoader._CircularReferenceEncoder,
+                cls=MetadataLoader._CircularReferenceEncoder,
                 default=lambda o: o.__dict__,
             )

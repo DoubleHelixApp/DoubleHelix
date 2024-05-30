@@ -6,18 +6,18 @@ from wgse.configuration import RepositoryConfig
 from wgse.data.genome import Genome
 from wgse.data.sequence import Sequence
 from wgse.fasta.reference import Reference
-from wgse.utility.bgzip_compressor import BGZIPCompressor, BgzipAction
-from wgse.utility.decompressor import Decompressor
-from wgse.reference_genome.downloader import Downloader
-from wgse.reference_genome.genome_metadata_loader import GenomeMetadataLoader
+from wgse.files.bgzip_compressor import BGZIPCompressor, BgzipAction
+from wgse.files.decompressor import Decompressor
+from wgse.files.downloader import Downloader
+from wgse.reference_genome.genome_metadata_loader import MetadataLoader
 from wgse.mtDNA.mt_dna import MtDNA
 from wgse.utility.samtools import Samtools
 
 
-class RepositoryManager:
+class Repository:
     def __init__(
         self,
-        loader: GenomeMetadataLoader = GenomeMetadataLoader(),
+        loader: MetadataLoader = MetadataLoader(),
         downloader: Downloader = Downloader(),
         mtdna: MtDNA = MtDNA(),
         config: RepositoryConfig = RepositoryConfig(),
@@ -206,7 +206,7 @@ if __name__ == "__main__":
     from os import close
     import pathlib
 
-    genomes = GenomeMetadataLoader().load()
+    genomes = MetadataLoader().load()
     decompressor = BGZIPCompressor()
     for genome in genomes:
         if genome.decompressed_md5 is None:
@@ -226,10 +226,10 @@ if __name__ == "__main__":
                     md5_hash.update(chunk)
             genome.decompressed_md5 = md5_hash.hexdigest()
             temp_file.unlink()
-    GenomeMetadataLoader().save(genomes)
+    MetadataLoader().save(genomes)
     exit()
 
-    genomes = GenomeMetadataLoader().load()
+    genomes = MetadataLoader().load()
     genomes = [x for x in genomes if x.decompressed_md5 is not None]
     for genome in genomes:
         target = genome.fasta.with_name(genome.decompressed_md5)

@@ -18,7 +18,7 @@ from wgse.data.mitochondrial_model_type import MitochondrialModelType
 from wgse.data.sequence_type import SequenceType
 from wgse.data.sorting import Sorting
 from wgse.fasta.reference import Reference, ReferenceStatus
-from wgse.reference_genome.repository_manager import RepositoryManager
+from wgse.reference_genome.repository_manager import Repository
 from wgse.mtDNA.mt_dna import MtDNA
 from wgse.utility.samtools import Samtools
 
@@ -36,7 +36,7 @@ class AlignmentMapFile:
         self,
         path: Path,
         samtools=Samtools(),
-        repository: RepositoryManager = RepositoryManager(),
+        repository: Repository = Repository(),
         mtdna: MtDNA = MtDNA(),
         config=MANAGER_CFG.EXTERNAL,
     ) -> None:
