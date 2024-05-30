@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
 )
 
 from wgse.adapters.alignment_stats_adapter import AlignmentStatsAdapter
+from wgse.adapters.coverage_stats_adapter import CoverageStatsAdapter
 from wgse.adapters.header_adapter import (
     HeaderCommentsAdapter,
     HeaderProgramsAdapter,
@@ -23,6 +24,7 @@ from wgse.adapters.header_adapter import (
 from wgse.adapters.index_stats_adapter import IndexStatsAdapter
 from wgse.adapters.reference_adapter import ReferenceAdapter
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
+from wgse.alignment_map.depth_analyzer import CoverageStatsCalculator
 from wgse.alignment_map.index_stats_calculator import IndexStatsCalculator
 from wgse.configuration import MANAGER_CFG
 from wgse.data.sorting import Sorting
@@ -35,8 +37,7 @@ from wgse.reference.repository_manager import Repository
 from wgse.utility.external import External
 from wgse.utility.samtools import Samtools
 from wgse.utility.shortcut import Shortcut
-from wgse.utility.simple_worker import SimpleWorker
-from wgse.alignment_map.variant_caller import VariantCaller
+from wgse.progress.simple_worker import SimpleWorker
 
 
 class WGSEWindow(QMainWindow):
@@ -87,7 +88,6 @@ class WGSEWindow(QMainWindow):
 
         self.ui.fileInformationTable.doubleClicked.connect(self.file_item_clicked)
         self.ui.extract.clicked.connect(self.export)
-        self.ui.variant.clicked.connect(self.variant_calling)
         self.ui.stop.clicked.connect(self.stop)
 
         self._message_updated.connect(self.ui.statusbar.showMessage)
@@ -95,20 +95,6 @@ class WGSEWindow(QMainWindow):
 
         self._long_operation: SimpleWorker = None
         self._prepare_ready(self.config.last_path)
-
-    def variant_calling(self):
-        if self.current_file is None:
-            return
-        self._prepare_long_operation("Starting variant calling")
-        try:
-            self._long_operation = VariantCaller(progress=self._set_progress)
-            self._worker = SimpleWorker(
-                self._long_operation.call,
-                self.current_file,
-            )
-        except Exception as e:
-            self._prepare_ready()
-            self._logger.error(f"Error when starting VariantCaller: {e!s}")
 
     def stop(self):
         if self._long_operation is not None:
@@ -120,9 +106,14 @@ class WGSEWindow(QMainWindow):
     def export(self):
         if self.current_file is None:
             return
-        self._prepare_long_operation("Start Exporting")
+        self._prepare_long_operation("Prepare exporting")
         dialog = ExtractWizard(self.current_file, progress=self._set_progress)
         dialog.exec()
+        if dialog._worker is not None:
+            self._long_operation = dialog
+            self._worker = dialog._worker
+        else:
+            self._prepare_ready()
 
     def closeEvent(self, event=False):
         MANAGER_CFG.save()
@@ -293,6 +284,7 @@ class WGSEWindow(QMainWindow):
         self.ui.progress.show()
         self.ui.stop.setEnabled(True)
         self.ui.stop.show()
+        self.ui.extract.hide()
         self.ui.statusbar.showMessage(message)
 
     def _prepare_ready(self, path=None):
@@ -305,8 +297,9 @@ class WGSEWindow(QMainWindow):
         elif path is not None:
             self.on_open(path)
         self.ui.statusbar.showMessage("Ready")
+        self.ui.extract.show()
 
-    def _yn_message_box(self, title, text, info):
+    def _yn_message_box(self, title, text, info=None):
         prompt = QMessageBox()
         prompt.setWindowTitle(title)
         prompt.setText(text)
@@ -354,7 +347,30 @@ class WGSEWindow(QMainWindow):
         dialog.exec()
 
     def _show_coverage_stats(self):
-        return
+        if self.current_file is None:
+            return
+
+        if self.current_file.file_info.coverage_stats is None:
+            choice = self._yn_message_box(
+                "Coverage stats are not computed",
+                "Do you want to calculate coverage stats? This may take a while.",
+            )
+            if choice == QMessageBox.StandardButton.No:
+                return
+        self._prepare_long_operation("Preparing to compute coverage stats")
+        self._worker = SimpleWorker(self._compute_coverage_stats)
+
+        coverage_statistics = self.current_file.file_info.index_stats
+        dialog = TableDialog("Coverage Statistics", self)
+        dialog.set_data(CoverageStatsAdapter.adapt(coverage_statistics))
+        dialog.exec()
+
+    def _compute_coverage_stats(self):
+        self._long_operation = CoverageStatsCalculator(progress=self._set_progress)
+        self.current_file.file_info.coverage_stats = self._long_operation.get_stats(
+            self.current_file
+        )
+        self.current_file.save_meta()
 
     def _show_reference(self):
         if self.current_file is None:

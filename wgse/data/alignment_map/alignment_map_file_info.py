@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from wgse.data.coverage_stats import CoverageStats
 from wgse.alignment_map.index_stats_calculator import SequenceStatistics
 from wgse.data.alignment_stats import AlignmentStats
 from wgse.data.chromosome_name_type import ChromosomeNameType
@@ -27,4 +28,5 @@ class AlignmentMapFileInfo:
         self.sequence_count: int = None
         self.alignment_stats: AlignmentStats = None
         self.index_stats: list[SequenceStatistics] = None
+        self.coverage_stats: CoverageStats = None
         self.gender: Gender = None

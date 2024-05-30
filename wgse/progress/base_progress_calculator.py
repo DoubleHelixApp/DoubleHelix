@@ -14,7 +14,7 @@ class BaseProgressCalculator:
     ) -> None:
         self._previous_bytes = None
         self._previous_time = None
-        self._bytes_per_second = [None] * 500
+        self._bytes_per_second = [None] * 100
         self._average_writes_index = 0
         self._op_name = op_name
         self._progress = progress

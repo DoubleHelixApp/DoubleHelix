@@ -1,9 +1,10 @@
-from enum import IntEnum
 import subprocess
+import time
 
+from wgse.data.coverage_stats import CoverageStats, DepthBin
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
-from wgse.configuration import MANAGER_CFG
 from wgse.data.file_type import FileType
+from wgse.data.sequence_type import SequenceType
 from wgse.fasta.reference import ReferenceStatus
 from wgse.naming.converter import Converter
 from wgse.progress.base_progress_calculator import BaseProgressCalculator
@@ -11,30 +12,14 @@ from wgse.utility.external import External
 from wgse.utility.regions import RegionType, Regions
 
 
-class DepthBin(IntEnum):
-    Zero = 0
-    Between0And3 = 1
-    Between3And7 = 2
-    MoreThan7 = 3
-
-
-class DepthStats:
-    def __init__(self) -> None:
-        self.sequence_name: str = None
-        self.bin_entries: list[int] = None
-        self.bin_sum: list[int] = None
-        self.non_zero_percentage: float = 0
-        self.non_zero_average: float = 0
-        self.all_average: float = 0
-
-
-class DepthAnalyzer:
+class CoverageStatsCalculator:
     def __init__(self, external=External(), regions=Regions(), progress=None) -> None:
         self._external = external
         self._progress = progress
         self._regions = regions
+        self._progress_calc = None
 
-    def analyze_aligned_file(self, file: AlignmentMapFile, region: RegionType = None):
+    def get_stats(self, file: AlignmentMapFile, region: RegionType = None):
         options = ["depth"]
         if region is not None:
             bed_path = self._regions.get_path(region)
@@ -52,12 +37,18 @@ class DepthAnalyzer:
         options.append(str(file.path))
 
         if self._progress is not None:
-            progress = BaseProgressCalculator(
-                self._progress, file.path.stat().st_size, "Calculating depth"
+            total_bases = sum(
+                [
+                    x.length
+                    for x in file.header.sequences.values()
+                    if x.type != SequenceType.Unmapped
+                ]
             )
-            progress = progress.compute_on_read_bytes
-        process = self._external.samtools(options, stdout=subprocess.PIPE, io=progress)
-        self.analyze_depth_lines(iter(process.stdout.readline, b""), file)
+            self._progress_calc = BaseProgressCalculator(
+                self._progress, total_bases, "Calculating depth"
+            )
+        process = self._external.samtools(options, stdout=subprocess.PIPE, text=True)
+        self.analyze_depth_lines(iter(process.stdout.readline, ""), file)
 
     def analyze_depth_lines(self, lines, file: AlignmentMapFile):
         # Stats are organized in bins according to how many times
@@ -69,8 +60,16 @@ class DepthAnalyzer:
         sums_by_name = {x: [0] * 4 for x in file.header.sequences.keys()}
 
         # Format is: sequence name, position (unused), # reads
+        last_time = time.time()
+        line_counter = 0
         for line in lines:
-            line = line.decode().split()
+            if self._progress_calc is not None:
+                now = time.time()
+                if (now - last_time) > 1:
+                    self._progress_calc.compute(line_counter)
+                    last_time = now
+                line_counter += 1
+            line = line.split()
             name = line[0]
             reads = int(line[2])
 
@@ -88,7 +87,7 @@ class DepthAnalyzer:
 
         statistics = []
         for name in entries_by_name:
-            current = DepthStats()
+            current = CoverageStats()
             current.sequence_name = Converter.canonicalize(name)
             current.bin_entries = entries_by_name[name]
             current.bin_sum = sums_by_name[name]
@@ -110,12 +109,3 @@ class DepthAnalyzer:
             current.all_average = all_sums / (all_count + 1)
             statistics.append(current)
         return statistics
-
-
-def report_progress(label, percentage):
-    print(f"{label}, {percentage}%")
-
-
-a = DepthAnalyzer(progress=report_progress)
-stats = a.analyze_aligned_file(AlignmentMapFile(MANAGER_CFG.GENERAL.last_path))
-pass

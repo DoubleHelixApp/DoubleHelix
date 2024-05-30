@@ -30,7 +30,14 @@ def exe(f, interpreter=[]):
     """
 
     def execute_binary(
-        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
     ):
         args = [*interpreter, shutil.which(f.__name__), *[str(x) for x in args]]
 
@@ -48,7 +55,12 @@ def exe(f, interpreter=[]):
             startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
         output = subprocess.Popen(
-            args, stdout=stdout, stdin=stdin, stderr=stderr, startupinfo=startup_info
+            args,
+            stdout=stdout,
+            stdin=stdin,
+            stderr=stderr,
+            startupinfo=startup_info,
+            text=text,
         )
         if io is not None:
             monitor = ProcessIOMonitor(output, io)
@@ -128,69 +140,170 @@ class External:
     # for more details.
 
     @exe
-    def gzip(self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None):
-        raise FileNotFoundError()
-
-    @exe
-    def bgzip(self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None):
-        raise FileNotFoundError()
-
-    @exe
-    def samtools(
-        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+    def gzip(
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
     ):
         raise FileNotFoundError()
 
     @exe
-    def bwa(self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None):
+    def bgzip(
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
+    ):
+        raise FileNotFoundError()
+
+    @exe
+    def samtools(
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
+    ):
+        raise FileNotFoundError()
+
+    @exe
+    def bwa(
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
+    ):
         raise FileNotFoundError()
 
     @exe
     def bwamem2(
-        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
     ):
         raise FileNotFoundError()
 
     @exe
     def minimap2(
-        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
     ):
         raise FileNotFoundError()
 
     @exe
-    def fastp(self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None):
+    def fastp(
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
+    ):
         raise FileNotFoundError()
 
     @exe
     def bcftools(
-        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
     ):
         raise FileNotFoundError()
 
     @exe
-    def tabix(self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None):
+    def tabix(
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
+    ):
         raise FileNotFoundError()
 
     @jar
     def haplogrep(
-        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
     ):
         raise FileNotFoundError()
 
     @jar
     def FastQC(
-        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
     ):
         raise FileNotFoundError()
 
     @jar
     def picard(
-        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
     ):
         raise FileNotFoundError()
 
     @jar
     def DISCVRSeq(
-        self, args=[], stdout=None, stdin=None, stderr=None, wait=False, io=None
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
     ):
         raise FileNotFoundError()

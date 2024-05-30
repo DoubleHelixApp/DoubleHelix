@@ -29,7 +29,7 @@ class Converter:
         """
         return Converter.convert(sequence_name, ChromosomeNameType.Number)
 
-    def get_type(sequence_name: str) -> str:
+    def get_type(sequence_name: str) -> SequenceType:
         canonical_name = Converter.canonicalize(sequence_name)
         if canonical_name.isnumeric():
             return SequenceType.Autosome

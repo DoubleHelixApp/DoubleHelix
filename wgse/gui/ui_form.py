@@ -18,9 +18,9 @@ from PySide6.QtCore import (
     QPoint,
     QRect,
     QSize,
-    Qt,
     QTime,
     QUrl,
+    Qt,
 )
 from PySide6.QtGui import (
     QAction,
@@ -45,6 +45,7 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
     QGridLayout,
+    QHBoxLayout,
     QHeaderView,
     QMainWindow,
     QMenu,
@@ -52,6 +53,7 @@ from PySide6.QtWidgets import (
     QProgressBar,
     QPushButton,
     QSizePolicy,
+    QSpacerItem,
     QStatusBar,
     QTableWidget,
     QTableWidgetItem,
@@ -83,24 +85,72 @@ class Ui_MainWindow(object):
         self.actionCreate_launcher_on_desktop.setObjectName(
             "actionCreate_launcher_on_desktop"
         )
+        self.actionHaplotype = QAction(MainWindow)
+        self.actionHaplotype.setObjectName("actionHaplotype")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
-        self.fileInformationTable = QTableWidget(self.centralwidget)
-        self.fileInformationTable.setObjectName("fileInformationTable")
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.horizontalSpacer = QSpacerItem(
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+        )
+
+        self.horizontalLayout.addItem(self.horizontalSpacer)
+
+        self.extract = QPushButton(self.centralwidget)
+        self.extract.setObjectName("extract")
+
+        self.horizontalLayout.addWidget(self.extract)
+
+        self.horizontalSpacer_2 = QSpacerItem(
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+        )
+
+        self.horizontalLayout.addItem(self.horizontalSpacer_2)
+
+        self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 3)
+
+        self.progress = QProgressBar(self.centralwidget)
+        self.progress.setObjectName("progress")
         sizePolicy = QSizePolicy(
-            QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding
+            QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
+        sizePolicy.setHeightForWidth(self.progress.sizePolicy().hasHeightForWidth())
+        self.progress.setSizePolicy(sizePolicy)
+        self.progress.setMinimumSize(QSize(0, 0))
+        self.progress.setValue(24)
+
+        self.gridLayout.addWidget(self.progress, 2, 0, 1, 1)
+
+        self.stop = QPushButton(self.centralwidget)
+        self.stop.setObjectName("stop")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.stop.sizePolicy().hasHeightForWidth())
+        self.stop.setSizePolicy(sizePolicy1)
+        self.stop.setMinimumSize(QSize(0, 0))
+
+        self.gridLayout.addWidget(self.stop, 2, 2, 1, 1)
+
+        self.fileInformationTable = QTableWidget(self.centralwidget)
+        self.fileInformationTable.setObjectName("fileInformationTable")
+        sizePolicy2 = QSizePolicy(
+            QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding
+        )
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(
             self.fileInformationTable.sizePolicy().hasHeightForWidth()
         )
-        self.fileInformationTable.setSizePolicy(sizePolicy)
+        self.fileInformationTable.setSizePolicy(sizePolicy2)
         self.fileInformationTable.setStyleSheet("")
         self.fileInformationTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        # self.fileInformationTable.setAlternatingRowColors(True)
+        self.fileInformationTable.setAlternatingRowColors(False)
         self.fileInformationTable.setShowGrid(True)
         self.fileInformationTable.setGridStyle(Qt.DotLine)
         self.fileInformationTable.setSortingEnabled(False)
@@ -115,52 +165,7 @@ class Ui_MainWindow(object):
         self.fileInformationTable.verticalHeader().setHighlightSections(False)
         self.fileInformationTable.verticalHeader().setStretchLastSection(False)
 
-        self.gridLayout.addWidget(self.fileInformationTable, 0, 0, 1, 4)
-
-        self.extract = QPushButton(self.centralwidget)
-        self.extract.setObjectName("extract")
-
-        self.gridLayout.addWidget(self.extract, 1, 0, 1, 1)
-
-        self.haplotype = QPushButton(self.centralwidget)
-        self.haplotype.setObjectName("haplotype")
-
-        self.gridLayout.addWidget(self.haplotype, 1, 1, 1, 1)
-
-        self.analysis = QPushButton(self.centralwidget)
-        self.analysis.setObjectName("analysis")
-
-        self.gridLayout.addWidget(self.analysis, 1, 2, 1, 1)
-
-        self.variant = QPushButton(self.centralwidget)
-        self.variant.setObjectName("variant")
-
-        self.gridLayout.addWidget(self.variant, 1, 3, 1, 1)
-
-        self.progress = QProgressBar(self.centralwidget)
-        self.progress.setObjectName("progress")
-        sizePolicy1 = QSizePolicy(
-            QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed
-        )
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.progress.sizePolicy().hasHeightForWidth())
-        self.progress.setSizePolicy(sizePolicy1)
-        self.progress.setMinimumSize(QSize(0, 0))
-        self.progress.setValue(24)
-
-        self.gridLayout.addWidget(self.progress, 4, 0, 1, 3)
-
-        self.stop = QPushButton(self.centralwidget)
-        self.stop.setObjectName("stop")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.stop.sizePolicy().hasHeightForWidth())
-        self.stop.setSizePolicy(sizePolicy2)
-        self.stop.setMinimumSize(QSize(0, 0))
-
-        self.gridLayout.addWidget(self.stop, 4, 3, 1, 1)
+        self.gridLayout.addWidget(self.fileInformationTable, 0, 0, 1, 3)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
@@ -195,6 +200,7 @@ class Ui_MainWindow(object):
         self.menuHelp.addAction(self.actionAbout)
         self.menuTools.addAction(self.actionLog_viewer)
         self.menuTools.addAction(self.actionGenomes)
+        self.menuTools.addAction(self.actionHaplotype)
         self.menuTools.addSeparator()
         self.menuTools.addAction(self.actionCreate_launcher_on_desktop)
 
@@ -231,16 +237,10 @@ class Ui_MainWindow(object):
         self.actionCreate_launcher_on_desktop.setText(
             QCoreApplication.translate("MainWindow", "Create launcher on desktop", None)
         )
-        self.extract.setText(QCoreApplication.translate("MainWindow", "Extract", None))
-        self.haplotype.setText(
+        self.actionHaplotype.setText(
             QCoreApplication.translate("MainWindow", "Haplotype", None)
         )
-        self.analysis.setText(
-            QCoreApplication.translate("MainWindow", "Analysis", None)
-        )
-        self.variant.setText(
-            QCoreApplication.translate("MainWindow", "Variant calling", None)
-        )
+        self.extract.setText(QCoreApplication.translate("MainWindow", "Extract", None))
         self.stop.setText(QCoreApplication.translate("MainWindow", "Stop", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", "File", None))
         self.menuHelp.setTitle(QCoreApplication.translate("MainWindow", "Help", None))

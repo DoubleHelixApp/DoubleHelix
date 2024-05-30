@@ -13,6 +13,7 @@ class ExtractTargetFormat(enum.Enum):
     FASTA = enum.auto()
     FASTQ = enum.auto()
     HTML = enum.auto()
+    VCF = enum.auto()
     Unknown = enum.auto()
 
 
@@ -36,6 +37,7 @@ class FormatSelection(QWidget):
                 "FASTA, textual format obtained with a consensus algorithm",
                 "FASTQ, textual format for unaligned files",
                 "HTML, report containing an overview of the file",
+                "VCF, textual format for variants",
             ]
         ]
 
@@ -46,6 +48,7 @@ class FormatSelection(QWidget):
         self._format_options[4].setObjectName(ExtractTargetFormat.FASTA.name)
         self._format_options[5].setObjectName(ExtractTargetFormat.FASTQ.name)
         self._format_options[6].setObjectName(ExtractTargetFormat.HTML.name)
+        self._format_options[7].setObjectName(ExtractTargetFormat.VCF.name)
 
         self.options_by_type = {
             ExtractTargetFormat[x.objectName()]: x for x in self._format_options

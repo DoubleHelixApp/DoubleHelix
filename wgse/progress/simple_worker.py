@@ -28,10 +28,8 @@ class SimpleWorker(Thread):
         if process is None:
             logging.error("Trying to kill a SimpleWorker but there's nothing to kill.")
             return
-        if not isinstance(process, Popen):
-            raise RuntimeError("Trying to kill a process that is not a Popen object.")
         try:
-            if hasattr(os.sys, "winver"):
+            if hasattr(os.sys, "winver") or not isinstance(process, Popen):
                 process.kill()
             else:
                 process.send_signal(signal.SIGTERM)

@@ -1,7 +1,5 @@
 import logging
 import pickle
-import shlex
-import subprocess
 from pathlib import Path
 
 from wgse.alignment_map.alignment_map_header import AlignmentMapHeader
@@ -18,6 +16,7 @@ from wgse.data.mitochondrial_model_type import MitochondrialModelType
 from wgse.data.sequence_type import SequenceType
 from wgse.data.sorting import Sorting
 from wgse.fasta.reference import Reference, ReferenceStatus
+from wgse.progress.base_progress_calculator import BaseProgressCalculator
 from wgse.reference.repository_manager import Repository
 from wgse.mtDNA.mt_dna import MtDNA
 from wgse.utility.samtools import Samtools
@@ -87,29 +86,31 @@ class AlignmentMapFile:
     def _to_fastq(self, io):
         pass
 
-    def _to_fasta(self, regions="", io=None):
+    def _to_fasta(self, regions="", progress=None):
         input = self.path
         suffixes = self.path.suffixes.copy()
         suffixes[-1] = ".fasta"
         output = self.path.with_name(self.path.stem + "".join(suffixes))
         reference = str(self.file_info.reference_genome.ready_reference.fasta)
-        faidx_opt = f'faidx "{reference}" {regions}'
-        consensus_opt = f'consensus "{input}" -o "{output}"'
-        # if io is not None:
-        #     io = lambda r,w: io(r,w)
 
-        faidx = self._samtools.fasta_index(faidx_opt, stdout=subprocess.PIPE)  # io=io)
-        consensus = self._samtools.samtools(
-            shlex.split(consensus_opt), stdin=faidx.stdout
-        )
+        io = None
+        # TODO: get a percentage of input read file size according to region
+        if progress is not None:
+            io = BaseProgressCalculator(
+                progress, self.path.stat().st_size, "Converting to FASTA"
+            )
+            io = io.compute_on_read_bytes
+
+        faidx = self._samtools.fasta_index(reference, regions=regions)
+        consensus = self._samtools.consensus(input, output, stdin=faidx.stdout, io=io)
         consensus.communicate()
         return output
 
-    def _to_alignment_map(self, target: FileType, region, io):
+    def _to_alignment_map(self, target: FileType, region, progress):
         suffixes = self.path.suffixes.copy()
         if len(suffixes) == 0:
             suffixes = [None]
-
+        reference = None
         if target == FileType.BAM:
             suffixes[-1] = ".bam"
         elif target == FileType.CRAM:
@@ -123,21 +124,25 @@ class AlignmentMapFile:
             suffixes[-1] = ".sam"
         output = self.path.with_name(self.path.stem + "".join(suffixes))
 
-        progress = None
-        if io is not None:
-            progress = lambda r, w: io(self.path.stat().st_size, r)  # NOQA
+        io = None
+        # TODO: get a percentage of input read file size according to region
+        if progress is not None:
+            io = BaseProgressCalculator(
+                progress, self.path.stat().st_size, f"Converting to {target.name}"
+            )
+            io = io.compute_on_read_bytes
         return self._samtools.view(
-            self.path, target, output, region, reference, io=progress
+            self.path, target, output, region, None, reference, io=io
         )
 
-    def convert(self, target: FileType, regions="", io=None):
+    def convert(self, target: FileType, regions="", progress=None):
         if self.file_info.file_type == target:
             raise ValueError("Target and source file type for conversion are identical")
         if target == FileType.FASTA:
-            self._to_fasta(io=io)
+            return self._to_fasta(regions, progress)
         if target == FileType.FASTQ:
-            self._to_fastq(io=io)
-        return self._to_alignment_map(target, regions, io=io)
+            return self._to_fastq(progress)
+        return self._to_alignment_map(target, regions, progress)
 
     def load_meta(self):
         try:

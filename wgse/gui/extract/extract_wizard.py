@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 )
 
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
+from wgse.alignment_map.variant_caller import VariantCaller
 from wgse.data.file_type import FileType
 from wgse.gui.extract.format_selection import ExtractTargetFormat, FormatSelection
 from wgse.gui.extract.microarray_selection import MicroarraySelection
@@ -18,6 +19,7 @@ from wgse.gui.extract.sequence_selection import (
     ExtractTargetSequences,
     SequenceSelection,
 )
+from wgse.progress.simple_worker import SimpleWorker
 from wgse.renderers.html_aligned_file_report import HTMLAlignedFileReport
 
 
@@ -78,6 +80,7 @@ class ExtractWizard(QDialog):
             ExtractTargetFormat.FASTQ: self._to_fastq,
             ExtractTargetFormat.FASTA: self._to_fasta,
             ExtractTargetFormat.HTML: self._to_html,
+            ExtractTargetFormat.VCF: self._to_vcf,
             ExtractTargetFormat.Unknown: self._to_unknown,
         }
 
@@ -87,26 +90,36 @@ class ExtractWizard(QDialog):
     def _to_bam(self):
         if self.current_file is None:
             return
-        self.current_file.convert(FileType.BAM, io=self._progress)
+
+        self._worker = SimpleWorker(
+            self.current_file.convert, FileType.BAM, progress=self._progress
+        )
         self.close()
 
     def _to_sam(self):
         if self.current_file is None:
             return
-        self.current_file.convert(FileType.SAM, io=self._progress)
+        self._worker = SimpleWorker(
+            self.current_file.convert, FileType.SAM, progress=self._progress
+        )
         self.close()
 
     def _to_cram(self):
         if self.current_file is None:
             return
-        self.current_file.convert(FileType.CRAM, io=self._progress)
+
+        self._worker = SimpleWorker(
+            self.current_file.convert, FileType.CRAM, progress=self._progress
+        )
         self.close()
 
     def _to_fasta(self):
         if self.current_file is None:
             return
 
-        self.current_file.convert(FileType.FASTA, io=self._progress)
+        self._worker = SimpleWorker(
+            self.current_file.convert, FileType.FASTA, progress=self._progress
+        )
         self.close()
 
     def _to_fastq(self):
@@ -132,6 +145,16 @@ class ExtractWizard(QDialog):
 
     def _to_microarray(self):
         pass
+
+    def _to_vcf(self):
+        if self.current_file is None:
+            return
+
+        long_operation = VariantCaller(progress=self._progress)
+        self._worker = SimpleWorker(
+            long_operation.call,
+            self.current_file,
+        )
 
     def _to_unknown(self):
         raise RuntimeError("BUG: Invalid target format")
