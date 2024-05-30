@@ -3,7 +3,7 @@ import textwrap
 from pathlib import Path
 
 from wgse.alignment_map.alignment_map_header import AlignmentMapHeader
-from wgse.reference_genome.genome_metadata_loader import MetadataLoader
+from wgse.reference.genome_metadata_loader import MetadataLoader
 
 
 class FakeReferenceGenomeGenerator:

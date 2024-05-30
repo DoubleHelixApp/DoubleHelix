@@ -2,7 +2,7 @@ import enum
 from pathlib import Path
 
 from wgse.configuration import MANAGER_CFG
-from wgse.reference_genome.genome_metadata_loader import Genome
+from wgse.reference.genome_metadata_loader import Genome
 from wgse.utility.external import External
 from wgse.files.file_type_checker import FileType, FileTypeChecker
 

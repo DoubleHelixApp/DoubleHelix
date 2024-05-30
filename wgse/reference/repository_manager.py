@@ -9,7 +9,7 @@ from wgse.fasta.reference import Reference
 from wgse.files.bgzip_compressor import BGZIPCompressor, BgzipAction
 from wgse.files.decompressor import Decompressor
 from wgse.files.downloader import Downloader
-from wgse.reference_genome.genome_metadata_loader import MetadataLoader
+from wgse.reference.genome_metadata_loader import MetadataLoader
 from wgse.mtDNA.mt_dna import MtDNA
 from wgse.utility.samtools import Samtools
 

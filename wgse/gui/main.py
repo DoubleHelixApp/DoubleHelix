@@ -31,11 +31,11 @@ from wgse.gui.extract.extract_wizard import ExtractWizard
 from wgse.gui.table_dialog import ListTableDialog, TableDialog
 from wgse.gui.ui_form import Ui_MainWindow
 from wgse.progress.base_progress_calculator import BaseProgressCalculator
-from wgse.reference_genome.repository_manager import Repository
+from wgse.reference.repository_manager import Repository
 from wgse.utility.external import External
 from wgse.utility.shortcut import Shortcut
 from wgse.utility.simple_worker import SimpleWorker
-from wgse.variant_caller import VariantCaller
+from wgse.alignment_map.variant_caller import VariantCaller
 
 
 class WGSEWindow(QMainWindow):

@@ -13,7 +13,7 @@ try:
 except Exception:
     tqdm = None
 
-from wgse.reference_genome.genome_metadata_loader import Genome
+from wgse.reference.genome_metadata_loader import Genome
 
 
 class FASTALetterCounter:

@@ -8,7 +8,7 @@ import pycurl
 from google.cloud import storage
 
 from wgse.configuration import MANAGER_CFG
-from wgse.reference_genome.genome_metadata_loader import Genome
+from wgse.reference.genome_metadata_loader import Genome
 from wgse.files.file_type_checker import FileTypeChecker
 
 logger = logging.getLogger(__name__)

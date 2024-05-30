@@ -3,6 +3,7 @@ import typing
 from wgse.data.chromosome_name_type import ChromosomeNameType
 
 
+# Deprecated
 class SequenceOrderer:
     def __init__(
         self,
