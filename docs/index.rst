@@ -8,7 +8,7 @@ Welcome to WGSE's documentation!
    Home <self>
    basic-usage
    reference-genome
-   wgse-library
+   API
 
 
 Indices and tables

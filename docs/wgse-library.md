@@ -1,1 +1,0 @@
-# WGSE Library
