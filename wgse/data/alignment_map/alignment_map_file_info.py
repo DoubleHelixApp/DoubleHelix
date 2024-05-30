@@ -20,7 +20,6 @@ class AlignmentMapFileInfo:
         self.file_type: FileType = None
         self.reference_genome: Reference = None
         self.content: SequenceType = None
-        self.primary: bool = None
         self.mitochondrial_dna_model: MitochondrialModelType = None
         self.build: int = None
         self.name_type_chromosomes: ChromosomeNameType = None
