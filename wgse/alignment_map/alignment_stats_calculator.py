@@ -36,6 +36,8 @@ class AlignmentStatsCalculator:
                     self._config.skip + self._config.samples, self._config.samples * 29
                 )
             )
+            # Stats takes a fraction of seconds to compute.
+            # Re-compute them again
             stats = self._process_samples(samples)
         return stats
 

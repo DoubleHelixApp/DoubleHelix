@@ -59,6 +59,7 @@
         "PROGRESSFUNCTION",
         "psutil",
         "pycurl",
+        "pydantic",
         "queryname",
         "RAFZ",
         "razf",

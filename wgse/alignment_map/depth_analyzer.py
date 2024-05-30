@@ -1,13 +1,16 @@
-from enum import Enum
+from enum import IntEnum
 import subprocess
 
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
+from wgse.configuration import MANAGER_CFG
+from wgse.data.file_type import FileType
+from wgse.fasta.reference import ReferenceStatus
 from wgse.sequence_naming.converter import Converter
 from wgse.utility.external import External
 from wgse.utility.regions import RegionType, Regions
 
 
-class DepthBin(Enum):
+class DepthBin(IntEnum):
     Zero = 0
     Between0And3 = 1
     Between3And7 = 2
@@ -33,15 +36,20 @@ class DepthAnalyzer:
         options = ["depth"]
         if region is not None:
             bed_path = self._regions.get_path(region)
+            options.extend("-b", bed_path)
+        else:
+            options.append("-aa")
 
-        process = self._external.samtools(
-            [
-                "depth",
-                "-aa",
-                str(file.path),
-            ],
-            stdout=subprocess.PIPE,
-        )
+        if file.file_info.file_type == FileType.CRAM:
+            if file.file_info.reference_genome.status != ReferenceStatus.Available:
+                raise FileNotFoundError(
+                    "Unable to find the reference genome for loaded file."
+                )
+            options.extend(["-T", file.file_info.reference_genome.ready_reference])
+
+        options.append(str(file.path))
+
+        process = self._external.samtools(options, stdout=subprocess.PIPE)
         self.analyze_depth_lines(iter(process.stdout.readline, b""), file)
 
     def analyze_depth_lines(self, lines, file: AlignmentMapFile):
@@ -95,3 +103,8 @@ class DepthAnalyzer:
             current.all_average = all_sums / (all_count + 1)
             statistics.append(current)
         return statistics
+
+
+a = DepthAnalyzer()
+stats = a.analyze_aligned_file(AlignmentMapFile(MANAGER_CFG.GENERAL.last_path))
+pass
