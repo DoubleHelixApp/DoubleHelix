@@ -11,7 +11,6 @@ class AlignmentMapFileInfoAdapter:
             "file_type": "File type",
             "reference_genome": "Reference genome",
             "content": "Content",
-            "primary": "Primary",
             "mitochondrial_dna_type": "Mitochondrial DNA type",
             "name_type_chromosomes": "Name type chromosomes",
             "name_type_mtdna": "Name type mtDNA",
