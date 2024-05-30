@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 import webbrowser
@@ -29,6 +30,7 @@ from wgse.fasta.reference import ReferenceStatus
 from wgse.gui.extract.extract_wizard import ExtractWizard
 from wgse.gui.table_dialog import ListTableDialog, TableDialog
 from wgse.gui.ui_form import Ui_MainWindow
+from wgse.progress.base_progress_calculator import BaseProgressCalculator
 from wgse.reference_genome.repository_manager import RepositoryManager
 from wgse.utility.external import External
 from wgse.utility.shortcut import Shortcut
@@ -53,6 +55,7 @@ class WGSEWindow(QMainWindow):
         self._external = external
         self.config = config
         self.current_file = None
+        self._logger = logging.getLogger("main")
 
         self.switch_to_main()
         self.ui.actionDocumentation.triggered.connect(self.on_doc)
@@ -78,6 +81,7 @@ class WGSEWindow(QMainWindow):
         self.ui.fileInformationTable.doubleClicked.connect(self.file_item_clicked)
         self.ui.extract.clicked.connect(self.export)
         self.ui.variant.clicked.connect(self.variant_calling)
+        self.ui.stop.clicked.connect(self.stop)
 
         self._long_operation: SimpleWorker = None
         self._prepare_ready(self.config.last_path)
@@ -85,61 +89,38 @@ class WGSEWindow(QMainWindow):
     def variant_calling(self):
         if self.current_file is None:
             return
-        self._prepare_long_operation("Variant calling.")
-        self._long_operation = VariantCaller(progress=self._set_calling_progress)
-        self._worker = SimpleWorker(
-            self._long_operation.call,
-            self.current_file,
-        )
-
-    def _set_calling_progress(self, sub_operation, total, current):
-        if current is None:
+        self._prepare_long_operation("Starting variant calling")
+        try:
+            self._long_operation = VariantCaller(progress=self._set_progress)
+            self._worker = SimpleWorker(
+                self._long_operation.call,
+                self.current_file,
+            )
+        except Exception as e:
             self._prepare_ready()
-            return
-        if total is None or total == 0:
-            return
-        self.ui.statusbar.showMessage(f"Variant calling, {sub_operation}")
-        self.ui.progress.setValue((current / total) * 100)
+            self._logger.error(f"Error when starting VariantCaller: {e!s}")
 
     def stop(self):
         if self._long_operation is not None:
             self._long_operation.kill()
+            self._long_operation = None
+            self._worker = None
         self._prepare_ready()
-
-    def dragEnterEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.accept()
-        else:
-            event.ignore()
-
-    def dropEvent(self, event):
-        for url in event.mimeData().urls():
-            file_path = url.toLocalFile()
-            print("Dropped file:", file_path)
-            # Do something with the dropped file
 
     def export(self):
         if self.current_file is None:
             return
-        dialog = ExtractWizard(self.current_file, progress=self._set_export_progress)
+        self._prepare_long_operation("Start Exporting")
+        dialog = ExtractWizard(self.current_file, progress=self._set_progress)
         dialog.exec()
-        self._prepare_long_operation("Exporting")
-
-    def _set_export_progress(self, total, current):
-        if current is None:
-            self._prepare_ready()
-            return
-        if total is None or total == 0:
-            return
-        self.ui.progress.setValue((current / total) * 100)
-
-    def on_close(self):
-        MANAGER_CFG.save()
-        self.close()
 
     def closeEvent(self, event=False):
         MANAGER_CFG.save()
         event.accept()
+
+    def on_close(self):
+        MANAGER_CFG.save()
+        self.close()
 
     def on_doc(self):
         webbrowser.open("https://wgse-ng.readthedocs.io", 2)
@@ -273,10 +254,23 @@ class WGSEWindow(QMainWindow):
             )
             if choice == QMessageBox.StandardButton.No:
                 return
-        self._prepare_long_operation("Indexing")
-        self._long_operation = SimpleWorker(
-            self._external.index, self.current_file.path, io=self._set_index_progress
+        self._prepare_long_operation("Start indexing.")
+        progress = BaseProgressCalculator(
+            self._set_progress, self.current_file.path.stat().st_size, "Indexing"
         )
+
+        self._long_operation = SimpleWorker(
+            self._external.index,
+            self.current_file.path,
+            io=progress.compute_on_read_bytes,
+        )
+
+    def _set_progress(self, label, percentage):
+        if label is None:
+            self._prepare_ready()
+            return
+        self.ui.statusbar.showMessage(label)
+        self.ui.progress.setValue(percentage)
 
     def _prepare_long_operation(self, message):
         self.ui.progress.setMaximum(100)
@@ -296,15 +290,7 @@ class WGSEWindow(QMainWindow):
             self.on_open(self.current_file.path)
         elif path is not None:
             self.on_open(path)
-        self.ui.statusbar.showMessage("Ready.")
-
-    def _set_index_progress(self, read_bytes, _):
-        if read_bytes is None:
-            self._prepare_ready()
-            return
-        percentage = read_bytes / self.current_file.path.stat().st_size
-        print(int(percentage * 100))
-        self.ui.progress.setValue(int(percentage * 100))
+        self.ui.statusbar.showMessage("Ready")
 
     def _yn_message_box(self, title, text, info):
         prompt = QMessageBox()

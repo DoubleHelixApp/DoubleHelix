@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from wgse.configuration import MANAGER_CFG
-from wgse.utility.process_io_monitor import ProcessIOMonitor
+from wgse.progress.process_io_monitor import ProcessIOMonitor
 
 logger = logging.getLogger(__name__)
 

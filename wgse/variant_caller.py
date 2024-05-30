@@ -3,6 +3,7 @@ import logging
 import shlex
 import subprocess
 
+from wgse.progress.base_progress_calculator import BaseProgressCalculator
 from wgse.alignment_map.alignment_map_file import AlignmentMapFile
 from wgse.configuration import MANAGER_CFG
 from wgse.utility.external import External
@@ -61,38 +62,48 @@ class VariantCaller:
         call_opt = shlex.split(call_opt)
         tabix_opt = shlex.split(tabix_opt)
 
-        mapped_sequences = [x.mapped for x in self.current_file.file_info.index_stats]
-        mapped_sequences = sum(mapped_sequences)
+        progress = None
+        if self._progress is not None:
+            mapped_sequences = [
+                x.mapped for x in self.current_file.file_info.index_stats
+            ]
+            mapped_sequences = sum(mapped_sequences)
 
-        # 112 bytes seems to be the average bytes written for a single base
-        self.pileup_bytes_write = (
-            mapped_sequences
-            * self.current_file.file_info.alignment_stats.average_length
-            * 112
-        )
+            # 112 bytes seems to be the average bytes written for a single base
+            total_bytes = (
+                mapped_sequences
+                * self.current_file.file_info.alignment_stats.average_length
+                * 112
+            )
 
-        self._current_operation: subprocess.Popen = self._external.bcftools(
+            progress = BaseProgressCalculator(
+                self._progress, total_bytes, "[1/2] Calling"
+            )
+            progress = progress.compute_on_write_bytes
+
+        self._current_operation = self._external.bcftools(
             pileup_opt,
             stdout=subprocess.PIPE,
-            io=lambda r, w: self._progress("[1/2] Calling", self.pileup_bytes_write, w),
+            io=progress,
         )
 
         call = self._external.bcftools(call_opt, stdin=self._current_operation.stdout)
         call.communicate()
         if self._is_quitting:
             return
+
+        progress = BaseProgressCalculator(
+            self._progress, output_file.stat().st_size, "[2/2] Indexing"
+        )
         self._current_operation = self._external.tabix(
-            tabix_opt,
-            wait=True,
-            io=lambda r, w: self._progress(
-                "[2/2] Indexing", output_file.stat().st_size, r
-            ),
+            tabix_opt, wait=True, io=progress.compute_on_read_bytes
         )
 
     def kill(self):
         self._is_quitting = True
-        self._current_operation.kill()
-
-    def _stats(self, operation, read, write):
-        if write is not None:
-            print(f"{operation}: {(write/self.pileup_bytes_write)*100}")
+        operation = self._current_operation
+        try:
+            if operation is not None:
+                operation.kill()
+        except Exception as e:
+            self._logger.error(f"Error while killing variant calling: {e!s}")

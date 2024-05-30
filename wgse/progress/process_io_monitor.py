@@ -32,4 +32,5 @@ class ProcessIOMonitor(Thread):
                 logging.error(f"Exception in ProcessIOMonitor: {e!s}")
             pass
         finally:
+            # Signal the process ended.
             self.report(None, None)
