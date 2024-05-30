@@ -1,19 +1,19 @@
+from pydantic import BaseModel
 from wgse.data.read_type import ReadType
 
 
-class AlignmentStats:
-    def __init__(self) -> None:
-        self.skipped_samples: int = None
-        self.samples_count: int = None
-        self.sequencer: str = None
-        self.duplicate: int = None
-        self.count_length: int = None
-        self.average_length: float = None
-        self.standard_dev_length: float = None
-        self.count_insert_size: int = None
-        self.average_insert_size: float = None
-        self.standard_dev_insert_size: float = None
-        self.count_quality: int = None
-        self.average_quality: float = None
-        self.standard_dev_quality: float = None
-        self.read_type: ReadType = None
+class AlignmentStats(BaseModel):
+    skipped_samples: int = None
+    samples_count: int = None
+    sequencer: str = None
+    duplicate: int = None
+    count_length: int = None
+    average_length: float = None
+    standard_dev_length: float = None
+    count_insert_size: int = None
+    average_insert_size: float = None
+    standard_dev_insert_size: float = None
+    count_quality: int = None
+    average_quality: float = None
+    standard_dev_quality: float = None
+    read_type: ReadType = None
