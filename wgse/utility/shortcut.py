@@ -13,10 +13,14 @@ class Shortcut:
     def __init__(self) -> None:
         distribution = importlib.metadata.distribution("WGSE-NG")
         entry_point = distribution.entry_points["wgse"]
-        self.path = entry_point.dist.locate_file(entry_point.dist.files[0])
         self.desktop = Path.home().joinpath("Desktop")
+        self.path = None
+        if len(entry_point.dist.files) > 0:
+            self.path = entry_point.dist.locate_file(entry_point.dist.files[0])
 
     def _create_win(self):
+        if self.path is None:
+            return
         path = str(self.desktop.joinpath("WGSE-NG.lnk"))
         shell = Dispatch("WScript.Shell")
         shortcut = shell.CreateShortCut(path)
@@ -39,6 +43,8 @@ class Shortcut:
         return str(self.desktop)
 
     def _create_linux(self):
+        if self.path is None:
+            return
         shortcut_path = self.desktop.joinpath("WGSE-NG.desktop")
         desktop_entry = (
             "[Desktop Entry]\n"

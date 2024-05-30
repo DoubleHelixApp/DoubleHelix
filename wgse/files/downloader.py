@@ -8,6 +8,7 @@ import pycurl
 from google.cloud import storage
 
 from wgse.configuration import MANAGER_CFG
+from wgse.progress.base_progress_calculator import BaseProgressCalculator
 from wgse.reference.genome_metadata_loader import Genome
 from wgse.files.file_type_checker import FileTypeChecker
 
@@ -159,13 +160,13 @@ class Downloader:
             downloaded = target
         return downloaded
 
-    def perform(self, genome: Genome, callback: any = False) -> Path:
+    def perform(self, genome: Genome, progress: any = False) -> Path:
         for handler in HANDLERS.keys():
             if genome.fasta_url.startswith(handler):
-                return HANDLERS[handler](self, genome, callback)
-        return self.download_pycurl(genome, callback)
+                return HANDLERS[handler](self, genome, progress)
+        return self.download_pycurl(genome, progress)
 
-    def download_pycurl(self, genome: Genome, callback: any):
+    def download_pycurl(self, genome: Genome, progress: any):
         if genome.download_size is None:
             genome.download_size = self.get_file_size(genome.fasta_url)
             if genome.download_size is None:
@@ -185,7 +186,7 @@ class Downloader:
             curl.setopt(pycurl.URL, genome.fasta_url)
             curl.setopt(pycurl.WRITEDATA, f)
             curl.setopt(pycurl.FOLLOWLOCATION, True)
-            if callback is not False or callback is not None:
+            if progress is not False or progress is not None:
                 curl.setopt(pycurl.NOPROGRESS, False)
 
             if resume_from is not None:
@@ -197,15 +198,19 @@ class Downloader:
             curl.setopt(pycurl.SSL_VERIFYPEER, 0)
             curl.setopt(pycurl.SSL_VERIFYHOST, 0)
 
-            if callback is not None and callback is not False:
+            progress_calc = BaseProgressCalculator(
+                progress, genome.download_size, "Download"
+            )
+
+            if progress is not None and progress is not False:
                 curl.setopt(
                     pycurl.PROGRESSFUNCTION,
-                    lambda tot, n, tot_up, n_up: callback(tot, n),
+                    lambda tot_down, down, tot_up, up: progress_calc.compute(down),
                 )
 
             curl.perform()
             curl.close()
             # Signal the download is done
-            if callback is not None and callback is not False:
-                callback(None, None)
+            if progress is not None and progress is not False:
+                progress(None, None)
         return self.post_download_action(genome, target)

@@ -1,4 +1,3 @@
-import datetime
 import time
 
 
@@ -20,10 +19,10 @@ class BaseProgressCalculator:
         self._op_name = op_name
         self._progress = progress
         self._total_bytes = total_bytes
-        self.compute_on_write_bytes = lambda _, w: self._compute(w)
-        self.compute_on_read_bytes = lambda r, _: self._compute(r)
+        self.compute_on_write_bytes = lambda _, w: self.compute(w)
+        self.compute_on_read_bytes = lambda r, _: self.compute(r)
 
-    def _compute(self, current_bytes):
+    def compute(self, current_bytes):
         if current_bytes is None:
             self._progress(None, None)
             return
@@ -71,7 +70,13 @@ class BaseProgressCalculator:
         if threshold:
             formatted_delta = "Calculating, please stand-by."
         else:
-            formatted_delta = str(datetime.timedelta(seconds=second_to_completion))
+            if second_to_completion != 0:
+                hours, remainder = divmod(second_to_completion, 3600)
+                minutes, seconds = divmod(remainder, 60)
+                formatted_delta = f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
+            else:
+                formatted_delta = "Unavailable"
+
         percentage = current_bytes * 100 / self._total_bytes
 
         formatted_label = f"{self._op_name}, ETA: {formatted_delta}"

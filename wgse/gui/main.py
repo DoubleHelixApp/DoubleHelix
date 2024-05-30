@@ -33,6 +33,7 @@ from wgse.gui.ui_form import Ui_MainWindow
 from wgse.progress.base_progress_calculator import BaseProgressCalculator
 from wgse.reference.repository_manager import Repository
 from wgse.utility.external import External
+from wgse.utility.samtools import Samtools
 from wgse.utility.shortcut import Shortcut
 from wgse.utility.simple_worker import SimpleWorker
 from wgse.alignment_map.variant_caller import VariantCaller
@@ -53,10 +54,14 @@ class WGSEWindow(QMainWindow):
         self,
         parent=None,
         config=MANAGER_CFG.GENERAL,
-        external: External = External(),
+        external=External(),
+        samtools=Samtools(),
+        repository=Repository(),
     ):
         super().__init__(parent)
         self._external = external
+        self._samtools = samtools
+        self._repository = repository
         self.config = config
         self.current_file = None
         self._logger = logging.getLogger("main")
@@ -264,11 +269,15 @@ class WGSEWindow(QMainWindow):
             self._set_progress, self.current_file.path.stat().st_size, "Indexing"
         )
 
-        self._long_operation = SimpleWorker(
-            self._external.index,
-            self.current_file.path,
-            io=progress.compute_on_read_bytes,
-        )
+        try:
+            self._long_operation = SimpleWorker(
+                self._samtools.index,
+                self.current_file.path,
+                io=progress.compute_on_read_bytes,
+            )
+        except Exception as e:
+            self._logger.error(f"Error while initializing indexing: {e!s}")
+            self._prepare_ready()
 
     def _set_progress(self, label, percentage):
         if label is None:
@@ -370,14 +379,16 @@ class WGSEWindow(QMainWindow):
     def _perform_reference_download(self):
         if self.current_file is None:
             return
-        if (
-            self.current_file.file_info.reference_genome.status
-            != ReferenceStatus.Downloadable
-        ):
+        status = self.current_file.file_info.reference_genome.status
+        if status != ReferenceStatus.Downloadable:
             return
         reference = self.current_file.file_info.reference_genome
         for match in reference.matching:
-            Repository().download(match)
+            try:
+                SimpleWorker(self._repository.download, match, self._set_progress)
+                break
+            except Exception as e:
+                self._logger.error(f"Error while downloading the reference: {e!s}")
 
     def _show_alignment_stats(self):
         if self.current_file is None:

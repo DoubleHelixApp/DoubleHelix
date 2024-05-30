@@ -160,7 +160,7 @@ class Repository:
                 except Exception as e:
                     logging.critical(e)
 
-    def download(self, genome: Genome, force=False):
+    def download(self, genome: Genome, progress=None, force=False):
         downloader = Downloader()
         decompressor = Decompressor()
         compressor = BGZIPCompressor()
@@ -179,7 +179,7 @@ class Repository:
             genome.decompressed_size = None
 
         logging.info(f"1/4: Downloading fasta from: {genome.fasta_url}.")
-        download_output = downloader.perform(genome)
+        download_output = downloader.perform(genome, progress)
         logging.info(f"2/4: Decompressing: {download_output.name}.")
         decompressor_output = decompressor.perform(genome, download_output)
         logging.info(f"3/4: Compressing to gzip: {decompressor_output.name}.")

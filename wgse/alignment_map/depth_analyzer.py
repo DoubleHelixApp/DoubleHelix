@@ -5,7 +5,8 @@ from wgse.alignment_map.alignment_map_file import AlignmentMapFile
 from wgse.configuration import MANAGER_CFG
 from wgse.data.file_type import FileType
 from wgse.fasta.reference import ReferenceStatus
-from wgse.sequence_naming.converter import Converter
+from wgse.naming.converter import Converter
+from wgse.progress.base_progress_calculator import BaseProgressCalculator
 from wgse.utility.external import External
 from wgse.utility.regions import RegionType, Regions
 
@@ -28,8 +29,9 @@ class DepthStats:
 
 
 class DepthAnalyzer:
-    def __init__(self, external=External(), regions=Regions()) -> None:
+    def __init__(self, external=External(), regions=Regions(), progress=None) -> None:
         self._external = external
+        self._progress = progress
         self._regions = regions
 
     def analyze_aligned_file(self, file: AlignmentMapFile, region: RegionType = None):
@@ -49,7 +51,12 @@ class DepthAnalyzer:
 
         options.append(str(file.path))
 
-        process = self._external.samtools(options, stdout=subprocess.PIPE)
+        if self._progress is not None:
+            progress = BaseProgressCalculator(
+                self._progress, file.path.stat().st_size, "Calculating depth"
+            )
+            progress = progress.compute_on_read_bytes
+        process = self._external.samtools(options, stdout=subprocess.PIPE, io=progress)
         self.analyze_depth_lines(iter(process.stdout.readline, b""), file)
 
     def analyze_depth_lines(self, lines, file: AlignmentMapFile):
@@ -105,6 +112,10 @@ class DepthAnalyzer:
         return statistics
 
 
-a = DepthAnalyzer()
+def report_progress(label, percentage):
+    print(f"{label}, {percentage}%")
+
+
+a = DepthAnalyzer(progress=report_progress)
 stats = a.analyze_aligned_file(AlignmentMapFile(MANAGER_CFG.GENERAL.last_path))
 pass
