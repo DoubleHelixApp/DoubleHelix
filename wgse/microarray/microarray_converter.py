@@ -8,7 +8,7 @@ from wgse.configuration import MANAGER_CFG
 from wgse.data.microarray_converter import MicroarrayConverterTarget
 from wgse.microarray.microarray_line_formatter import TARGET_FORMATTER_MAP
 from wgse.microarray.raw_file import RawEntry, RawFile
-from wgse.sequence_naming.converter import Converter
+from wgse.naming.converter import Converter
 from wgse.naming.orderer import SequenceOrderer
 
 
