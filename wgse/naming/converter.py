@@ -1,6 +1,6 @@
 from wgse.data.chromosome_name_type import ChromosomeNameType
 from wgse.data.sequence_type import SequenceType
-from wgse.sequence_naming.lookup_tables import (
+from wgse.naming.lookup_tables import (
     GENBANK_T2T_TO_NUMBER,
     GENBANK_TO_NUMBER,
     NUMBER_TO_GENBANK,

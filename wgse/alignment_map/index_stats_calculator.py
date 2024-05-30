@@ -3,7 +3,7 @@ from pathlib import Path
 
 from wgse.data.sequence_type import SequenceType
 from wgse.utility.external import External
-from wgse.sequence_naming.converter import Converter
+from wgse.naming.converter import Converter
 
 
 class SequenceStatistics:

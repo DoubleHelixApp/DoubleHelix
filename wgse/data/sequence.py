@@ -1,4 +1,4 @@
-from wgse.sequence_naming.converter import Converter
+from wgse.naming.converter import Converter
 
 
 class Sequence:

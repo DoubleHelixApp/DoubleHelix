@@ -7,6 +7,8 @@ from wgse.gui.main import WGSEWindow
 
 def main():
     app = QApplication(sys.argv)
+    # Use a less broken UI style
+    app.setStyle("fusion")
     widget = WGSEWindow()
     widget.show()
     sys.exit(app.exec())

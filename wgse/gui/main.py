@@ -4,7 +4,7 @@ import sys
 import webbrowser
 from pathlib import Path
 
-from PySide6.QtCore import QModelIndex
+from PySide6.QtCore import QModelIndex, Signal
 from PySide6.QtWidgets import (
     QApplication,
     QFileDialog,
@@ -39,6 +39,10 @@ from wgse.alignment_map.variant_caller import VariantCaller
 
 
 class WGSEWindow(QMainWindow):
+
+    _percentage_updated = Signal(int)
+    _message_updated = Signal(str)
+
     def launch():
         app = QApplication(sys.argv)
         widget = WGSEWindow()
@@ -76,12 +80,13 @@ class WGSEWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.ui.fileInformationTable.setAlternatingRowColors(True)
-
         self.ui.fileInformationTable.doubleClicked.connect(self.file_item_clicked)
         self.ui.extract.clicked.connect(self.export)
         self.ui.variant.clicked.connect(self.variant_calling)
         self.ui.stop.clicked.connect(self.stop)
+
+        self._message_updated.connect(self.ui.statusbar.showMessage)
+        self._percentage_updated.connect(self.ui.progress.setValue)
 
         self._long_operation: SimpleWorker = None
         self._prepare_ready(self.config.last_path)
@@ -269,8 +274,8 @@ class WGSEWindow(QMainWindow):
         if label is None:
             self._prepare_ready()
             return
-        self.ui.statusbar.showMessage(label)
-        self.ui.progress.setValue(percentage)
+        self._percentage_updated.emit(percentage)
+        self._message_updated.emit(label)
 
     def _prepare_long_operation(self, message):
         self.ui.progress.setMaximum(100)

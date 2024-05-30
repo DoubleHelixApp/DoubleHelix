@@ -1,7 +1,7 @@
 from wgse.alignment_map.index_stats_calculator import SequenceStatistics
 from wgse.data.sequence_type import SequenceType
 from wgse.data.tabular_data import TabularData, TabularDataRow
-from wgse.sequence_naming.converter import Converter
+from wgse.naming.converter import Converter
 
 
 class IndexStatsAdapter:

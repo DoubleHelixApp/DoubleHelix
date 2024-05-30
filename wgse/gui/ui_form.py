@@ -100,7 +100,7 @@ class Ui_MainWindow(object):
         self.fileInformationTable.setSizePolicy(sizePolicy)
         self.fileInformationTable.setStyleSheet("")
         self.fileInformationTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.fileInformationTable.setAlternatingRowColors(True)
+        # self.fileInformationTable.setAlternatingRowColors(True)
         self.fileInformationTable.setShowGrid(True)
         self.fileInformationTable.setGridStyle(Qt.DotLine)
         self.fileInformationTable.setSortingEnabled(False)
