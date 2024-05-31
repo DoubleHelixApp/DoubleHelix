@@ -45,6 +45,7 @@ class WGSEWindow(QMainWindow):
 
     _percentage_updated = Signal(int)
     _message_updated = Signal(str)
+    _operation_ended = Signal()
     _coverage_ready = Signal()
 
     def launch():
@@ -95,6 +96,7 @@ class WGSEWindow(QMainWindow):
         self._message_updated.connect(self.ui.statusbar.showMessage)
         self._percentage_updated.connect(self.ui.progress.setValue)
         self._coverage_ready.connect(self._show_coverage_stats)
+        self._operation_ended.connect(self._prepare_ready)
 
         self._long_operation: SimpleWorker = None
         self._prepare_ready(self.config.last_path)
@@ -110,7 +112,7 @@ class WGSEWindow(QMainWindow):
         if self.current_file is None:
             return
         self._prepare_long_operation("Prepare exporting")
-        dialog = ExtractWizard(self.current_file, progress=self._set_progress)
+        dialog = ExtractWizard(self.current_file, self, progress=self._set_progress)
         dialog.exec()
         if dialog._worker is not None:
             self._long_operation = dialog
@@ -274,8 +276,14 @@ class WGSEWindow(QMainWindow):
             self._prepare_ready()
 
     def _set_progress(self, label, percentage):
+        # Memento: this is always called from another thread.
+        #   Don't put anything here that is updating the UI if
+        #   you don't want the app to crash spectacularly and
+        #   you don't want to spend the next 2 hours troubleshooting
+        #   the issue. Manage every interaction with the UI with
+        #   signal/slots.
         if label is None:
-            self._prepare_ready()
+            self._operation_ended.emit()
             return
         self._percentage_updated.emit(percentage)
         self._message_updated.emit(label)
