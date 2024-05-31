@@ -155,6 +155,7 @@ class ExtractWizard(QDialog):
             long_operation.call,
             self.current_file,
         )
+        self.close()
 
     def _to_unknown(self):
         raise RuntimeError("BUG: Invalid target format")
