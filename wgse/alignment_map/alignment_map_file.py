@@ -101,12 +101,12 @@ class AlignmentMapFile:
             )
             io = io.compute_on_read_bytes
 
-        faidx = self._samtools.fasta_index(reference, regions=regions)
-        consensus = self._samtools.consensus(input, output, stdin=faidx.stdout, io=io)
-        consensus.communicate()
+        # faidx = self._samtools.fasta_index(reference, regions=regions)
+        consensus = self._samtools.consensus(input, output, io=io)
+        consensus.wait()
         return output
 
-    def _to_alignment_map(self, target: FileType, region, progress):
+    def _to_alignment_map(self, target: FileType, regions, progress):
         suffixes = self.path.suffixes.copy()
         if len(suffixes) == 0:
             suffixes = [None]
@@ -132,7 +132,7 @@ class AlignmentMapFile:
             )
             io = io.compute_on_read_bytes
         return self._samtools.view(
-            self.path, target, output, region, None, reference, io=io
+            self.path, target, output, regions, None, reference, io=io
         )
 
     def convert(self, target: FileType, regions="", progress=None):
