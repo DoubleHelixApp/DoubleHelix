@@ -105,7 +105,10 @@ class CoverageStatsCalculator:
             all_count = zero_count + non_zero_count
 
             current.non_zero_percentage = non_zero_count / (all_count + 1)
-            current.non_zero_average = all_sums / non_zero_count
+            current.non_zero_average = 0
+            if non_zero_count != 0:
+                current.non_zero_average = all_sums / non_zero_count
+
             current.all_average = all_sums / (all_count + 1)
             statistics.append(current)
         return statistics

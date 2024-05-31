@@ -360,7 +360,7 @@ class WGSEWindow(QMainWindow):
         self._prepare_long_operation("Preparing to compute coverage stats")
         self._worker = SimpleWorker(self._compute_coverage_stats)
 
-        coverage_statistics = self.current_file.file_info.index_stats
+        coverage_statistics = self.current_file.file_info.coverage_stats
         dialog = TableDialog("Coverage Statistics", self)
         dialog.set_data(CoverageStatsAdapter.adapt(coverage_statistics))
         dialog.exec()
