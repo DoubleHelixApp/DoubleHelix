@@ -22,8 +22,12 @@ class CoverageStatsCalculator:
     def get_stats(self, file: AlignmentMapFile, region: RegionType = None):
         options = ["depth"]
         if region is not None:
-            bed_path = self._regions.get_path(region)
-            options.extend("-b", bed_path)
+            bed_path = self._regions.get_path(
+                file.file_info.reference_genome.ready_reference.build,
+                region,
+                file.header.sequences.values(),
+            )
+            options.extend(["-b", str(bed_path)])
         else:
             options.append("-aa")
 
@@ -48,7 +52,7 @@ class CoverageStatsCalculator:
                 self._progress, total_bases, "Calculating depth"
             )
         process = self._external.samtools(options, stdout=subprocess.PIPE, text=True)
-        self.analyze_depth_lines(iter(process.stdout.readline, ""), file)
+        return self.analyze_depth_lines(iter(process.stdout.readline, ""), file)
 
     def analyze_depth_lines(self, lines, file: AlignmentMapFile):
         # Stats are organized in bins according to how many times

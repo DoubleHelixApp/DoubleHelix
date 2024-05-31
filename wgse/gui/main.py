@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QTableWidgetItem,
+    QAbstractScrollArea,
 )
 
 from wgse.adapters.alignment_stats_adapter import AlignmentStatsAdapter
@@ -44,6 +45,7 @@ class WGSEWindow(QMainWindow):
 
     _percentage_updated = Signal(int)
     _message_updated = Signal(str)
+    _coverage_ready = Signal()
 
     def launch():
         app = QApplication(sys.argv)
@@ -92,6 +94,7 @@ class WGSEWindow(QMainWindow):
 
         self._message_updated.connect(self.ui.statusbar.showMessage)
         self._percentage_updated.connect(self.ui.progress.setValue)
+        self._coverage_ready.connect(self._show_coverage_stats)
 
         self._long_operation: SimpleWorker = None
         self._prepare_ready(self.config.last_path)
@@ -357,13 +360,13 @@ class WGSEWindow(QMainWindow):
             )
             if choice == QMessageBox.StandardButton.No:
                 return
-        self._prepare_long_operation("Preparing to compute coverage stats")
-        self._worker = SimpleWorker(self._compute_coverage_stats)
-
-        coverage_statistics = self.current_file.file_info.coverage_stats
-        dialog = TableDialog("Coverage Statistics", self)
-        dialog.set_data(CoverageStatsAdapter.adapt(coverage_statistics))
-        dialog.exec()
+            self._prepare_long_operation("Preparing to compute coverage stats")
+            self._worker = SimpleWorker(self._compute_coverage_stats)
+        else:
+            coverage_statistics = self.current_file.file_info.coverage_stats
+            dialog = TableDialog("Coverage Statistics", self)
+            dialog.set_data(CoverageStatsAdapter.adapt(coverage_statistics))
+            dialog.exec()
 
     def _compute_coverage_stats(self):
         self._long_operation = CoverageStatsCalculator(progress=self._set_progress)
@@ -371,6 +374,7 @@ class WGSEWindow(QMainWindow):
             self.current_file
         )
         self.current_file.save_meta()
+        self._coverage_ready.emit()
 
     def _show_reference(self):
         if self.current_file is None:
@@ -389,7 +393,11 @@ class WGSEWindow(QMainWindow):
                 self._perform_reference_download()
         reference = self.current_file.file_info.reference_genome
         dialog = TableDialog("Reference genome", self)
+        dialog.tableWidget.setSizeAdjustPolicy(
+            QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents
+        )
         dialog.set_data(ReferenceAdapter.adapt(reference))
+        dialog.tableWidget.resizeColumnsToContents()
         dialog.exec()
 
     def _perform_reference_download(self):

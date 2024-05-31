@@ -15,12 +15,12 @@ class CoverageStatsAdapter:
                 str(sequence_stats.non_zero_average),
             ]
             rows.append(TabularDataRow(sequence_stats.sequence_name, row))
-        horizontal_header = {
+        horizontal_header = [
             "# Reads: 0",
             "# Reads: 0-3",
             "# Reads: 3-7",
             "# Reads: >7",
             "Average",
             "Non-zero average",
-        }
+        ]
         return TabularData(horizontal_header, rows)
