@@ -25,4 +25,4 @@ python -m pip install wgse-ng
 wgse
 ```
 
-NOTE: See the [doc](https://wgse-ng.github.io/) for troubleshooting
+NOTE: See the [doc](https://wgse-ng.github.io/) for troubleshooting and for developer/user guides.
