@@ -60,8 +60,11 @@ class CoverageStatsCalculator:
         entries_by_name = {}
         sums_by_name = {}
 
-        entries_by_name = {x: [0] * 4 for x in file.header.sequences.keys()}
-        sums_by_name = {x: [0] * 4 for x in file.header.sequences.keys()}
+        for name, sequence in file.header.sequences.items():
+            if sequence.type == SequenceType.Other:
+                continue
+            entries_by_name[name] = [0] * 4
+            sums_by_name[name] = [0] * 4
 
         # Format is: sequence name, position (unused), # reads
         last_time = time.time()
@@ -76,6 +79,9 @@ class CoverageStatsCalculator:
             line = line.split()
             name = line[0]
             reads = int(line[2])
+
+            if name not in entries_by_name:
+                continue
 
             if reads > 7:
                 entries_by_name[name][DepthBin.MoreThan7] += 1

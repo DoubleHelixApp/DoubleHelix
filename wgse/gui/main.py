@@ -365,7 +365,11 @@ class WGSEWindow(QMainWindow):
         else:
             coverage_statistics = self.current_file.file_info.coverage_stats
             dialog = TableDialog("Coverage Statistics", self)
+            dialog.tableWidget.setSizeAdjustPolicy(
+                QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents
+            )
             dialog.set_data(CoverageStatsAdapter.adapt(coverage_statistics))
+            dialog.tableWidget.resizeColumnsToContents()
             dialog.exec()
 
     def _compute_coverage_stats(self):
