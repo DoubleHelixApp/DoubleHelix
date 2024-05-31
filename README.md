@@ -13,10 +13,8 @@
 This is my attempt to improve [WGSE](https://github.com/WGSExtract/WGSExtract-Dev). Still under heavy development. Don't expect anything working.
 
 
-[PyPi Package](https://pypi.org/project/WGSE-NG/)
-
-### Documentation
-- [Read the docs](https://wgse-ng.readthedocs.io/en/latest/) (pretty much empty at this point)
+- [PyPi Package](https://pypi.org/project/WGSE-NG/)
+- [Documentation](https://wgse-ng.github.io/)
 
 ### Launch
 The only currently supported way to install `WGSE-NG` is with a pypi package.
