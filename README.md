@@ -11,6 +11,7 @@
 
 This is my attempt to improve [WGSE](https://github.com/WGSExtract/WGSExtract-Dev). Still under heavy development. Don't expect anything working.
 
+Don't miss updates about WGSE-NG: [![channel icon](https://patrolavia.github.io/telegram-badge/follow.png)](https://t.me/WGSENG)
 
 - [PyPi Package](https://pypi.org/project/WGSE-NG/)
 - [Documentation](https://wgse-ng.github.io/)
