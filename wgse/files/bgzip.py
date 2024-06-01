@@ -13,7 +13,7 @@ class BgzipAction(enum.Enum):
     Reindex = 2
 
 
-class BGZIPCompressor:
+class BGzip:
     def __init__(
         self,
         external: External = External(),

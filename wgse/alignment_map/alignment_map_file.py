@@ -13,6 +13,7 @@ from wgse.data.alignment_map.alignment_map_file_info import AlignmentMapFileInfo
 from wgse.data.file_type import FileType
 from wgse.data.gender import Gender
 from wgse.data.mitochondrial_model_type import MitochondrialModelType
+from wgse.data.read_type import ReadType
 from wgse.data.sequence_type import SequenceType
 from wgse.data.sorting import Sorting
 from wgse.fasta.reference import Reference, ReferenceStatus
@@ -84,9 +85,34 @@ class AlignmentMapFile:
         return AlignmentMapHeader(self._samtools.header(self.path))
 
     def _to_fastq(self, io):
-        pass
+        options_fq = ["fastq"]
+        if self.file_info.alignment_stats.read_type == ReadType.Paired:
+            name_1 = self.path.stem + "_R1.fastq.gz"
+            name_2 = self.path.stem + "_R2.fastq.gz"
+            name_1 = self.path.parent.joinpath(name_1)
+            name_2 = self.path.parent.joinpath(name_2)
+            options_fq.extend(["-1", str(name_1), "-2", str(name_2)])
+        elif self.file_info.alignment_stats.read_type == ReadType.Single:
+            name = self.path.stem + ".fastq.gz"
+            options_fq.extend(["-0", str(name)])
+        else:
+            raise RuntimeError("Unknown read type")
+        options_fq.append("-n")
+        options_fq.extend(["-@", self._config.threads])
 
-    def _to_fasta(self, regions="", progress=None):
+        view = self._samtools.view(
+            self.path,
+            target_format=FileType.BAM,
+            cram_reference=self.file_info.reference_genome.ready_reference,
+            header=True,
+            uncompressed=True,
+            io=io,
+        )
+
+        # sort = self._samtools.sort(self.path)
+        # fastq = self._samtools.fastq(self.path, )
+
+    def _to_fasta(self, regions=None, progress=None):
         input = self.path
         suffixes = self.path.suffixes.copy()
         suffixes[-1] = ".fasta"
@@ -131,11 +157,17 @@ class AlignmentMapFile:
                 progress, self.path.stat().st_size, f"Converting to {target.name}"
             )
             io = io.compute_on_read_bytes
+
         return self._samtools.view(
-            self.path, target, output, regions, None, reference, io=io
+            self.path,
+            target_format=target,
+            output=output,
+            regions=regions,
+            cram_reference=reference,
+            io=io,
         )
 
-    def convert(self, target: FileType, regions="", progress=None):
+    def convert(self, target: FileType, regions=None, progress=None):
         if self.file_info.file_type == target:
             raise ValueError("Target and source file type for conversion are identical")
         if target == FileType.FASTA:

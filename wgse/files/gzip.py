@@ -4,19 +4,19 @@ from pathlib import Path
 from wgse.utility.external import External
 
 
-class GzipAction(enum.Enum):
+class GZipAction(enum.Enum):
     Compress = 0
     Decompress = 1
 
 
-class GzipCompressor:
+class GZip:
     def __init__(self, external=External()) -> None:
         self._external = external
 
-    def _gzip_filename(self, input: Path, action: GzipAction):
-        if action == GzipAction.Compress:
+    def _gzip_filename(self, input: Path, action: GZipAction):
+        if action == GZipAction.Compress:
             return Path(str(input) + ".gz")
-        elif action == GzipAction.Decompress:
+        elif action == GZipAction.Decompress:
             if len(input.suffixes) == 0:
                 raise RuntimeError(
                     f"Unable to determine decompressed filename, invalid filename {str(input)} (no extensions)."
@@ -30,7 +30,7 @@ class GzipCompressor:
         self,
         input: Path,
         output: Path,
-        action: GzipAction = GzipAction.Decompress,
+        action: GZipAction = GZipAction.Decompress,
     ) -> Path:
         # TODO: move this logic somewhere else.
         if output.exists():
@@ -39,7 +39,7 @@ class GzipCompressor:
             )
         inferred_filename = self._gzip_filename(input, action)
 
-        action_flags = {GzipAction.Compress: "", GzipAction.Decompress: "-d"}
+        action_flags = {GZipAction.Compress: "", GZipAction.Decompress: "-d"}
 
         process = self._external.gzip([action_flags[action], str(input)])
         process.wait()

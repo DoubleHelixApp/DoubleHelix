@@ -6,7 +6,7 @@ import typing
 import zipfile
 from pathlib import Path
 
-from wgse.files.bgzip_compressor import BGZIPCompressor, BgzipAction
+from wgse.files.bgzip import BGzip, BgzipAction
 from wgse.reference.genome_metadata_loader import Genome
 from wgse.utility.external import External
 from wgse.files.file_type_checker import FileType, FileTypeChecker
@@ -17,7 +17,7 @@ class Decompressor:
         self,
         type_checker: FileTypeChecker = FileTypeChecker(),
         external: External = External(),
-        bgzip_compressor=BGZIPCompressor(),
+        bgzip_compressor=BGzip(),
     ) -> None:
         self._bgzip_compressor = bgzip_compressor
         self._external = external

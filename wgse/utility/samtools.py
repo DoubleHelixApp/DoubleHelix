@@ -9,10 +9,14 @@ from wgse.utility.external import External
 
 class Samtools:
     def __init__(
-        self, external: External = External(), config=MANAGER_CFG.EXTERNAL
+        self,
+        external: External = External(),
+        config=MANAGER_CFG.EXTERNAL,
+        repo=MANAGER_CFG.REPOSITORY,
     ) -> None:
         self._external = external
         self._config = config
+        self._repository_config = repo
 
     def fasta_index(self, input: Path, output: Path = None, regions=None, io=None):
         faidx_opt = ["faidx", input]
@@ -47,6 +51,23 @@ class Samtools:
             ["idxstats", path, "-@", self._config.threads], wait=wait, io=io
         )
 
+    def sort(
+        self, file: Path, output: Path = None, format: FileType = FileType.SAM, io=None
+    ):
+        options = ["sort", "-T", self._repository_config.temporary, "-n"]
+        options.extend(["-@", self._config.threads])
+        if output is not None:
+            options.extend(["-o", str(output)])
+        if format == FileType.SAM:
+            options.extend(["-O", "sam"])
+        elif format == FileType.BAM:
+            options.extend(["-O", "bam"])
+        else:
+            raise RuntimeError("Unsupported file type")
+
+        options.append(str(file))
+        return self._external.samtools(options, io=io)
+
     def view(
         self,
         file: Path,
@@ -55,6 +76,8 @@ class Samtools:
         regions: str = None,
         subsample: float = None,
         cram_reference: Path = None,
+        header=False,
+        uncompressed=False,
         io=None,
     ):
         options = ["view", "--no-PG"]
@@ -66,6 +89,11 @@ class Samtools:
             pass
         else:
             raise ValueError("Cannot view in format %s" % (target_format.name))
+
+        if header:
+            options.append("-h")
+        if uncompressed:
+            options.append("-u")
 
         options.append(str(file))
         if output is not None:

@@ -6,7 +6,7 @@ from wgse.configuration import RepositoryConfig
 from wgse.data.genome import Genome
 from wgse.data.sequence import Sequence
 from wgse.fasta.reference import Reference
-from wgse.files.bgzip_compressor import BGZIPCompressor, BgzipAction
+from wgse.files.bgzip import BGzip, BgzipAction
 from wgse.files.decompressor import Decompressor
 from wgse.files.downloader import Downloader
 from wgse.reference.genome_metadata_loader import MetadataLoader
@@ -133,7 +133,7 @@ class Repository:
 
     def _create_companion_files(self, genome: Genome, force=False):
         samtools = Samtools()
-        bgzip = BGZIPCompressor()
+        bgzip = BGzip()
         logging.info(f"{genome}: Starting post-download tasks.")
         if not genome.gzi.exists():
             logging.info(f"{genome}: Generating bgzip index.")
@@ -163,7 +163,7 @@ class Repository:
     def download(self, genome: Genome, progress=None, force=False):
         downloader = Downloader()
         decompressor = Decompressor()
-        compressor = BGZIPCompressor()
+        compressor = BGzip()
 
         if genome.fasta.exists() and not force:
             logging.info(f"File {genome.fasta.name} already exist. Re-using it.")
@@ -207,7 +207,7 @@ if __name__ == "__main__":
     import pathlib
 
     genomes = MetadataLoader().load()
-    decompressor = BGZIPCompressor()
+    decompressor = BGzip()
     for genome in genomes:
         if genome.decompressed_md5 is None:
             continue
