@@ -3,15 +3,15 @@
 </p>
   <h1 align="center">WGSE-NG</h1>
 
-[![Build + Lint](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-build-lint.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-build-lint.yml)
-[![Python Publish](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-publish.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-publish.yml/badge.svg)
+[![PyInstaller release for Windows](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller-win.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller-win.yml) [![PyInstaller release for Linux](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller-linux.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller-linux.yml)
 
-[![PyInstaller release for Linux](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller-linux.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller-linux.yml)
-[![PyInstaller release for Windows](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller-win.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-pyinstaller-win.yml)
+[![Build + Lint](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-build-lint.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-build-lint.yml) [![Python Publish](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-publish.yml/badge.svg)](https://github.com/WGSE-NG/WGSE-NG/actions/workflows/python-publish.yml/badge.svg)
+
+[![channel icon](https://patrolavia.github.io/telegram-badge/follow.png)](https://t.me/WGSENG)
 
 This is my attempt to improve [WGSE](https://github.com/WGSExtract/WGSExtract-Dev). Still under heavy development. Don't expect anything working.
 
-Don't miss updates about WGSE-NG: [![channel icon](https://patrolavia.github.io/telegram-badge/follow.png)](https://t.me/WGSENG)
+ Don't miss updates about WGSE-NG
 
 - [PyPi Package](https://pypi.org/project/WGSE-NG/)
 - [Documentation](https://wgse-ng.github.io/)
