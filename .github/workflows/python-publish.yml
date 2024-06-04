@@ -37,7 +37,7 @@ jobs:
         name: wheels
         path: dist/
         retention-days: 1
-        
+
   # Publish Job
   pypi-publish:
     name: Upload release to PyPI
