@@ -1,16 +1,16 @@
 import webbrowser
 
-from wgse.adapters.alignment_map_file_info_adapter import AlignmentMapFileInfoAdapter
-from wgse.adapters.alignment_stats_adapter import AlignmentStatsAdapter
-from wgse.adapters.header_adapter import HeaderAdapter
-from wgse.adapters.index_stats_adapter import IndexStatsAdapter
-from wgse.alignment_map.alignment_map_file import AlignmentMapFile
-from wgse.configuration import MANAGER_CFG
-from wgse.renderers.html_aligned_file_report import HTMLAlignedFileReport
+from helix.adapters.alignment_map_file_info_adapter import AlignmentMapFileInfoAdapter
+from helix.adapters.alignment_stats_adapter import AlignmentStatsAdapter
+from helix.adapters.header_adapter import HeaderAdapter
+from helix.adapters.index_stats_adapter import IndexStatsAdapter
+from helix.alignment_map.alignment_map_file import AlignmentMapFile
+from helix.configuration import MANAGER_CFG
+from helix.renderers.html_aligned_file_report import HTMLAlignedFileReport
 
 if __name__ == "__main__":
     """This script will generate a report for
-    the last file that was opened by WGSE."""
+    the last file that was opened by Helix."""
     input = MANAGER_CFG.GENERAL.last_path
     if input is None:
         exit()

@@ -2,7 +2,7 @@ from pathlib import Path
 from test.utility import MockFile
 from unittest.mock import Mock, patch
 
-from wgse.microarray.raw_file import RawEntry, RawFile
+from helix.microarray.raw_file import RawEntry, RawFile
 
 
 def test_raw_entry():

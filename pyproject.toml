@@ -3,10 +3,10 @@ requires = ["setuptools>=42", "setuptools_scm[toml]>=6.0.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "WGSE-NG"
+name = "Helix"
 description = "Whole Genome Sequencing data manipulation tool"
 readme = { file = "README.md", content-type = "text/markdown" }
-authors = [{ name = "Multiple", email = "unavailable@wgse-ng.com" }]
+authors = [{ name = "Multiple", email = "unavailable@helix.com" }]
 keywords = ["bioinformatics", "genetics", "wgs", "microarray", "science"]
 license = {file = "LICENSE"}
 classifiers = [
@@ -35,7 +35,7 @@ dependencies = [
     "PySide6",
     "jinja2",
     "vcf_parser",
-    "WGSE-NG-3rd-party",
+    "Helix-3rd-party",
     "sentry-sdk",
     "debugpy",
     "psutil",
@@ -43,30 +43,30 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = "https://github.com/WGSE-NG/WGSE-NG"
-Documentation = "https://wgse-ng.readthedocs.io/en/latest/"
-Repository = "https://github.com/WGSE-NG/WGSE-NG"
-Issues = "https://github.com/WGSE-NG/WGSE-NG/issues"
-Changelog = "https://github.com/WGSE-NG/WGSE-NG/releases"
+homepage = "https://github.com/Helix/Helix"
+Documentation = "https://helix.readthedocs.io/en/latest/"
+Repository = "https://github.com/Helix/Helix"
+Issues = "https://github.com/Helix/Helix/issues"
+Changelog = "https://github.com/Helix/Helix/releases"
 
 [tool.setuptools.packages.find]
-include = ["wgse", "wgse.*"]
+include = ["helix", "helix.*"]
 
 [tool.setuptools]
 include-package-data = true
 
 [tool.setuptools.exclude-package-data]
-"wgse.metadata.microarray_templates.head" = ["*.*"]
-"wgse.metadata.microarray_templates.body" = ["*.*"]
+"helix.metadata.microarray_templates.head" = ["*.*"]
+"helix.metadata.microarray_templates.body" = ["*.*"]
 
 [project.scripts]
-wgse_cli = "wgse.main:main"
+helix_cli = "helix.main:main"
 
 [project.gui-scripts]
-wgse = "wgse.main:main"
+helix = "helix.main:main"
 
 [tool.setuptools_scm]
-version_file = "wgse/VERSION.py"
+version_file = "helix/VERSION.py"
 
 [tool.isort]
 profile = "black"

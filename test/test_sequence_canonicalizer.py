@@ -1,6 +1,6 @@
-from wgse.data.chromosome_name_type import ChromosomeNameType
-from wgse.naming.converter import Converter
-from wgse.naming.lookup_tables import ACCESSION_TO_NUMBER
+from helix.data.chromosome_name_type import ChromosomeNameType
+from helix.naming.converter import Converter
+from helix.naming.lookup_tables import ACCESSION_TO_NUMBER
 
 
 def test_convert_to_number():

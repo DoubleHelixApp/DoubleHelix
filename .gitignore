@@ -14,5 +14,5 @@ configuration/main.ini
 _build
 _static
 _templates
-wgse/VERSION.py
+helix/VERSION.py
 bare_minimum

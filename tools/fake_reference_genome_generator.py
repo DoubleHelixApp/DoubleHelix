@@ -2,8 +2,8 @@ import random
 import textwrap
 from pathlib import Path
 
-from wgse.alignment_map.alignment_map_header import AlignmentMapHeader
-from wgse.reference.genome_metadata_loader import MetadataLoader
+from helix.alignment_map.alignment_map_header import AlignmentMapHeader
+from helix.reference.genome_metadata_loader import MetadataLoader
 
 
 class FakeReferenceGenomeGenerator:

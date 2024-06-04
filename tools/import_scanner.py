@@ -5,51 +5,55 @@ import pefile
 
 
 class ImportScanner:
-    def __init__(self, exe: Path):
-        self.exe = exe
+    def __init__(self, paths: list[Path]):
+        self.paths = paths
 
-    def get_dlls(self):
-        to_scan = [self.exe.name]
+    def get_dlls(self, binary):
+        to_scan = [binary]
         scanned = []
 
-        dependencies = set([self.exe])
-        directory = self.exe.parent
-
+        dependencies = set([binary])
         while len(to_scan) > 0:
             file = to_scan.pop()
-            pe = pefile.PE(str(Path(directory, file)))
+            pe = pefile.PE(str(file))
             for entry in pe.DIRECTORY_ENTRY_IMPORT:
                 dependency = entry.dll.decode("utf-8")
-                if Path(directory, dependency).exists():
-                    if dependency not in scanned and dependency not in to_scan:
-                        to_scan.append(dependency)
-                    dependencies.add(Path(directory, dependency))
+                for path in self.paths:
+                    target = Path(path, dependency)
+                    if target.exists():
+                        if target not in scanned and target not in to_scan:
+                            to_scan.append(target)
+                        dependencies.add(target)
             scanned.append(file)
         return dependencies
 
 
 if __name__ == "__main__":
-    cygwin_root = Path("cygwin64", "usr", "local", "bin")
+    """This script will scan certain executables and
+    recursively look for dependencies.
+    """
+
+    msys2_additional_path = Path("/", "usr", "bin")
 
     files = [
-        cygwin_root.joinpath("bwa.exe"),
-        cygwin_root.joinpath("bgzip.exe"),
-        cygwin_root.joinpath("samtools.exe"),
-        cygwin_root.joinpath("htsfile.exe"),
-        cygwin_root.joinpath("bcftools.exe"),
-        cygwin_root.joinpath("tabix.exe"),
-        cygwin_root.joinpath("minimap2.exe"),
-        cygwin_root.joinpath("fastp.exe"),
-        cygwin_root.joinpath("gzip.exe"),
+        Path("bwa", "bwa.exe"),
+        Path("htslib", "bgzip.exe"),
+        Path("htslib", "tabix.exe"),
+        Path("htslib", "htsfile.exe"),
+        Path("samtools", "samtools.exe"),
+        Path("bcftools", "bcftools.exe"),
+        Path("minimap2", "minimap2.exe"),
     ]
 
-    destination_root = Path("bare_minimum")
+    destination_root = Path("helix", "third_party")
     if not destination_root.exists():
-        destination_root.mkdir()
+        destination_root.mkdir(parents=True, exist_ok=True)
+
+    destination_root.joinpath("__init__.py").touch()
 
     for file in files:
-        scanner = ImportScanner(file)
-        binaries = scanner.get_dlls()
+        scanner = ImportScanner([msys2_additional_path])
+        binaries = scanner.get_dlls(file)
 
         for source_binary in binaries:
             destination_binary = destination_root.joinpath(source_binary.name)

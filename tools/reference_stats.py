@@ -3,10 +3,10 @@ import logging
 import time
 from pathlib import Path
 
-from wgse.data.genome import Genome
-from wgse.fasta.fasta_letter_counter import FASTALetterCounter
-from wgse.fasta.fasta_stats_files import FASTAStatsFiles
-from wgse.utility.samtools import Samtools
+from helix.data.genome import Genome
+from helix.fasta.fasta_letter_counter import FASTALetterCounter
+from helix.fasta.fasta_stats_files import FASTAStatsFiles
+from helix.utility.samtools import Samtools
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(__name__)

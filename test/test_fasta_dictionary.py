@@ -1,5 +1,5 @@
-from wgse.alignment_map.alignment_map_header import AlignmentMapHeader
-from wgse.data.sorting import Sorting
+from helix.alignment_map.alignment_map_header import AlignmentMapHeader
+from helix.data.sorting import Sorting
 
 
 def test_header_parsed_correctly():

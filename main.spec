@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['wgse/main.py'],
+    ['helix/main.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -21,7 +21,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='WGSE-NG',
+    name='Helix',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

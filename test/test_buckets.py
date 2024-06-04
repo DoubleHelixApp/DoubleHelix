@@ -1,7 +1,7 @@
 import pytest
 
-from wgse.fasta.letter_run_buckets import LetterRunBuckets
-from wgse.fasta.letter_run_collection import LetterRunCollection
+from helix.fasta.letter_run_buckets import LetterRunBuckets
+from helix.fasta.letter_run_collection import LetterRunCollection
 
 
 def test_single_bucket():

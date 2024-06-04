@@ -2,7 +2,7 @@ from test.utility import MockFile, MockPath
 
 import pytest
 
-from wgse.fasta.fasta_letter_counter import FASTALetterCounter
+from helix.fasta.fasta_letter_counter import FASTALetterCounter
 
 
 class MockGenome:

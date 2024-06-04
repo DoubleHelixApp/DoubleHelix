@@ -1,6 +1,6 @@
 import pytest
 
-from wgse.fasta.letter_run_collection import LetterRunCollection
+from helix.fasta.letter_run_collection import LetterRunCollection
 
 
 def test_sequence_with_invalid_length():

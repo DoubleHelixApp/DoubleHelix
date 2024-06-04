@@ -2,8 +2,8 @@ from test.test_fasta import MockPath
 
 import pytest
 
-from wgse.configuration import RepositoryConfig
-from wgse.microarray.microarray_converter import MicroarrayConverter
+from helix.configuration import RepositoryConfig
+from helix.microarray.microarray_converter import MicroarrayConverter
 
 # def test_every_target_has_formatter():
 #     assert all(x in TARGET_FORMATTER_MAP for x in MicroarrayConverterTarget)

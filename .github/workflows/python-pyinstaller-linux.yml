@@ -30,9 +30,9 @@ jobs:
         pip install pyinstaller
     - name: Make pyinstaller release
       run: |
-        pyinstaller ./wgse/main.py --clean -y --collect-all wgse --log-level=WARN --add-data ./wgse/metadata/*.*:./wgse/metadata --add-data ./wgse/metadata/report_templates/*.*:./wgse/metadata/report_templates --windowed --onefile
+        pyinstaller ./helix/main.py --clean -y --collect-all helix --log-level=WARN --add-data ./helix/metadata/*.*:./helix/metadata --add-data ./helix/metadata/report_templates/*.*:./helix/metadata/report_templates --windowed --onefile
     - uses: actions/upload-artifact@v2
       with:
-        name: WGSE
+        name: Helix
         path: ./dist/main
         retention-days: 1

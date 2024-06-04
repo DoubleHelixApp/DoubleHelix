@@ -1,8 +1,8 @@
 from collections import OrderedDict
 
-from wgse.data.genome import Genome
-from wgse.data.sequence import Sequence
-from wgse.fasta.reference import Reference, ReferenceStatus
+from helix.data.genome import Genome
+from helix.data.sequence import Sequence
+from helix.fasta.reference import Reference, ReferenceStatus
 
 
 def test_query_is_a_perfect_match():
