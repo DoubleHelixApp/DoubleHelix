@@ -1,7 +1,7 @@
 # pkgutil shenanigans to make python load helix.third_party from site-packages
 #
 # tl;dr helix.third_party contains some executables for windows and is installed
-# from another pypi package (helix-3rd-party).
+# from another pypi package (doublehelix-external).
 # When importing helix.third_party from any files inside Helix, python will expect
 # to find helix.third_party INSIDE this package and not in site-packages. Code
 # below will make this package a "Native Namespace Package" (PEP 420) and will

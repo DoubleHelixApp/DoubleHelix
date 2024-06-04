@@ -6,7 +6,7 @@ from importlib.metadata import version
 class Updater:
 
     def __init__(self) -> None:
-        self.packages = ["Helix", "Helix-3rd-party"]
+        self.packages = ["Helix", "doublehelix-external"]
         # Package Name -> (Current v., Latest v.)
         self.versions = {x: (version(x), self.check(x)) for x in self.packages}
 
