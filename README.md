@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://avatars.githubusercontent.com/u/168782993?s=200&v=4">
 </p>
-  <h1 align="center">Helix</h1>
+  <h1 align="center">DoubleHelix</h1>
 
 [![Build + Lint](https://github.com/Helix/Helix/actions/workflows/python-build-lint.yml/badge.svg)](https://github.com/Helix/Helix/actions/workflows/python-build-lint.yml)
 [![Python Publish](https://github.com/Helix/Helix/actions/workflows/python-publish.yml/badge.svg)](https://github.com/Helix/Helix/actions/workflows/python-publish.yml/badge.svg)
