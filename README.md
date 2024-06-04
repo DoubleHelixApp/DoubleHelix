@@ -21,8 +21,8 @@ The only currently supported way to install `Helix` is with a pypi package.
 
 ```bash
 sudo apt install libqt6waylandclient6 samtools bcftools -y # Only for Linux
-python -m pip install helix
+python -m pip install doublehelix
 helix
 ```
 
-NOTE: See the [doc](https://helix.github.io/) for troubleshooting and for developer/user guides.
+NOTE: See the [doc](https://doublehelixapp.github.io/) for troubleshooting and for developer/user guides.
