@@ -3,10 +3,10 @@ requires = ["setuptools>=42", "setuptools_scm[toml]>=6.0.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "Helix"
-description = "Whole Genome Sequencing data manipulation tool"
+name = "DoubleHelix"
+description = "Genomic data manipulation tool"
 readme = { file = "README.md", content-type = "text/markdown" }
-authors = [{ name = "Multiple", email = "unavailable@helix.com" }]
+authors = [{ name = "Multiple", email = "unavailable@doublehelix.bio" }]
 keywords = ["bioinformatics", "genetics", "wgs", "microarray", "science"]
 license = {file = "LICENSE"}
 classifiers = [
@@ -43,11 +43,11 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = "https://github.com/Helix/Helix"
+homepage = "https://github.com/DoubleHelixApp/DoubleHelix"
 Documentation = "https://helix.readthedocs.io/en/latest/"
-Repository = "https://github.com/Helix/Helix"
-Issues = "https://github.com/Helix/Helix/issues"
-Changelog = "https://github.com/Helix/Helix/releases"
+Repository = "https://github.com/DoubleHelixApp/DoubleHelix"
+Issues = "https://github.com/DoubleHelixApp/DoubleHelix/issues"
+Changelog = "https://github.com/DoubleHelix/DoubleHelix/releases"
 
 [tool.setuptools.packages.find]
 include = ["helix", "helix.*"]
