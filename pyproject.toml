@@ -35,7 +35,7 @@ dependencies = [
     "PySide6",
     "jinja2",
     "vcf_parser",
-    "Helix-3rd-party",
+    "doublehelix-external",
     "sentry-sdk",
     "debugpy",
     "psutil",
