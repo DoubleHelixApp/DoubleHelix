@@ -14,10 +14,10 @@ This is my attempt to improve [WGSE](https://github.com/WGSExtract/WGSExtract-De
 - [PyPi Package](https://pypi.org/project/Helix/)
 - [Documentation](https://doublehelixapp.github.io/)
 
-Follow [this](https://t.me/DoubleHelixApp) very low traffic telegram channel if you don't want to miss any updates on WGSE-NG (the channel is managed by [WGSE-NG Telegram bot](https://github.com/WGSE-NG/TelegramBOT)).
+Follow [this](https://t.me/DoubleHelixApp) very low traffic telegram channel if you don't want to miss any updates on DoubleHelix (the channel is managed by [DoubleHelix Telegram bot](https://github.com/DoubleHelixApp/TelegramBOT)).
 
 ### Launch
-The only currently supported way to install `Helix` is with a pypi package.
+The only currently supported way to install `DoubleHelix` is with a pypi package.
 
 ```bash
 sudo apt install libqt6waylandclient6 samtools bcftools -y # Only for Linux
