@@ -1,12 +1,10 @@
 import logging
 import os
-import sys
 import webbrowser
 from pathlib import Path
 
 from PySide6.QtCore import QModelIndex, Signal
 from PySide6.QtWidgets import (
-    QApplication,
     QFileDialog,
     QMainWindow,
     QMessageBox,
@@ -39,6 +37,7 @@ from helix.utility.external import External
 from helix.utility.samtools import Samtools
 from helix.utility.shortcut import Shortcut
 from helix.progress.simple_worker import SimpleWorker
+from helix.utility.updater import Updater
 
 
 class HelixWindow(QMainWindow):
@@ -48,12 +47,6 @@ class HelixWindow(QMainWindow):
     _operation_ended = Signal()
     _coverage_ready = Signal()
 
-    def launch():
-        app = QApplication(sys.argv)
-        widget = HelixWindow()
-        widget.show()
-        sys.exit(app.exec())
-
     def __init__(
         self,
         parent=None,
@@ -61,6 +54,7 @@ class HelixWindow(QMainWindow):
         external=External(),
         samtools=Samtools(),
         repository=Repository(),
+        updater=Updater(),
     ):
         super().__init__(parent)
         self._external = external
@@ -69,6 +63,7 @@ class HelixWindow(QMainWindow):
         self.config = config
         self.current_file = None
         self._logger = logging.getLogger("main")
+        self._updater = updater
 
         self.switch_to_main()
         self.ui.actionDocumentation.triggered.connect(self.on_doc)
@@ -98,25 +93,26 @@ class HelixWindow(QMainWindow):
         self._coverage_ready.connect(self._show_coverage_stats)
         self._operation_ended.connect(self._prepare_ready)
 
-        self._long_operation: SimpleWorker = None
+        self._long_operation = None
         self._prepare_ready(self.config.last_path)
 
     def stop(self):
-        if self._long_operation is not None:
-            self._long_operation.kill()
-            self._long_operation = None
-            self._worker = None
+        long_op = self._long_operation
+        if long_op is not None:
+            long_op.kill()
         self._prepare_ready()
 
     def export(self):
         if self.current_file is None:
             return
-        self._prepare_long_operation("Prepare exporting")
+        if self._long_operation is not None:
+            return
+
         dialog = ExtractWizard(self.current_file, self, progress=self._set_progress)
         dialog.exec()
         if dialog._worker is not None:
-            self._long_operation = dialog
-            self._worker = dialog._worker
+            self._prepare_long_operation("Prepare exporting")
+            self._long_operation = dialog._worker
         else:
             self._prepare_ready()
 
@@ -310,14 +306,21 @@ class HelixWindow(QMainWindow):
         self.ui.statusbar.showMessage("Ready")
         self.ui.extract.show()
 
+    def _ok_message_box(self, title, text, info=None):
+        buttons = QMessageBox.StandardButton.Ok
+        return self._message_box(title, text, buttons, info)
+
     def _yn_message_box(self, title, text, info=None):
+        buttons = QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        return self._message_box(title, text, buttons, info)
+
+    def _message_box(self, title, text, buttons, info=None):
         prompt = QMessageBox()
         prompt.setWindowTitle(title)
         prompt.setText(text)
         if info is not None:
             prompt.setInformativeText(info)
 
-        buttons = QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         prompt.setStandardButtons(buttons)
         prompt.setDefaultButton(QMessageBox.StandardButton.Yes)
         return QMessageBox.StandardButton(prompt.exec())
@@ -360,6 +363,12 @@ class HelixWindow(QMainWindow):
     def _show_coverage_stats(self):
         if self.current_file is None:
             return
+        if self._long_operation is not None:
+            self._ok_message_box(
+                "Unable to get stats",
+                "Please wait until the current operation is finished.",
+            )
+            return
 
         if self.current_file.file_info.coverage_stats is None:
             choice = self._yn_message_box(
@@ -369,7 +378,7 @@ class HelixWindow(QMainWindow):
             if choice == QMessageBox.StandardButton.No:
                 return
             self._prepare_long_operation("Preparing to compute coverage stats")
-            self._worker = SimpleWorker(self._compute_coverage_stats)
+            self._long_operation = SimpleWorker(self._compute_coverage_stats)
         else:
             coverage_statistics = self.current_file.file_info.coverage_stats
             dialog = TableDialog("Coverage Statistics", self)
@@ -381,12 +390,13 @@ class HelixWindow(QMainWindow):
             dialog.exec()
 
     def _compute_coverage_stats(self):
-        self._long_operation = CoverageStatsCalculator(progress=self._set_progress)
-        self.current_file.file_info.coverage_stats = self._long_operation.get_stats(
-            self.current_file
+        self._long_operation = CoverageStatsCalculator(
+            self.current_file, progress=self._set_progress
         )
-        self.current_file.save_meta()
-        self._coverage_ready.emit()
+        self.current_file.file_info.coverage_stats = self._long_operation.get_stats()
+        if self.current_file.file_info.coverage_stats is not None:
+            self.current_file.save_meta()
+            self._coverage_ready.emit()
 
     def _show_reference(self):
         if self.current_file is None:

@@ -8,6 +8,13 @@ import debugpy
 
 
 class SimpleWorker(Thread):
+    """Run a function that returns a Popen in another
+    thread and provide a way to kill it.
+
+    Args:
+        Thread (_type_): _description_
+    """
+
     def __init__(self, function, *args, **kwargs) -> None:
         super().__init__()
         self.function = function

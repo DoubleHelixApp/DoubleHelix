@@ -125,6 +125,9 @@ class ExtractWizard(QDialog):
     def _to_fastq(self):
         if self.current_file is None:
             return
+        self._worker = SimpleWorker(
+            self.current_file.convert, FileType.FASTQ, progress=self._progress
+        )
         self.close()
 
     def _to_html(self):
@@ -150,11 +153,8 @@ class ExtractWizard(QDialog):
         if self.current_file is None:
             return
 
-        long_operation = VariantCaller(progress=self._progress)
-        self._worker = SimpleWorker(
-            long_operation.call,
-            self.current_file,
-        )
+        self._worker = VariantCaller(self.current_file, progress=self._progress)
+        self._worker.start()
         self.close()
 
     def _to_unknown(self):

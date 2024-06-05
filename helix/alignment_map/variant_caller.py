@@ -2,10 +2,12 @@ import enum
 import logging
 import shlex
 import subprocess
+from time import sleep
 
 from helix.progress.base_progress_calculator import BaseProgressCalculator
 from helix.alignment_map.alignment_map_file import AlignmentMapFile
 from helix.configuration import MANAGER_CFG
+from helix.progress.simple_worker import SimpleWorker
 from helix.utility.external import External
 
 
@@ -15,9 +17,11 @@ class VariantCallingType(enum.Enum):
     Both = enum.auto()
 
 
-class VariantCaller:
+class VariantCaller(SimpleWorker):
     def __init__(
         self,
+        input: AlignmentMapFile,
+        calling_type=VariantCallingType.Both,
         repo_config=MANAGER_CFG.REPOSITORY,
         ext_config=MANAGER_CFG.EXTERNAL,
         external: External = External(),
@@ -28,30 +32,39 @@ class VariantCaller:
         self._ext_config = ext_config
         self._ploidy = str(repo_config.metadata.joinpath("ploidy.txt"))
         self._is_quitting = False
+        self._quitting_ack = False
         self._current_operation = None
         self._progress = progress
         self._logger = logger
+        self._input_file = input
+        self._calling_type = calling_type
 
-    def call(self, aligned_file: AlignmentMapFile, type=VariantCallingType.Both):
-        if aligned_file.file_info.index_stats is None:
+        if self._input_file.file_info.index_stats is None:
             raise RuntimeError("Index stats cannot be None for variant calling")
-        if aligned_file.file_info.reference_genome.ready_reference is None:
+        if self._input_file.file_info.reference_genome.ready_reference is None:
             raise RuntimeError("Reference cannot be None for variant calling")
-        self.current_file = aligned_file
-        reference = str(aligned_file.file_info.reference_genome.ready_reference.fasta)
-        self._logger.info(
-            f"Calling variants with {aligned_file.file_info.reference_genome.ready_reference}"
+
+    def call(self):
+        return self.run()
+
+    def run(self):
+        self.current_file = self._input_file
+        reference = str(
+            self._input_file.file_info.reference_genome.ready_reference.fasta
         )
-        input_file = aligned_file.path
+        self._logger.info(
+            f"Calling variants with {self._input_file.file_info.reference_genome.ready_reference}"
+        )
+        input_file = self._input_file.path
 
         skip_variant_opt = ""
-        if type == VariantCallingType.InDel:
+        if self._calling_type == VariantCallingType.InDel:
             skip_variant_opt = "-V snps"
-        elif type == VariantCallingType.SNP:
+        elif self._calling_type == VariantCallingType.SNP:
             skip_variant_opt = "-V indels"
 
-        output_file = aligned_file.path.with_name(
-            f"{aligned_file.path.stem}_{type.name}.vcf.gz"
+        output_file = self._input_file.path.with_name(
+            f"{self._input_file.path.stem}_{self._calling_type.name}.vcf.gz"
         )
 
         pileup_opt = f'mpileup -B -I -C 50 --threads {self._ext_config.threads} -f "{reference}" -Ou "{input_file}"'
@@ -90,20 +103,37 @@ class VariantCaller:
         call = self._external.bcftools(call_opt, stdin=self._current_operation.stdout)
         call.communicate()
         if self._is_quitting:
+            self._quitting_ack = True
             return
 
         progress = BaseProgressCalculator(
             self._progress, output_file.stat().st_size, "[2/2] Indexing"
         )
         self._current_operation = self._external.tabix(
-            tabix_opt, wait=True, io=progress.compute_on_read_bytes
+            tabix_opt, io=progress.compute_on_read_bytes
         )
+        self._current_operation.wait()
+        self._quitting_ack = True
 
     def kill(self):
         self._is_quitting = True
-        operation = self._current_operation
         try:
-            if operation is not None:
-                operation.kill()
+            # The while is just to prevent a (unlikely IMO but who knows) situation
+            # where _is_quitting is seen as False by the other thread after Popen.kill()
+            # has been called.
+            for _ in range(10):
+                operation = self._current_operation
+                if self._quitting_ack:
+                    break
+                if operation is not None:
+                    operation.kill()
+                self._current_operation = None
+                if self._quitting_ack:
+                    break
+                sleep(0.5)
+            if not self._quitting_ack:
+                raise RuntimeError(
+                    f"Failed 10 attempts to kill {self._current_operation}."
+                )
         except Exception as e:
             self._logger.error(f"Error while killing variant calling: {e!s}")

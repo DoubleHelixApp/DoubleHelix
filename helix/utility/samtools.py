@@ -79,6 +79,7 @@ class Samtools:
         header=False,
         uncompressed=False,
         io=None,
+        wait=True,
     ):
         options = ["view", "--no-PG"]
         if target_format == FileType.BAM:
@@ -108,4 +109,4 @@ class Samtools:
 
         options.extend(["-@", self._config.threads])
 
-        return self._external.samtools(options, wait=True, io=io, text=True).split("\n")
+        return self._external.samtools(options, wait=wait, io=io, text=True)

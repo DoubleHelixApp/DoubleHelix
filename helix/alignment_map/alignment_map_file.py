@@ -111,8 +111,11 @@ class AlignmentMapFile:
 
         # sort = self._samtools.sort(self.path)
         # fastq = self._samtools.fastq(self.path, )
+        return view
 
     def _to_fasta(self, regions=None, progress=None):
+        if self.file_info.reference_genome.ready_reference is None:
+            raise RuntimeError("Unable to convert to FASTA without a valid reference.")
         input = self.path
         suffixes = self.path.suffixes.copy()
         suffixes[-1] = ".fasta"
@@ -129,8 +132,7 @@ class AlignmentMapFile:
 
         # faidx = self._samtools.fasta_index(reference, regions=regions)
         consensus = self._samtools.consensus(input, output, io=io)
-        consensus.wait()
-        return output
+        return consensus
 
     def _to_alignment_map(self, target: FileType, regions, progress):
         suffixes = self.path.suffixes.copy()
@@ -165,6 +167,7 @@ class AlignmentMapFile:
             regions=regions,
             cram_reference=reference,
             io=io,
+            wait=False,
         )
 
     def convert(self, target: FileType, regions=None, progress=None):
