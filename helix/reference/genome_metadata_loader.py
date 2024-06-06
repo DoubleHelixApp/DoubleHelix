@@ -9,17 +9,6 @@ from helix.data.source import Source
 
 
 class MetadataLoader:
-    """Manage metadata related to reference genomes.
-
-    Raises:
-        FileNotFoundError: _description_
-        FileNotFoundError: _description_
-        FileNotFoundError: _description_
-
-    Returns:
-        _type_: _description_
-    """
-
     class _CircularReferenceEncoder(json.JSONEncoder):
         """Helps with the serialization of metadata, ensuring
         that is serialized only what's really needed."""

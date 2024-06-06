@@ -2,9 +2,7 @@ import time
 
 
 class BaseProgressCalculator:
-    """Provide an abstraction over ProcessIOMonitor to compute an ETA
-    and a percentage for a long operation (i.e., variant calling, indexing, etc.)
-    """
+    """Provide a way to calculate the progress and an ETA."""
 
     def __init__(
         self,
