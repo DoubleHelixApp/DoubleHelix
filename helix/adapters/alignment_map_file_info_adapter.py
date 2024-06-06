@@ -1,5 +1,6 @@
 from helix.data.alignment_map.alignment_map_file_info import AlignmentMapFileInfo
 from helix.data.tabular_data import TabularData, TabularDataRow
+from helix.utility.unit_prefix import UnitPrefix
 
 
 class AlignmentMapFileInfoAdapter:
@@ -17,9 +18,6 @@ class AlignmentMapFileInfoAdapter:
             "sequence_count": "Sequence count",
             "gender": "Gender",
         }
-        size = stats.path.stat().st_size
-        size /= 1024**3
-        size = f"{size:.1f} GB"
 
         data = {x: None for x in label_map.values()}
         data["Sorted"] = [stats.sorted.name]
@@ -29,7 +27,7 @@ class AlignmentMapFileInfoAdapter:
         data["Gender"] = [stats.gender.name]
         data["File type"] = [stats.file_type.name]
         data["Path"] = [str(stats.path)]
-        data["Size"] = [size]
+        data["Size"] = [UnitPrefix.convert_bytes(stats.path.stat().st_size)]
         for key, value in label_map.items():
             if value not in data or data[value] is None:
                 data[value] = [str(stats.__dict__[key])]
