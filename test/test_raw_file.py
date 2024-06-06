@@ -17,9 +17,7 @@ def test_compressed_raw_file(mock_open, mock_gzopen):
     file = Mock()
     file.write = lambda x: lines.append(x)
 
-    mock_gzopen.side_effect = [
-        MockFile(["#FOO", " rs1 \t 1 \t 1 \t AA \n", "rs2\tX\t123\tBB"])
-    ]
+    mock_gzopen.side_effect = [MockFile("#FOO\nrs1 \t 1 \t 1 \t AA \nrs2\tX\t123\tBB")]
     mock_open.side_effect = [file]
 
     elements: list[RawEntry] = []

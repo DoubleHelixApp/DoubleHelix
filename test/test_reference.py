@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from helix.data.genome import Genome
 from helix.data.sequence import Sequence
-from helix.fasta.reference import Reference, ReferenceStatus
+from helix.reference.reference import Reference, ReferenceStatus
 
 
 def test_query_is_a_perfect_match():
@@ -45,6 +45,25 @@ def test_genome_is_superset():
     sequences_1 = [
         Sequence("chr1", 123, "a", genome_1),
         Sequence("chr2", 124, "b", genome_1),
+    ]
+
+    genome_1.sequences = sequences_1
+
+    query_sequences = OrderedDict(
+        [
+            (Sequence("chr1", 123, None), [sequences_1[0]]),
+        ]
+    )
+
+    ref = Reference(query_sequences)
+    assert ref.status == ReferenceStatus.Buildable
+    assert len(ref.matching) == 0
+
+
+def test_name_is_not_matching():
+    genome_1 = Genome("https://reference_1.com/fasta.fa", source="Fake", build="38")
+    sequences_1 = [
+        Sequence("1", 123, "a", genome_1),
     ]
 
     genome_1.sequences = sequences_1

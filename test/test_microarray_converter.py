@@ -38,9 +38,11 @@ def test_inexistent_head_folder_raise():
 def test_inexistent_head_folder_raise():
     config = RepositoryConfig()
     config.metadata = MockPath(exists=False)
-    microarray_templates = MockPath(exists=False, name="microarray_templates")
+    microarray_templates = MockPath("microarray_templates", exists=False)
     microarray_templates.joinpath = lambda x: MockPath(
-        [], False if x == "body" else True, x
+        x,
+        buffer=[],
+        exists=False if x == "body" else True,
     )
     config.metadata.joinpath = lambda _: microarray_templates
     with pytest.raises(FileNotFoundError) as e:
