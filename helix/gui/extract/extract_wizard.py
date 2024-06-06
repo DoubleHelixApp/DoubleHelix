@@ -34,6 +34,7 @@ class ExtractWizard(QDialog):
         self.current_file: AlignmentMapFile = current_file
         super().__init__(parent, Qt.WindowType.Dialog)
         self._progress = progress
+        self._worker = None
 
         self.resize(648, 600)
         self.setObjectName("extract")
