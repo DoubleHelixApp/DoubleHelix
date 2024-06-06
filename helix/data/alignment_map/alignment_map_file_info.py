@@ -10,7 +10,7 @@ from helix.data.mitochondrial_model_type import MitochondrialModelType
 from helix.data.mitochondrial_name_type import MitochondrialNameType
 from helix.data.sequence_type import SequenceType
 from helix.data.sorting import Sorting
-from helix.fasta.reference import Reference
+from helix.reference.reference import Reference
 
 
 class AlignmentMapFileInfo:

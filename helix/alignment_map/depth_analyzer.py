@@ -6,7 +6,7 @@ from helix.data.coverage_stats import CoverageStats, DepthBin
 from helix.alignment_map.alignment_map_file import AlignmentMapFile
 from helix.data.file_type import FileType
 from helix.data.sequence_type import SequenceType
-from helix.fasta.reference import ReferenceStatus
+from helix.reference.reference import ReferenceStatus
 from helix.naming.converter import Converter
 from helix.progress.base_progress_calculator import BaseProgressCalculator
 from helix.utility.external import External

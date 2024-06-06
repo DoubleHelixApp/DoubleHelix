@@ -5,7 +5,7 @@ from helix.alignment_map.alignment_map_header import AlignmentMapHeader
 from helix.configuration import RepositoryConfig
 from helix.data.genome import Genome
 from helix.data.sequence import Sequence
-from helix.fasta.reference import Reference
+from helix.reference.reference import Reference
 from helix.files.bgzip import BGzip, BgzipAction
 from helix.files.decompressor import Decompressor
 from helix.files.downloader import Downloader
@@ -36,6 +36,11 @@ class Repository:
         self._config = config
 
     def analyze_references(self):
+        # TODO: This function is currently unused.
+        # Needs to be improved to provide some kind of
+        # useful info about supported references.
+        # As it is right now is garbage.
+
         # Analyzing sequence by sequence
         different_md5_same_length = []
         for ln, seqs in self._sequences_by_length.items():

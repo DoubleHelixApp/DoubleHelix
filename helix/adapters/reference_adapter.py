@@ -1,5 +1,5 @@
 from helix.data.tabular_data import TabularData, TabularDataRow
-from helix.fasta.reference import Reference
+from helix.reference.reference import Reference
 
 
 class ReferenceAdapter:

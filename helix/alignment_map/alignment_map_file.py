@@ -16,7 +16,7 @@ from helix.data.mitochondrial_model_type import MitochondrialModelType
 from helix.data.read_type import ReadType
 from helix.data.sequence_type import SequenceType
 from helix.data.sorting import Sorting
-from helix.fasta.reference import Reference, ReferenceStatus
+from helix.reference.reference import Reference, ReferenceStatus
 from helix.progress.base_progress_calculator import BaseProgressCalculator
 from helix.reference.repository_manager import Repository
 from helix.mtDNA.mt_dna import MtDNA

@@ -27,7 +27,7 @@ from helix.alignment_map.depth_analyzer import CoverageStatsCalculator
 from helix.alignment_map.index_stats_calculator import IndexStatsCalculator
 from helix.configuration import MANAGER_CFG
 from helix.data.sorting import Sorting
-from helix.fasta.reference import ReferenceStatus
+from helix.reference.reference import ReferenceStatus
 from helix.gui.extract.extract_wizard import ExtractWizard
 from helix.gui.table_dialog import ListTableDialog, TableDialog
 from helix.gui.ui_form import Ui_MainWindow
