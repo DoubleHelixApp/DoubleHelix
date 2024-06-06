@@ -11,7 +11,7 @@ class UnitPrefix:
         converted = None
         si_prefixes = OrderedDict(
             [
-                ("", (0, 10, 0)),
+                ("B", (0, 10, 0)),
                 ("kB", (10, 20, 10)),
                 ("MB", (20, 30, 20)),
                 ("GB", (30, 40, 30)),
@@ -19,7 +19,7 @@ class UnitPrefix:
             ]
         )
         if input == 0:
-            return "0"
+            return "0B"
 
         input_log = log(input, 2)
         input_log = int(floor(input_log))
