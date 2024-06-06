@@ -1,4 +1,3 @@
-import glob
 import hashlib
 import logging
 import os
@@ -11,6 +10,7 @@ from helix.configuration import MANAGER_CFG
 from helix.progress.base_progress_calculator import BaseProgressCalculator
 from helix.reference.genome_metadata_loader import Genome
 from helix.files.file_type_checker import FileTypeChecker
+from helix.utility.unit_prefix import UnitPrefix
 
 logger = logging.getLogger(__name__)
 # There libs are very chatty for everything less than WARNING
@@ -46,20 +46,21 @@ class Downloader:
         self,
         config=MANAGER_CFG.REPOSITORY,
         file_type_checker: FileTypeChecker = FileTypeChecker(),
+        curl=pycurl.Curl(),
     ) -> None:
         if file_type_checker is None:
             raise RuntimeError("FileTypeChecker cannot be None.")
 
         self._config = config
-        self._progressbar = None
+        self._curl = curl
         self.file_type_checker = file_type_checker
+        self._logger = logging.getLogger("downloader")
 
     def size_pycurl(self, url: str):
-        curl = pycurl.Curl()
-        curl.setopt(pycurl.URL, url)
-        curl.setopt(pycurl.NOBODY, 1)
-        curl.perform()
-        length = int(curl.getinfo(pycurl.CONTENT_LENGTH_DOWNLOAD))
+        self._curl.setopt(pycurl.URL, url)
+        self._curl.setopt(pycurl.NOBODY, 1)
+        self._curl.perform()
+        length = int(self._curl.getinfo(pycurl.CONTENT_LENGTH_DOWNLOAD))
         if length == -1:
             return None
         if length == 0:
@@ -83,23 +84,10 @@ class Downloader:
         return md5_hash.hexdigest()
 
     def pre_download_action(self, genome: Genome):
-        # Until it's in the temporary directory, the file has
-        # a known name but it may have an unknown extension.
-        # The extension is assigned after the file is downloaded
-        # based on the file content (as the URL can be misleading).
-        # As a consequence, the only way to find a file is to
-        # look at its size/MD5.
-
         target = self._config.temporary.joinpath(genome.url_hash)
         if target.exists():
             return target
-
-        files = glob.glob(f"{target}.*")
-        for file in files:
-            file = Path(file)
-            if file.stat().st_size == genome.download_size:
-                return file
-        return target
+        return None
 
     @size_handler("https://storage.cloud.google.com")
     @size_handler("gs://")
@@ -125,6 +113,8 @@ class Downloader:
         blob.reload()
         if genome.download_size is None:
             genome.download_size = blob.size
+        if genome.downloaded_md5 is None:
+            genome.downloaded_md5 = blob.md5_hash
 
         target = self.pre_download_action(genome)
 
@@ -156,11 +146,13 @@ class Downloader:
 
         if downloaded.suffix != extension:
             target = downloaded.with_suffix(extension)
+            if target.exists():
+                target.unlink()
             downloaded.rename(target)
             downloaded = target
         return downloaded
 
-    def perform(self, genome: Genome, progress: any = False) -> Path:
+    def perform(self, genome: Genome, progress: any = None) -> Path:
         for handler in HANDLERS.keys():
             if genome.fasta_url.startswith(handler):
                 return HANDLERS[handler](self, genome, progress)
@@ -181,36 +173,54 @@ class Downloader:
             else:
                 resume_from = target.stat().st_size
 
-        with target.open("wb" if resume_from is None else "ab") as f:
-            curl = pycurl.Curl()
-            curl.setopt(pycurl.URL, genome.fasta_url)
-            curl.setopt(pycurl.WRITEDATA, f)
-            curl.setopt(pycurl.FOLLOWLOCATION, True)
-            if progress is not False or progress is not None:
-                curl.setopt(pycurl.NOPROGRESS, False)
-
-            if resume_from is not None:
-                curl.setopt(pycurl.RESUME_FROM, resume_from)
-
-            # TODO: find an easy way (if it exists) to load ca-bundle
-            # on every platform. Or remove this TODO as we don't really
-            # care about people MITM-ing our reference genome download.
-            curl.setopt(pycurl.SSL_VERIFYPEER, 0)
-            curl.setopt(pycurl.SSL_VERIFYHOST, 0)
-
+        progress_calc = None
+        if progress is not None:
             progress_calc = BaseProgressCalculator(
                 progress, genome.download_size, "Download"
             )
 
-            if progress is not None and progress is not False:
-                curl.setopt(
+        total = UnitPrefix.convert_bytes(genome.download_size)
+        resume = UnitPrefix.convert_bytes(resume_from if resume_from is not None else 0)
+        url = genome.fasta_url
+        self._logger.info(
+            "Downloading file from %s, resuming from %s (%s total)"
+            % (url, resume, total)
+        )
+
+        self.download_file(genome.fasta_url, target, resume_from, progress_calc)
+        return self.post_download_action(genome, target)
+
+    def download_file(
+        self,
+        url: str,
+        target: Path,
+        resume_from: int = None,
+        progress_calc: BaseProgressCalculator = None,
+    ):
+        with target.open("wb" if resume_from is None else "ab") as f:
+            self._curl.setopt(pycurl.URL, url)
+            self._curl.setopt(pycurl.WRITEDATA, f)
+            self._curl.setopt(pycurl.FOLLOWLOCATION, True)
+            if progress_calc is not None:
+                self._curl.setopt(pycurl.NOPROGRESS, False)
+
+            if resume_from is not None:
+                self._curl.setopt(pycurl.RESUME_FROM, resume_from)
+
+            # TODO: find an easy way (if it exists) to load ca-bundle
+            # on every platform. Or remove this TODO as we don't really
+            # care about people MITM-ing our reference genome download.
+            self._curl.setopt(pycurl.SSL_VERIFYPEER, 0)
+            self._curl.setopt(pycurl.SSL_VERIFYHOST, 0)
+
+            if progress_calc is not None:
+                self._curl.setopt(
                     pycurl.PROGRESSFUNCTION,
                     lambda tot_down, down, tot_up, up: progress_calc.compute(down),
                 )
 
-            curl.perform()
-            curl.close()
+            self._curl.perform()
+            self._curl.close()
             # Signal the download is done
-            if progress is not None and progress is not False:
-                progress(None, None)
-        return self.post_download_action(genome, target)
+            if progress_calc is not None:
+                progress_calc.compute(None)
