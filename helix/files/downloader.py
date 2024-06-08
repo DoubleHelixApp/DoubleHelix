@@ -46,21 +46,22 @@ class Downloader:
         self,
         config=MANAGER_CFG.REPOSITORY,
         file_type_checker: FileTypeChecker = FileTypeChecker(),
-        curl=pycurl.Curl(),
+        curl_class=pycurl.Curl,
     ) -> None:
         if file_type_checker is None:
             raise RuntimeError("FileTypeChecker cannot be None.")
 
         self._config = config
-        self._curl = curl
+        self._curl_class = curl_class
         self.file_type_checker = file_type_checker
         self._logger = logging.getLogger("downloader")
 
     def size_pycurl(self, url: str):
-        self._curl.setopt(pycurl.URL, url)
-        self._curl.setopt(pycurl.NOBODY, 1)
-        self._curl.perform()
-        length = int(self._curl.getinfo(pycurl.CONTENT_LENGTH_DOWNLOAD))
+        curl = self._curl_class()
+        curl.setopt(pycurl.URL, url)
+        curl.setopt(pycurl.NOBODY, 1)
+        curl.perform()
+        length = int(curl.getinfo(pycurl.CONTENT_LENGTH_DOWNLOAD))
         if length == -1:
             return None
         if length == 0:
@@ -76,18 +77,9 @@ class Downloader:
     def calculate_md5_hash(self, filename: Path, chunk_size=4096):
         md5_hash = hashlib.md5()
         with filename.open("rb") as f:
-            while True:
-                chunk = f.read(chunk_size)
-                if not chunk:
-                    break
+            for chunk in iter(lambda: f.read(chunk_size), b""):
                 md5_hash.update(chunk)
         return md5_hash.hexdigest()
-
-    def pre_download_action(self, genome: Genome):
-        target = self._config.temporary.joinpath(genome.url_hash)
-        if target.exists():
-            return target
-        return None
 
     @size_handler("https://storage.cloud.google.com")
     @size_handler("gs://")
@@ -116,7 +108,7 @@ class Downloader:
         if genome.downloaded_md5 is None:
             genome.downloaded_md5 = blob.md5_hash
 
-        target = self.pre_download_action(genome)
+        target = self._config.temporary.joinpath(genome.name_only)
 
         if target.exists():
             if target.stat().st_size == genome.download_size:
@@ -164,10 +156,10 @@ class Downloader:
             if genome.download_size is None:
                 raise RuntimeError(f"Unable to download file {genome.fasta_url}")
 
-        target = self.pre_download_action(genome)
+        target = self._config.temporary.joinpath(genome.name_only)
 
         resume_from = None
-        if target.exists():
+        if target is not None and target.exists():
             if target.stat().st_size == genome.download_size:
                 return self.post_download_action(genome, target)
             else:
@@ -197,30 +189,31 @@ class Downloader:
         resume_from: int = None,
         progress_calc: BaseProgressCalculator = None,
     ):
+        curl = self._curl_class()
         with target.open("wb" if resume_from is None else "ab") as f:
-            self._curl.setopt(pycurl.URL, url)
-            self._curl.setopt(pycurl.WRITEDATA, f)
-            self._curl.setopt(pycurl.FOLLOWLOCATION, True)
+            curl.setopt(pycurl.URL, url)
+            curl.setopt(pycurl.WRITEDATA, f)
+            curl.setopt(pycurl.FOLLOWLOCATION, True)
             if progress_calc is not None:
-                self._curl.setopt(pycurl.NOPROGRESS, False)
+                curl.setopt(pycurl.NOPROGRESS, False)
 
             if resume_from is not None:
-                self._curl.setopt(pycurl.RESUME_FROM, resume_from)
+                curl.setopt(pycurl.RESUME_FROM, resume_from)
 
             # TODO: find an easy way (if it exists) to load ca-bundle
             # on every platform. Or remove this TODO as we don't really
             # care about people MITM-ing our reference genome download.
-            self._curl.setopt(pycurl.SSL_VERIFYPEER, 0)
-            self._curl.setopt(pycurl.SSL_VERIFYHOST, 0)
+            curl.setopt(pycurl.SSL_VERIFYPEER, 0)
+            curl.setopt(pycurl.SSL_VERIFYHOST, 0)
 
             if progress_calc is not None:
-                self._curl.setopt(
+                curl.setopt(
                     pycurl.PROGRESSFUNCTION,
                     lambda tot_down, down, tot_up, up: progress_calc.compute(down),
                 )
 
-            self._curl.perform()
-            self._curl.close()
+            curl.perform()
+            curl.close()
             # Signal the download is done
             if progress_calc is not None:
                 progress_calc.compute(None)

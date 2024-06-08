@@ -86,12 +86,16 @@ class Genome:
         ]
 
     @property
-    def no_extensions(self) -> Path:
+    def name_only(self) -> str:
         if self.suffix is not None:
             filename = f"{self.build}_{self.suffix}_{self.source}_{self.url_hash[0:8]}"
         else:
             filename = f"{self.build}_{self.source}_{self.url_hash[0:8]}"
-        return self.__parent_folder.joinpath(filename)
+        return filename
+
+    @property
+    def no_extensions(self) -> Path:
+        return self.__parent_folder.joinpath(self.name_only)
 
     @property
     def fasta(self) -> Path:
@@ -126,7 +130,7 @@ class Genome:
         return Path(str(self.no_extensions) + ".dict")
 
     def __repr__(self) -> str:
-        return str(self.no_extensions.name)
+        return self.name_only
 
     def __str__(self) -> str:
         return self.__repr__()
