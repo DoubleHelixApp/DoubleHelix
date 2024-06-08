@@ -18,10 +18,10 @@ class FakeReferenceGenomeGenerator:
         bases = list(FakeReferenceGenomeGenerator.ACGT_PERCENTAGE.keys())
         bases_weights = list(FakeReferenceGenomeGenerator.ACGT_PERCENTAGE.values())
 
-        total_bases = sum([x.length for x in self.dictionary.entries.values()])
+        total_bases = sum([x.length for x in self.dictionary.sequences.values()])
 
         with open(filename, "w") as f:
-            for name, entry in self.dictionary.entries.items():
+            for name, entry in self.dictionary.sequences.items():
                 length_adapted = int((entry.length / total_bases) * length)
                 reminder = length_adapted % self.read_length
                 length_adapted += self.read_length - reminder
@@ -40,6 +40,7 @@ class FakeReferenceGenomeGenerator:
 # Example usage:
 if __name__ == "__main__":
     metadata = MetadataLoader()
+    g = metadata.load()
 
-    generator = FakeReferenceGenomeGenerator(Path("reference_genome.fa.dict"), 150)
+    generator = FakeReferenceGenomeGenerator(g[0].dict, 150)
     generator.generate_fasta(100000)
