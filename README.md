@@ -11,7 +11,7 @@
 
 This is my attempt to improve [WGSE](https://github.com/WGSExtract/WGSExtract-Dev). Still under heavy development. Don't expect anything working.
 
-- [PyPi Package](https://pypi.org/project/Helix/)
+- [PyPi Package](https://pypi.org/project/doublehelix/)
 - [Documentation](https://doublehelixapp.github.io/)
 
 Follow [this](https://t.me/DoubleHelixApp) very low traffic telegram channel if you don't want to miss any updates on DoubleHelix (the channel is managed by [DoubleHelix Telegram bot](https://github.com/DoubleHelixApp/TelegramBOT)).
