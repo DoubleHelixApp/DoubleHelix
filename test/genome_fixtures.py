@@ -11,7 +11,7 @@ format_map = {
     "gzip": "fake_genome.fasta.gz",
     "fasta": "fake_genome.fasta",
     "zip": "fake_genome.zip",
-    # "razf" : "fake_genome_razf.fasta.gz"
+    "razf": "fake_genome_razf.fasta.gz",
 }
 
 reverse_format_map = {x: y for y, x in format_map.items()}
@@ -29,7 +29,9 @@ file_map = {
     format_map[
         "zip"
     ]: "UEsDBBQAAAAIAF0/x1i1LKBaNQAAAEQAAAARAAAAZmFrZV9nZW5vbWUuZmFzdGEVibEJADEAAvuH3yVZICAWLuAGaVJn/yKKiHK39rlz/J9MAQKlrGEzgYjQHJaAbOvLGaSIB1BLAQI/ABQAAAAIAF0/x1i1LKBaNQAAAEQAAAARACQAAAAAAAAAIAAAAAAAAABmYWtlX2dlbm9tZS5mYXN0YQoAIAAAAAAAAQAYAOIsJMmfuNoB0n99zZ+42gFLn4mpn7jaAVBLBQYAAAAAAQABAGMAAABkAAAAAAA=",
-    # format_map["razf"] : ""
+    format_map[
+        "razf"
+    ]: "H4sIBAAAAAAAAwcAUkFaRgGAABWKMQoAIAAC915THwjEwQ/4g5bm/j+kiCin+9y35pApQKCUNGxGEBGawhKQdfdyBuXg8QFNJR3vRAAAAAAAAAAAAAAAAAAAAAAAAAAAAABEAAAAAAAAAE8=",
 }
 
 md5_map = {
@@ -37,19 +39,20 @@ md5_map = {
     format_map["gzip"]: "a070ccf700131775e1d8a3cc9128107a",
     format_map["fasta"]: "069c8ead795424e20e4a21fc5e368599",
     format_map["zip"]: "c463c4be4bf8d9a03bcd99ab74eaf1b8",
-    # format_map["razf"]: "",
+    format_map["razf"]: "4e299205f6a94ed9b18795f81fa80b33",
 }
 
 
 @pytest.fixture()
-def remote_repo(tmp_path: Path):
+def remote_repo_fixture(tmp_path: Path):
     genomes = {}
+    tmp_path = tmp_path.joinpath("repo")
+    tmp_path.mkdir(exist_ok=True)
     for name, content in file_map.items():
         path = tmp_path.joinpath(name).absolute()
         with path.open("wb") as f:
             f.write(base64.b64decode(content))
         uri_path = path.as_uri()  # e.g., file://c:/.. or file://home/..
-        # uri_path = uri_path.replace("file:///", "file:////")
 
         genome = Genome(uri_path, build="38", source="Fake")
         genomes[reverse_format_map[name]] = {
