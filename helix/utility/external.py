@@ -39,7 +39,11 @@ def exe(f, interpreter=[]):
         io=None,
         text=False,
     ):
-        args = [*interpreter, shutil.which(f.__name__), *[str(x) for x in args]]
+        binary_path = shutil.which(f.__name__)
+        if binary_path is None:
+            raise FileNotFoundError(f"Unable to find the binary: {f.__name__}")
+
+        args = [*interpreter, binary_path, *[str(x) for x in args]]
 
         if wait:
             # Force stdout/stderr to be PIPE as we
