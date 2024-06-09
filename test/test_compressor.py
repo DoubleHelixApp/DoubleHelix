@@ -4,7 +4,7 @@ import pytest
 from helix.data.genome import Genome
 from helix.files.bgzip import BGzip
 from helix.files.file_type_checker import FileType, FileTypeChecker
-from test.genome_fixtures import format_map
+from test.genome_fixtures import format_map, remote_repo_fixture
 
 
 def test_compress_gzip(remote_repo_fixture, tmp_path_factory):
