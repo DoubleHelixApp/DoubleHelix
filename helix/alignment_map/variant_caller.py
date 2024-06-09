@@ -28,6 +28,7 @@ class VariantCaller(SimpleWorker):
         progress=None,
         logger=logging.getLogger(__name__),
     ) -> None:
+        super().__init__(None)
         self._external = external
         self._ext_config = ext_config
         self._ploidy = str(repo_config.metadata.joinpath("ploidy.txt"))

@@ -21,7 +21,8 @@ class SimpleWorker(Thread):
         self.process = None
         self._kwargs = kwargs
         self._args = args
-        self.start()
+        if self.function is not None:
+            self.start()
 
     def run(self):
         if debugpy.is_client_connected():
