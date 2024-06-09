@@ -31,6 +31,7 @@ class BGzip:
                 if genome.fasta.exists():
                     genome.fasta.unlink()
                 file.rename(genome.fasta)
+            self.bgzip_wrapper(genome.fasta, None, BgzipAction.Reindex)
             return genome.fasta
         elif file_type == FileType.DECOMPRESSED:
             return self.bgzip_wrapper(file, genome.fasta)
@@ -58,7 +59,7 @@ class BGzip:
         output: Path,
         action: BgzipAction = BgzipAction.Compress,
     ) -> Path:
-        if output.exists():
+        if action != BgzipAction.Reindex and output.exists():
             output.unlink()
 
         action_flags = {
@@ -67,6 +68,9 @@ class BGzip:
             BgzipAction.Reindex: "-r",
         }
         inferred_filename = self._gzip_filename(input, action)
+
+        if action == BgzipAction.Reindex and output is None:
+            output = inferred_filename
 
         out = self._external.bgzip(
             [action_flags[action], str(input), "-@", str(self._config.threads)],
