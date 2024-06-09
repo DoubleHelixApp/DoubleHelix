@@ -6,9 +6,8 @@ import typing
 import zipfile
 from pathlib import Path
 
-from helix.files.bgzip import BGzip, BgzipAction
+from helix.files.gzip import GZip, GZipAction
 from helix.reference.genome_metadata_loader import Genome
-from helix.utility.external import External
 from helix.files.file_type_checker import FileType, FileTypeChecker
 
 
@@ -16,11 +15,9 @@ class Decompressor:
     def __init__(
         self,
         type_checker: FileTypeChecker = FileTypeChecker(),
-        external: External = External(),
-        bgzip_compressor=BGzip(),
+        gzip_compressor=GZip(),
     ) -> None:
-        self._bgzip_compressor = bgzip_compressor
-        self._external = external
+        self._gzip_compressor = gzip_compressor
         self._type_checker = type_checker
 
         self._handlers: typing.Dict[FileType, typing.Callable[[Path, Path], None]] = {
@@ -29,7 +26,17 @@ class Decompressor:
             FileType.ZIP: Decompressor.zip,
             FileType.SEVENZIP: Decompressor.sevenzip,
             FileType.BZIP: Decompressor.bzip,
+            FileType.DECOMPRESSED: Decompressor.dummy,
+            FileType.BGZIP: Decompressor.dummy,
         }
+
+    def dummy(self, input_file: Path, output_file: Path):
+        # Dummy handler as the file it's either already compressed
+        # in the target format or decompressed.
+        if input_file != output_file:
+            if output_file.exists():
+                output_file.unlink()
+            input_file.rename(output_file)
 
     def gz(self, input_file: Path, output_file: Path):
         # Not reliable with RAZF and currently not used.
@@ -55,9 +62,7 @@ class Decompressor:
                 extracted.rename(output_file)
 
     def razf_gzip(self, input_file: Path, output_file: Path):
-        self._bgzip_compressor.bgzip_wrapper(
-            input_file, output_file, BgzipAction.Decompress
-        )
+        self._gzip_compressor.gzip(input_file, output_file, GZipAction.Decompress)
 
     def calculate_md5_hash(self, filename: Path, chunk_size=4096):
         md5_hash = hashlib.md5()
@@ -69,37 +74,12 @@ class Decompressor:
                 md5_hash.update(chunk)
         return md5_hash.hexdigest()
 
-    def decompression_needed(self, genome: Genome, file: Path):
-        if not file.exists():
-            return True
-
-        type = self._type_checker.get_type(file)
-        # Shortcut in case we're dealing with a BGZIP file
-        if type == FileType.BGZIP:
-            if genome.bgzip_size is None:
-                genome.bgzip_size = file.stat().st_size
-                return False
-            if file.stat().st_size == genome.bgzip_size:
-                return False
-        # Shortcut in case we're dealing with a FASTA file
-        elif type == FileType.DECOMPRESSED:
-            if genome.decompressed_size is None:
-                return True
-            if file.stat().st_size == genome.decompressed_size:
-                return False
-        return True
-
     def perform(self, genome: Genome, downloaded: Path = None):
-        if not self.decompression_needed(genome, downloaded):
-            return downloaded
-
-        target = downloaded.with_suffix(".fa")
-        if not self.decompression_needed(genome, target):
-            return target
-
         if not downloaded.exists():
             raise FileNotFoundError(f"Unable to find file {downloaded.name}")
 
+        no_ext = downloaded.name.removesuffix("".join(downloaded.suffixes))
+        target = downloaded.with_name(no_ext + ".fa")
         type = self._type_checker.get_type(downloaded)
         if type not in self._handlers:
             raise RuntimeError(
@@ -115,6 +95,12 @@ class Decompressor:
             raise RuntimeError(
                 f"Error during the decompression of {str(genome)}. Decompressed file is not present."
             )
+
+        type = self._type_checker.get_type(target)
+
+        if type != FileType.DECOMPRESSED:
+            # If we've a bgzip, the file is never decompressed.
+            return target
 
         if genome.decompressed_size is None:
             genome.decompressed_size = target.stat().st_size
