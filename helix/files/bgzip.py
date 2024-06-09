@@ -25,13 +25,16 @@ class BGzip:
         self._config = config
 
     def perform(self, genome: Genome, file: Path) -> Path:
-        if self._type_checker.get_type(file) == FileType.BGZIP:
+        file_type = self._type_checker.get_type(file)
+        if file_type == FileType.BGZIP:
             if genome.fasta != file:
                 if genome.fasta.exists():
                     genome.fasta.unlink()
                 file.rename(genome.fasta)
             return genome.fasta
-        return self.bgzip_wrapper(file, genome.fasta)
+        elif file_type == FileType.DECOMPRESSED:
+            return self.bgzip_wrapper(file, genome.fasta)
+        raise RuntimeError("Trying to compress a file that is not decompressed")
 
     def _gzip_filename(self, input: Path, action: BgzipAction):
         if action == BgzipAction.Compress:
@@ -69,6 +72,11 @@ class BGzip:
             [action_flags[action], str(input), "-@", str(self._config.threads)],
             wait=True,
         )
+        if not inferred_filename.exists():
+            raise FileNotFoundError(
+                "Inferred bgzip file name does not exist after bgzip compression."
+            )
+
         if inferred_filename != output:
             inferred_filename.rename(output)
             if action == BgzipAction.Compress:
