@@ -2,10 +2,22 @@ import configparser
 import logging
 import multiprocessing
 from pathlib import Path
+import sys
+
+from helix import metadata, mtDNA
 
 # Why third_party is not recognized by the IDE?
 # See helix/__init__.py
-from helix import metadata, mtDNA, third_party
+
+if sys.platform == "win32":
+    from helix import third_party
+else:
+    # As it is right now, on linux third_party is not installed and
+    # not needed.
+    # This will probably change in the future but for the moment just
+    # provide anything else that have a __file__ so that nothing here
+    # crashes.
+    import helix as third_party
 
 logger = logging.getLogger("configuration")
 logging.getLogger().setLevel(logging.DEBUG)
