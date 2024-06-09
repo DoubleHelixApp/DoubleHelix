@@ -20,7 +20,7 @@ Follow [this](https://t.me/DoubleHelixApp) very low traffic telegram channel if 
 The only currently supported way to install `DoubleHelix` is with a pypi package.
 
 ```bash
-sudo apt install libqt6waylandclient6 samtools bcftools -y # Only for Linux
+sudo apt install libqt6waylandclient6 samtools tabix bcftools -y # Only for Linux
 python -m pip install doublehelix
 helix
 ```
