@@ -88,7 +88,7 @@ class Decompressor:
 
         handler = self._handlers[type]
         logging.debug(
-            f"Decompressing {genome.fasta.name}. {type.name} compression detected."
+            f"Decompressing {downloaded!s}. {type.name} compression detected."
         )
         handler(self, downloaded, target)
         if not target.exists():

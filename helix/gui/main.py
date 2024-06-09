@@ -413,6 +413,7 @@ class HelixWindow(QMainWindow):
             )
             if choice == QMessageBox.StandardButton.Yes:
                 self._perform_reference_download()
+                return
         reference = self.current_file.file_info.reference_genome
         dialog = TableDialog("Reference genome", self)
         dialog.tableWidget.setSizeAdjustPolicy(
@@ -431,7 +432,10 @@ class HelixWindow(QMainWindow):
         reference = self.current_file.file_info.reference_genome
         for match in reference.matching:
             try:
-                SimpleWorker(self._repository.download, match, self._set_progress)
+                self._prepare_long_operation("Start Downloading.")
+                self._long_operation = SimpleWorker(
+                    self._repository.download, match, self._set_progress
+                )
                 break
             except Exception as e:
                 self._logger.error(f"Error while downloading the reference: {e!s}")
