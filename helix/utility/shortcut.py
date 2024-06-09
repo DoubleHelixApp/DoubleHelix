@@ -6,29 +6,29 @@ try:
     from win32com.client import Dispatch
 except Exception:
     pass
-import importlib.metadata
+# import importlib.metadata
 
 
 class Shortcut:
     def __init__(self) -> None:
-        distribution = importlib.metadata.distribution("Helix")
-        entry_point = distribution.entry_points["helix"]
+        # distribution = importlib.metadata.distribution("doublehelix")
+        # entry_point = distribution.entry_points["helix"]
+        # if len(entry_point.dist.files) > 0:
+        #     self.path = entry_point.dist.locate_file(entry_point.dist.files[0])
         self.desktop = Path.home().joinpath("Desktop")
-        self.path = None
-        if len(entry_point.dist.files) > 0:
-            self.path = entry_point.dist.locate_file(entry_point.dist.files[0])
+        self.path = "helix"
 
     def _create_win(self):
         if self.path is None:
             return
-        path = str(self.desktop.joinpath("Helix.lnk"))
+        path = str(self.desktop.joinpath("DoubleHelix.lnk"))
         shell = Dispatch("WScript.Shell")
         shortcut = shell.CreateShortCut(path)
         shortcut.TargetPath = str(self.path)
         shortcut.WorkingDirectory = str(Path.home().joinpath("Documents"))
         shortcut.IconLocation = str(self.path)
         shortcut.Description = (
-            "Genome file manipulation tool, https://github.com/Helix/Helix"
+            "Genome file manipulation tool, https://github.com/DoubleHelixApp/Helix"
         )
         shortcut.save()
         return path
@@ -49,7 +49,7 @@ class Shortcut:
         desktop_entry = (
             "[Desktop Entry]\n"
             + "Type=Application\n"
-            + "Name=Helix\n"
+            + "Name=DoubleHelix\n"
             + f"Exec={self.path!s}\n"
             + "Icon=\n"
             + "Terminal=false\n"

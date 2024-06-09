@@ -125,7 +125,7 @@ class HelixWindow(QMainWindow):
         self.close()
 
     def on_doc(self):
-        webbrowser.open("https://helix.readthedocs.io", 2)
+        webbrowser.open("https://doublehelix.app", 2)
 
     def on_open(self, file: Path = False):
         if not file:
