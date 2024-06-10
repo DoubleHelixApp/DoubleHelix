@@ -173,18 +173,13 @@ class Repository:
         This Python function downloads, decompresses, compresses, and extracts sequence data from a
         genome file, with optional progress tracking and force download capability.
 
-        :param genome: The `genome` parameter in the `download` method is an instance of the `Genome`
-        class. It represents the genome for which the download operation is being performed
+        :param genome: Represents the genome for which the download operation is being performed
         :type genome: Genome
-        :param progress: The `progress` parameter in the `download` method is a callback function that
-        takes two arguments: a string indicating the progress message and an integer indicating the
-        progress percentage. This function is optional and can be used to provide progress updates
-        during the download process. If provided, the `progress` function will
+        :param progress: Callback function that takes two arguments: a string indicating the progress
+        message and an integer indicating the progress percentage.
         :type progress: Callable[[str, int], None]
-        :param force: The `force` parameter in the `download` method is a boolean flag that determines
-        whether to overwrite existing files. If `force` is set to `True`, the method will delete any
-        existing files related to the genome being downloaded and re-download them. If `force` is set to
-        `False, defaults to False (optional)
+        :param force: Determines whether to overwrite existing files. If `force` is set to `True`, the
+        method will delete any existing files related to the genome being downloaded and re-download them.
         :return: The `download` method returns the `genome` object after performing the download,
         decompression, compression, and creation of companion files.
         """
