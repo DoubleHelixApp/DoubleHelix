@@ -15,8 +15,6 @@ class Genome:
         suffix: str = None,
         build: str = None,
         source: str = None,
-        mitochondrial_name_type: str = None,
-        nuclear_name_type: str = None,
         sequences: typing.List[Sequence] = None,
         description: str = None,
         download_size: int = None,
@@ -34,8 +32,6 @@ class Genome:
         self.suffix = suffix
         self.build = build
         self.source = source
-        self.mitochondrial_name_type = mitochondrial_name_type
-        self.nuclear_name_type = nuclear_name_type
         self.sequences = sequences
         self.description = description
         self.download_size = download_size
