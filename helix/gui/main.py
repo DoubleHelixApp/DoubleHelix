@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
 
 from helix.adapters.alignment_stats_adapter import AlignmentStatsAdapter
 from helix.adapters.coverage_stats_adapter import CoverageStatsAdapter
+from helix.adapters.genome_adapter import GenomeAdapter
 from helix.adapters.header_adapter import (
     HeaderCommentsAdapter,
     HeaderProgramsAdapter,
@@ -27,6 +28,7 @@ from helix.alignment_map.depth_analyzer import CoverageStatsCalculator
 from helix.alignment_map.index_stats_calculator import IndexStatsCalculator
 from helix.configuration import MANAGER_CFG
 from helix.data.sorting import Sorting
+from helix.reference.genome_metadata_loader import MetadataLoader
 from helix.reference.reference import ReferenceStatus
 from helix.gui.extract.extract_wizard import ExtractWizard
 from helix.gui.table_dialog import ListTableDialog, TableDialog
@@ -71,6 +73,14 @@ class HelixWindow(QMainWindow):
         self.ui.actionExit.triggered.connect(self.on_close)
         self.ui.actionSettings.triggered.connect(self.on_settings)
         self.ui.actionCreate_launcher_on_desktop.triggered.connect(self.create_launcher)
+        self.ui.actionGenomes.triggered.connect(self.open_genomes)
+
+    def open_genomes(self):
+        dialog = ListTableDialog("Genomes", self)
+        dialog.set_data(
+            {str(x): GenomeAdapter.adapt(x) for x in MetadataLoader().load()}
+        )
+        dialog.show()
 
     def create_launcher(self):
         path = Shortcut().create()
@@ -424,18 +434,20 @@ class HelixWindow(QMainWindow):
         dialog.exec()
 
     def _perform_reference_download(self):
+        self._long_operation = SimpleWorker(self._download_reference)
+
+    def _download_reference(self):
         if self.current_file is None:
             return
         status = self.current_file.file_info.reference_genome.status
         if status != ReferenceStatus.Downloadable:
             return
+
+        self._prepare_long_operation("Start Downloading.")
         reference = self.current_file.file_info.reference_genome
         for match in reference.matching:
             try:
-                self._prepare_long_operation("Start Downloading.")
-                self._long_operation = SimpleWorker(
-                    self._repository.download, match, self._set_progress
-                )
+                self._repository.download(match, self._set_progress)
                 break
             except Exception as e:
                 self._logger.error(f"Error while downloading the reference: {e!s}")
