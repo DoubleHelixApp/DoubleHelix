@@ -86,7 +86,7 @@ class HelixWindow(QMainWindow):
         path = Shortcut().create()
         message_box = QMessageBox()
         message_box.setWindowTitle("Created")
-        message_box.setText(f"A link to Helix was created at {path}")
+        message_box.setText(f"A link to DoubleHelix was created at {path}")
         message_box.setStandardButtons(QMessageBox.StandardButton.Ok)
         message_box.exec()
 
