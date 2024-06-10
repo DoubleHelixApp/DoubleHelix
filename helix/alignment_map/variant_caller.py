@@ -18,6 +18,22 @@ class VariantCallingType(enum.Enum):
 
 
 class VariantCaller(SimpleWorker):
+    """This class is responsible for calling variants in a given alignment file.
+
+    Parameters:
+        alignment_file (AlignmentMapFile): The input alignment file.
+        variant_calling_type (VariantCallingType): The type of variant to call (InDel, SNP or Both).
+        progress_calculator (BaseProgressCalculator): An object that calculates the progress of the variant calling process.
+
+    Attributes:
+        _alignment_file: The input alignment file.
+        _variant_calling_type: The type of variant to call.
+        _progress_calculator: An object that calculates the progress of the variant calling process.
+
+    Methods:
+        run(): Runs the variant calling process.
+    """
+
     def __init__(
         self,
         input: AlignmentMapFile,

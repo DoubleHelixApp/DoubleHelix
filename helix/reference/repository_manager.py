@@ -16,6 +16,37 @@ from helix.utility.samtools import Samtools
 
 
 class Repository:
+    """
+    The central repository class that holds all the necessary objects to perform
+    various operations. This class encapsulates a set of functionalities that are
+    related to biological data processing and manipulation.
+
+    Attributes
+    ----------
+
+        * alignment_map_header: AlignmentMapHeader
+            - A header object representing an alignment map.
+        * configuration: RepositoryConfig
+            - The repository's configuration settings.
+        * decompressor: Decompressor
+            - An object for decompressing files.
+        * downloader: Downloader
+            - A class used to download files from a remote location.
+        * genome: Genome
+            - Represents the genomic data.
+        * metadata_loader: MetadataLoader
+            - Used to load metadata about genomes and sequences.
+        * mt_dna: MtDNA
+            - Handles mitochondrial DNA-related operations.
+        * samtools: Samtools
+            - An object providing functions for manipulating SAM/BAM files.
+
+    Methods
+    -------
+
+    # Insert docstring explaining methods, if any.
+    """
+
     def __init__(
         self,
         loader: MetadataLoader = MetadataLoader(),
@@ -36,26 +67,29 @@ class Repository:
         )
         self._config = config
 
-    def analyze_references(self):
-        # TODO: This function is currently unused.
-        # Needs to be improved to provide some kind of
-        # useful info about supported references.
-        # As it is right now is garbage.
+    def analyze_references(self) -> None:
+        """
+        Analyze the references in the repository and provide some basic information.
 
+        This method currently just prints out some statistics about the sequences.
+        It needs to be improved to provide more useful information about supported
+        references. For now, it's just a placeholder.
+
+        :return: None
+        :rtype: NoneType
+        """
         # Analyzing sequence by sequence
         different_md5_same_length = []
-        for ln, seqs in self._sequences_by_length.items():
-            unique_seq = set()
+        for length, seqs in self._sequences_by_length.items():
+            unique_seq_set = set()
             name = None
             for seq in seqs:
-                unique_seq.add(seq.md5)
+                unique_seq_set.add(seq.md5)
                 name = seq.name
-            # Filtering by an arbitrary value so that what's left are mostly
-            # normal chromosomes sequences.
-            if (len(unique_seq) > 1) and ln > 57227414:
-                different_md5_same_length.append(ln)
+            if len(unique_seq_set) > 1 and length > 57227414:
+                different_md5_same_length.append(length)
                 logging.debug(
-                    f"There are {len(unique_seq)} different MD5 for length {ln} ({name})."
+                    f"There are {len(unique_seq_set)} different MD5 for length {length} ({name})."
                 )
 
         # Analyzing the whole genome, looking for identical length sequences
@@ -76,13 +110,23 @@ class Repository:
         )
         logging.debug(f"Found {ambiguous} possible ambiguous sequences of lengths:")
         index = 0
-        for different_md5_same_length, md5s in different_md5s_same_lengths.items():
+        for length, md5s in different_md5s_same_lengths.items():
             if len(md5s) > 1:
                 for md5, genome in md5s:
                     logging.debug(f"{index+1}) {genome.fasta_url!s}")
                 index += 1
 
     def find(self, sequences: list[Sequence]):
+        """
+        Find the references that match the given sequence(s) based on their MD5
+        or length if an MD5 is not available.
+
+        This method returns a Reference object containing the matching sequences.
+
+        :param sequences: A list of Sequence objects to search for.
+        :return: A Reference object with the matching sequences.
+        :rtype: helix.reference.reference.Reference
+        """
         md5_available = all([x.md5 is not None for x in sequences])
         matching = OrderedDict([(x, []) for x in sequences])
         if md5_available:
@@ -154,6 +198,14 @@ class Repository:
             logging.info(f"{genome}: Dictionary file exists.")
 
     def self_test(self):
+        """Runs tests on the current reference data to ensure its integrity and consistency.
+
+        This method checks if all genomes have sequences by comparing the lengths of their
+        sequence lists with the number of sequences in their fasta files. If any genome is found
+        without sequences, it attempts to download the missing sequences from the original source.
+
+        :return: None
+        """
         for index, reference in enumerate(self.genomes):
             if reference.sequences is None:
                 try:
@@ -210,14 +262,24 @@ class Repository:
         self._create_companion_files(genome)
         return genome
 
-    def ingest(
-        self, url: str = None, source: str = None, build: str = None, force=False
-    ):
-        genome = Genome(
-            url,
-            source=source,
-            build=build,
-        )
+    def ingest(self, url=None, source=None, build=None, force=False):
+        """Creates a new Genome object and ingests the provided URL, source, and build information.
+
+        This method downloads, decompresses, compresses, and extracts sequence data from a
+        genome file, with optional progress tracking and force download capability. The created
+        Genome object is then returned.
+
+        :param url: The URL of the genome file
+        :type url: str
+        :param source: The source of the genome file
+        :type source: str
+        :param build: The build version of the genome file
+        :type build: str
+        :param force: Determines whether to overwrite existing files. If `force` is set to `True`, the
+        method will delete any existing files related to the genome being downloaded and re-download them.
+        :return: A new Genome object after performing the download, decompression, compression, and creation of companion files.
+        """
+        genome = Genome(url, source=source, build=build)
         genome.parent_folder = self._config.genomes
         logging.info(f"Ingesting {genome}.")
         genome = self.download(genome, force)

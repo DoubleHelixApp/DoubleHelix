@@ -57,6 +57,17 @@ class AlignmentMapFile:
         self.file_info = self._initialize_file_info()
 
     def subset(self, percentage):
+        """Returns a subset of the alignment map file based on the specified percentage.
+
+        Args:
+            percentage (float): The percentage of the original file to be subsetted. Must be between 0 and 1.
+
+        Returns:
+            An AlignmentMapFile object representing the subsetted file.
+
+        Raises:
+            ValueError if the input percentage is not within the valid range.
+        """
         if percentage < 0.0 or percentage > 100.0:
             raise RuntimeError(
                 f"Percentage needs to be between 0 and 100 to produce a subset but was {percentage}"
@@ -171,6 +182,34 @@ class AlignmentMapFile:
         )
 
     def convert(self, target: FileType, regions=None, progress=None):
+        """
+        Convert the input file to a different format.
+
+        This function allows for converting a BAM file to other formats like FASTA or SAM.
+        It also supports converting a BAM file with paired-end reads to FASTQ.
+
+        Parameters
+        ----------
+        target : FileType
+            The target file format to convert to. Can be one of the following:
+            - FileType.BAM (default)
+            - FileType.FASTA
+            - FileType.SAM
+            - FileType.CRAM
+
+        regions : None or list of str
+            A list of genomic regions that will be used for conversion.
+            If None, all regions in the input file will be converted.
+
+        progress : None or int
+            The progress bar to display during the conversion process.
+            If None, no progress bar will be displayed.
+
+        Returns
+        -------
+        The converted file object.
+        """
+
         if self.file_info.file_type == target:
             raise ValueError("Target and source file type for conversion are identical")
         if target == FileType.FASTA:
