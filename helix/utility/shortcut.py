@@ -4,7 +4,7 @@ from pathlib import Path
 
 try:
     from win32com.client import Dispatch
-except Exception:
+except ImportError:
     pass
 # import importlib.metadata
 
@@ -34,9 +34,10 @@ class Shortcut:
         return path
 
     def _create_mac(self):
+        link_path = str(self.desktop.joinpath("DoubleHelix"))
         script = (
             'tell application "Finder"\n'
-            + f'make alias file to POSIX file "{self.path!s}" at POSIX file "{self.desktop!s}"\n'
+            + f'make alias file to POSIX file "{self.path!s}" at POSIX file "{link_path!s}"\n'
             + "end tell"
         )
         os.system(f"osascript -e '{script}'")
@@ -45,7 +46,7 @@ class Shortcut:
     def _create_linux(self):
         if self.path is None:
             return
-        shortcut_path = self.desktop.joinpath("Helix.desktop")
+        shortcut_path = self.desktop.joinpath("DoubleHelix.desktop")
         desktop_entry = (
             "[Desktop Entry]\n"
             + "Type=Application\n"
