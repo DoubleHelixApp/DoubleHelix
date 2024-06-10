@@ -1,5 +1,6 @@
 import logging
 from collections import OrderedDict
+from typing import Callable
 
 from helix.alignment_map.alignment_map_header import AlignmentMapHeader
 from helix.configuration import RepositoryConfig
@@ -165,7 +166,28 @@ class Repository:
                 except Exception as e:
                     logging.critical(e)
 
-    def download(self, genome: Genome, progress=None, force=False):
+    def download(
+        self, genome: Genome, progress: Callable[[str, int], None] = None, force=False
+    ):
+        """
+        This Python function downloads, decompresses, compresses, and extracts sequence data from a
+        genome file, with optional progress tracking and force download capability.
+
+        :param genome: The `genome` parameter in the `download` method is an instance of the `Genome`
+        class. It represents the genome for which the download operation is being performed
+        :type genome: Genome
+        :param progress: The `progress` parameter in the `download` method is a callback function that
+        takes two arguments: a string indicating the progress message and an integer indicating the
+        progress percentage. This function is optional and can be used to provide progress updates
+        during the download process. If provided, the `progress` function will
+        :type progress: Callable[[str, int], None]
+        :param force: The `force` parameter in the `download` method is a boolean flag that determines
+        whether to overwrite existing files. If `force` is set to `True`, the method will delete any
+        existing files related to the genome being downloaded and re-download them. If `force` is set to
+        `False, defaults to False (optional)
+        :return: The `download` method returns the `genome` object after performing the download,
+        decompression, compression, and creation of companion files.
+        """
         downloader = Downloader()
         decompressor = Decompressor()
         compressor = BGzip()
@@ -189,7 +211,7 @@ class Repository:
         decompressor_output = decompressor.perform(genome, download_output)
         logging.info(f"3/4: Compressing to gzip: {decompressor_output.name}.")
         compressor_output = compressor.perform(genome, decompressor_output)
-        logging.info(f"4/4: Extracting sequence data: {compressor_output.name}.")
+        logging.info(f"4/4: Creating companion files: {compressor_output.name}.")
         self._create_companion_files(genome)
         return genome
 
@@ -197,8 +219,11 @@ class Repository:
         self, url: str = None, source: str = None, build: str = None, force=False
     ):
         genome = Genome(
-            url, source=source, build=build, parent_folder=self._config.genomes
+            url,
+            source=source,
+            build=build,
         )
+        genome.parent_folder = self._config.genomes
         logging.info(f"Ingesting {genome}.")
         genome = self.download(genome, force)
         genome.sequences = self._get_sequences(genome)
