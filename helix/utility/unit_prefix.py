@@ -4,6 +4,8 @@ from typing import OrderedDict
 
 class UnitPrefix:
     def convert_bytes(input: int, decimal=2):
+        if input is None:
+            return None
         if input < 1 and input > 0:
             raise ValueError("Can't convert a fractional number of bytes")
         elif input < 0:
@@ -11,15 +13,15 @@ class UnitPrefix:
         converted = None
         si_prefixes = OrderedDict(
             [
-                ("B", (0, 10, 0)),
-                ("kB", (10, 20, 10)),
-                ("MB", (20, 30, 20)),
-                ("GB", (30, 40, 30)),
-                ("TB", (40, None, 40)),
+                (" B", (0, 10, 0)),
+                (" kB", (10, 20, 10)),
+                (" MB", (20, 30, 20)),
+                (" GB", (30, 40, 30)),
+                (" TB", (40, None, 40)),
             ]
         )
         if input == 0:
-            return "0B"
+            return "0 B"
 
         input_log = log(input, 2)
         input_log = int(floor(input_log))
@@ -51,16 +53,16 @@ class UnitPrefix:
         converted = None
         si_prefixes = OrderedDict(
             [
-                ("p", (None, -9, -12)),
-                ("n", (-9, -6, -9)),
-                ("μ", (-6, -3, -6)),
-                ("m", (-3, 0, -3)),
+                (" p", (None, -9, -12)),
+                (" n", (-9, -6, -9)),
+                (" μ", (-6, -3, -6)),
+                (" m", (-3, 0, -3)),
                 ("", (0, 3, 0)),
-                ("k", (3, 6, 3)),
-                ("M", (6, 9, 6)),
-                ("G", (9, 12, 9)),
-                ("T", (12, 15, 12)),
-                ("P", (15, None, 15)),
+                (" k", (3, 6, 3)),
+                (" M", (6, 9, 6)),
+                (" G", (9, 12, 9)),
+                (" T", (12, 15, 12)),
+                (" P", (15, None, 15)),
             ]
         )
         if input == 0:
