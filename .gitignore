@@ -16,3 +16,4 @@ _static
 _templates
 helix/VERSION.py
 bare_minimum
+.coverage
