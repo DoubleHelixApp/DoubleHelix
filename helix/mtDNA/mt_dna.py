@@ -21,7 +21,9 @@ class MtDNA:
 
         models = []
         for model in json_models:
-            sequence = Sequence(model["name"], int(model["length"]), model["md5"])
+            sequence = Sequence(
+                name=model["name"], length=int(model["length"]), md5=model["md5"]
+            )
             model = MitochondrialModel(
                 sequence, model["url"], MitochondrialModelType[model["name"]]
             )
