@@ -2,6 +2,7 @@ from helix.alignment_map.index_stats_calculator import SequenceStatistics
 from helix.data.sequence_type import SequenceType
 from helix.data.tabular_data import TabularData, TabularDataRow
 from helix.naming.converter import Converter
+from helix.utility.unit_prefix import UnitPrefix
 
 
 class IndexStatsAdapter:
@@ -57,9 +58,9 @@ class IndexStatsAdapter:
                     [
                         Converter.canonicalize(stat.name),
                         stat.type.name,
-                        str(stat.reference_length),
-                        f"{stat.mapped}{percentage_mapped}",
-                        f"{stat.unmapped}{percentage_unmapped}",
+                        str(UnitPrefix.convert(stat.reference_length)),
+                        f"{UnitPrefix.convert(stat.mapped)}{percentage_mapped}",
+                        f"{UnitPrefix.convert(stat.unmapped)}{percentage_unmapped}",
                     ],
                 )
             )

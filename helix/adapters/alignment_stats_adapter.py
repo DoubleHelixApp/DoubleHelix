@@ -2,6 +2,7 @@ import enum
 
 from helix.data.alignment_stats import AlignmentStats
 from helix.data.tabular_data import TabularData, TabularDataRow
+from helix.utility.unit_prefix import UnitPrefix
 
 
 class AlignmentStatsAdapter:
@@ -26,6 +27,8 @@ class AlignmentStatsAdapter:
         rows = []
         for key, value in name_map.items():
             data = input_data.__dict__[key]
+            if isinstance(data, int) or isinstance(data, float):
+                data = UnitPrefix.convert(data)
             if isinstance(data, enum.Enum):
                 data = str(data.name)
             rows.append(TabularDataRow(value, [str(data)]))
