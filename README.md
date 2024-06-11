@@ -9,7 +9,7 @@
 [![PyInstaller release for Linux](https://github.com/DoubleHelixApp/DoubleHelix/actions/workflows/python-pyinstaller-linux.yml/badge.svg)](https://github.com/Helix/Helix/actions/workflows/python-pyinstaller-linux.yml)
 [![PyInstaller release for Windows](https://github.com/DoubleHelixApp/DoubleHelix/actions/workflows/python-pyinstaller-win.yml/badge.svg)](https://github.com/Helix/Helix/actions/workflows/python-pyinstaller-win.yml)
 
-This is my attempt to improve [WGSE](https://github.com/WGSExtract/WGSExtract-Dev). Still under heavy development. Don't expect anything working.
+DoubleHelix is a tool to manipulate genomic data made for laymen. Still under heavy development. Don't expect anything working.
 
 - [PyPi Package](https://pypi.org/project/doublehelix/)
 - [Documentation](https://doublehelixapp.github.io/)
