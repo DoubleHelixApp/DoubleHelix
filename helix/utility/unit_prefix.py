@@ -3,10 +3,37 @@ from typing import OrderedDict
 
 
 class UnitPrefix:
-    def convert_bytes(input: int, decimal=2):
+    """Convert a quantity into a more readable form using unit prefixes.
+
+    This class is expecially useful for very big or very small number, that
+    are difficult to read or visualize.
+
+    Examples:
+        >>> UnitPrefix.convert_bytes(1024)
+        '1 kB'
+        >>> UnitPrefix.convert(1000)
+        '1 k'
+        >>> UnitPrefix.convert(0.01)
+        '10 m'
+    """
+
+    def convert_bytes(input: int, decimal=2) -> str:
+        """Convert bytes using binary prefixes.
+
+        Args:
+            input (int): The number to convert.
+            decimal (int, optional): Number of decimals to use. Defaults to 2.
+
+        Raises:
+            ValueError: The input number is a float
+            ValueError: The input number is negative.
+
+        Returns:
+            str: Converted number.
+        """
         if input is None:
             return None
-        if input < 1 and input > 0:
+        if isinstance(input, float):
             raise ValueError("Can't convert a fractional number of bytes")
         elif input < 0:
             raise ValueError("Can't convert a negative number of bytes")
@@ -50,6 +77,15 @@ class UnitPrefix:
         return converted
 
     def convert(input: int, decimal=2):
+        """Convert a quantity using metric prefixes.
+
+        Args:
+            input (int): The number to convert.
+            decimal (int, optional): Number of decimals to use. Defaults to 2.
+
+        Returns:
+            str: Converted number.
+        """
         converted = None
         si_prefixes = OrderedDict(
             [
