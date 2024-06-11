@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QAbstractScrollArea,
 )
 
+from helix.adapters.alignment_map_file_info_adapter import AlignmentMapFileInfoAdapter
 from helix.adapters.alignment_stats_adapter import AlignmentStatsAdapter
 from helix.adapters.coverage_stats_adapter import CoverageStatsAdapter
 from helix.adapters.genome_adapter import GenomeAdapter
@@ -28,6 +29,7 @@ from helix.alignment_map.depth_analyzer import CoverageStatsCalculator
 from helix.alignment_map.index_stats_calculator import IndexStatsCalculator
 from helix.configuration import MANAGER_CFG
 from helix.data.sorting import Sorting
+from helix.data.tabular_data import TabularData, TabularDataRow
 from helix.reference.genome_metadata_loader import MetadataLoader
 from helix.reference.reference import ReferenceStatus
 from helix.gui.extract.extract_wizard import ExtractWizard
@@ -167,48 +169,35 @@ class HelixWindow(QMainWindow):
 
     def load_aligned(self, file):
         self.current_file = AlignmentMapFile(Path(file))
-        info = self.current_file.file_info
-
-        sorted_string = info.sorted.name
-        if info.sorted in [Sorting.Unknown, Sorting.Unsorted]:
-            sorted_string += " (Click to sort)"
-
-        indexed_string = str(info.indexed)
-        gender_string = info.gender.name
-        if not info.indexed:
-            indexed_string += " (Click to index)"
-            gender_string += " (File is not indexed)"
-        click_to_open = "(Click here to open)"
-
-        reference_str = (
-            f"{info.reference_genome.build}, {info.reference_genome.status.name} "
+        adapted: TabularData = AlignmentMapFileInfoAdapter.adapt(
+            self.current_file.file_info
         )
-        reference_str += "(Click for details)"
+        for row in adapted.rows:
+            if row.vertical_header == "Sorted":
+                if self.current_file.file_info.sorted in [
+                    Sorting.Unknown,
+                    Sorting.Unsorted,
+                ]:
+                    row.columns[0] += " (Click to sort)"
+            elif row.vertical_header == "Indexed":
+                if not self.current_file.file_info.indexed:
+                    row.columns[0] += " (Click to index)"
+            elif row.vertical_header == "Gender":
+                if not self.current_file.file_info.indexed:
+                    row.columns[0] += " (File is not indexed)"
+            elif row.vertical_header == "Reference":
+                row.columns[0] += " (Click for details)"
 
-        size = self.current_file.path.stat().st_size
-        size /= 1024**3
-        size = f"{size:.1f} GB"
+        adapted.rows.append(TabularDataRow("Header", ["Click here to open"]))
+        adapted.rows.append(TabularDataRow("Alignment stats", ["Click here to open"]))
+        adapted.rows.append(TabularDataRow("Index stats", ["Click here to open"]))
+        adapted.rows.append(TabularDataRow("Coverage stats", ["Click here to open"]))
 
-        rows = [
-            ("Directory", str(self.current_file.path.parent)),
-            ("Filename", str(self.current_file.path.name)),
-            ("Size", size),
-            ("File Type", info.file_type.name),
-            ("Reference", reference_str),
-            ("Gender", gender_string),
-            ("Sorted", sorted_string),
-            ("Indexed", indexed_string),
-            ("Mitochondrial DNA Model", info.mitochondrial_dna_model.name),
-            ("Header", click_to_open),
-            ("Alignment stats", click_to_open),
-            ("Index stats", click_to_open),
-            ("Coverage stats", click_to_open),
-        ]
-
-        self.ui.fileInformationTable.setRowCount(len(rows))
+        self.ui.fileInformationTable.setRowCount(len(adapted.rows))
         self.ui.fileInformationTable.setColumnCount(1)
-        for index, row in enumerate(rows):
-            header, value = row
+        for index, row in enumerate(adapted.rows):
+            value = row.columns[0]
+            header = row.vertical_header
             self.ui.fileInformationTable.setVerticalHeaderItem(
                 index, QTableWidgetItem(header)
             )
