@@ -1,4 +1,4 @@
-from math import ceil, floor, log, log10
+from math import floor, log, log10
 from typing import OrderedDict
 
 
@@ -89,28 +89,23 @@ class UnitPrefix:
         converted = None
         si_prefixes = OrderedDict(
             [
-                (" p", (None, -9, -12)),
-                (" n", (-9, -6, -9)),
-                (" μ", (-6, -3, -6)),
-                (" m", (-3, 0, -3)),
+                ("p", (None, -9, -12)),
+                ("n", (-9, -6, -9)),
+                ("μ", (-6, -3, -6)),
+                ("m", (-3, 0, -3)),
                 ("", (0, 3, 0)),
-                (" k", (3, 6, 3)),
-                (" M", (6, 9, 6)),
-                (" G", (9, 12, 9)),
-                (" T", (12, 15, 12)),
-                (" P", (15, None, 15)),
+                ("k", (3, 6, 3)),
+                ("M", (6, 9, 6)),
+                ("G", (9, 12, 9)),
+                ("T", (12, 15, 12)),
+                ("P", (15, None, 15)),
             ]
         )
         if input == 0:
             return "0"
 
         input_log = log10(input)
-        # i.e., -3.9 should become -4;
-        #        3.9 should become 4
-        if input_log < 0:
-            input_log = int(floor(input_log))
-        else:
-            input_log = int(ceil(input_log))
+        input_log = int(floor(input_log))
 
         converted = None
         for letter, interval in si_prefixes.items():
