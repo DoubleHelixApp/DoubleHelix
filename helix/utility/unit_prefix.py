@@ -76,7 +76,7 @@ class UnitPrefix:
                 break
         return converted
 
-    def convert(input: int, decimal=2):
+    def convert(input: int, decimal=2) -> str:
         """Convert a quantity using metric prefixes.
 
         Args:
