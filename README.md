@@ -12,11 +12,10 @@
 DoubleHelix is a tool to manipulate genomic data made for laymen. Still under heavy development. Don't expect anything working.
 
 - [PyPi Package](https://pypi.org/project/doublehelix/)
-- [Documentation](https://doublehelixapp.github.io/)
+- [Documentation](https://doublehelix.app/)
+- [Telegram Channel](https://t.me/DoubleHelixApp) (administered by [DoubleHelix's own Telegram bot](https://github.com/DoubleHelixApp/TelegramBOT))
 
-Follow [this](https://t.me/DoubleHelixApp) very low traffic telegram channel if you don't want to miss any updates on DoubleHelix (the channel is managed by [DoubleHelix Telegram bot](https://github.com/DoubleHelixApp/TelegramBOT)).
-
-### Launch
+### Install
 The only currently supported way to install `DoubleHelix` is with a pypi package.
 
 ```bash
@@ -25,4 +24,4 @@ python -m pip install doublehelix
 helix
 ```
 
-NOTE: See the [doc](https://doublehelixapp.github.io/) for troubleshooting and for developer/user guides.
+_NOTE_: See the [doc](https://doublehelix.app/) for more details.
