@@ -3,10 +3,11 @@ import logging
 import shlex
 import subprocess
 from time import sleep
+from typing import Callable
 
 from helix.progress.base_progress_calculator import BaseProgressCalculator
 from helix.alignment_map.alignment_map_file import AlignmentMapFile
-from helix.configuration import MANAGER_CFG
+from helix.configuration import MANAGER_CFG, ExternalConfig, RepositoryConfig
 from helix.progress.simple_worker import SimpleWorker
 from helix.utility.external import External
 
@@ -18,32 +19,45 @@ class VariantCallingType(enum.Enum):
 
 
 class VariantCaller(SimpleWorker):
-    """This class is responsible for calling variants in a given alignment file.
-
-    Parameters:
-        alignment_file (AlignmentMapFile): The input alignment file.
-        variant_calling_type (VariantCallingType): The type of variant to call (InDel, SNP or Both).
-        progress_calculator (BaseProgressCalculator): An object that calculates the progress of the variant calling process.
-
-    Attributes:
-        _alignment_file: The input alignment file.
-        _variant_calling_type: The type of variant to call.
-        _progress_calculator: An object that calculates the progress of the variant calling process.
-
-    Methods:
-        run(): Runs the variant calling process.
-    """
+    """This class is responsible for calling variants in a given alignment file."""
 
     def __init__(
         self,
         input: AlignmentMapFile,
-        calling_type=VariantCallingType.Both,
-        repo_config=MANAGER_CFG.REPOSITORY,
-        ext_config=MANAGER_CFG.EXTERNAL,
+        calling_type: VariantCallingType = VariantCallingType.Both,
+        repo_config: RepositoryConfig = MANAGER_CFG.REPOSITORY,
+        ext_config: ExternalConfig = MANAGER_CFG.EXTERNAL,
         external: External = External(),
-        progress=None,
-        logger=logging.getLogger(__name__),
+        progress: Callable[[str, int], None] = None,
+        logger: logging.Logger = logging.getLogger(__name__),
     ) -> None:
+        """Initialize the class.
+
+        Args:
+            input (AlignmentMapFile):
+                File that contains aligned reads.
+            calling_type (VariantCallingType, optional):
+                Type of variant calling to perform. Defaults to VariantCallingType.Both.
+            repo_config (RepositoryConfig, optional):
+                Configuration for reference genome repository. Defaults to
+                MANAGER_CFG.REPOSITORY.
+            ext_config (ExternalConfig, optional):
+                Configuration for external tools. Defaults to MANAGER_CFG.EXTERNAL.
+            external (External, optional):
+                Object that contains functions to call external tools.
+                Defaults to External().
+            progress (Callable[[str, int], optional):
+                Function that accept a status message and a percentage,
+                for progress tracking. Defaults to None.
+            logger (Logger, optional):
+                Logger object. Defaults to logging.getLogger(__name__).
+
+        Raises:
+            RuntimeError:
+                If the index stats inside `input` are not available.
+            RuntimeError:
+                If the reference genome for `input` is not available.
+        """
         super().__init__(None)
         self._external = external
         self._ext_config = ext_config
@@ -62,9 +76,14 @@ class VariantCaller(SimpleWorker):
             raise RuntimeError("Reference cannot be None for variant calling")
 
     def call(self):
+        """Does exactly what you think it does."""
         return self.run()
 
     def run(self):
+        """Equivalent of call().
+
+        Needed to provide a run() method for the Thread interface.
+        """
         self.current_file = self._input_file
         reference = str(
             self._input_file.file_info.reference_genome.ready_reference.fasta
@@ -133,6 +152,7 @@ class VariantCaller(SimpleWorker):
         self._quitting_ack = True
 
     def kill(self):
+        """Kill a variant calling operation."""
         self._is_quitting = True
         try:
             # The while is just to prevent a (unlikely IMO but who knows) situation
