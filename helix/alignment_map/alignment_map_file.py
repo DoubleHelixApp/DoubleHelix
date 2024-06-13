@@ -35,6 +35,7 @@ class AlignmentMapFile:
     def __init__(
         self,
         path: Path,
+        ignore_meta: bool = False,
         samtools=Samtools(),
         repository: Repository = Repository(),
         mtdna: MtDNA = MtDNA(),
@@ -48,6 +49,7 @@ class AlignmentMapFile:
             raise RuntimeError(f"Unrecognized file extension: {path.name}")
 
         self.path: Path = path
+        self._ignore_meta = ignore_meta
         self.meta_file: Path = self.path.with_suffix(".pickle")
         self._repo = repository
         self._samtools = samtools
@@ -241,9 +243,10 @@ class AlignmentMapFile:
             )
 
     def _initialize_file_info(self):
-        meta = self.load_meta()
-        if meta is not None:
-            return meta
+        if not self._ignore_meta:
+            meta = self.load_meta()
+            if meta is not None:
+                return meta
         file_info = AlignmentMapFileInfo()
         file_info.path = self.path
         file_info.file_type = AlignmentMapFile.SUPPORTED_FILES[self.path.suffix.lower()]
