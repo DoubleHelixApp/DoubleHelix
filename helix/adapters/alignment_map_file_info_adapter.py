@@ -24,19 +24,19 @@ class AlignmentMapFileInfoAdapter:
         data["File type"] = [stats.file_type.name]
         if stats.reference_genome.status == ReferenceStatus.Available:
             data["Reference"] = [
-                f"Based on GRCh{stats.reference_genome.build}, reference is available"
+                f"Based on GRCh{stats.reference_genome.build}, available"
             ]
         elif stats.reference_genome.status == ReferenceStatus.Buildable:
             data["Reference"] = [
-                f"Likely based on GRCh{stats.reference_genome.build}, reference can be built"
+                f"Likely based on GRCh{stats.reference_genome.build}, buildable"
             ]
         elif stats.reference_genome.status == ReferenceStatus.Downloadable:
             data["Reference"] = [
-                f"Based on GRCh{stats.reference_genome.build}, reference can be downloaded"
+                f"Based on GRCh{stats.reference_genome.build}, downloadable"
             ]
         elif stats.reference_genome.status == ReferenceStatus.Unknown:
             data["Reference"] = [
-                f"Likely based on GRCh{stats.reference_genome.build}. reference is unknown"
+                f"Likely based on GRCh{stats.reference_genome.build}. unknown"
             ]
         data["Gender"] = [stats.gender.name]
         data["Sorted"] = [stats.sorted.name]
