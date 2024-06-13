@@ -21,7 +21,7 @@ def test_open_run_on_ended_sequence():
         sut = LetterRunCollection("Foo", 100)
         sut.end(100)
         sut.open_run(101)
-    assert "ended" in str(e.value)
+    assert "closed" in str(e.value)
 
 
 def test_double_open_run():
@@ -29,22 +29,22 @@ def test_double_open_run():
         sut = LetterRunCollection("Foo", 10)
         sut.open_run(0)
         sut.open_run(0)
-    assert "already opened" in str(e.value)
+    assert "already open" in str(e.value)
 
 
 def test_negative_open():
-    with pytest.raises(IndexError) as e:
+    with pytest.raises(ValueError) as e:
         sut = LetterRunCollection("Foo", 10)
         sut.open_run(-10)
     assert "negative" in str(e.value)
 
 
 def test_close_run_less_equal_than_open():
-    with pytest.raises(RuntimeError) as e:
+    with pytest.raises(ValueError) as e:
         sut = LetterRunCollection("Foo", 10)
         sut.open_run(0)
         sut.close_run(0)
-    assert "greater" in str(e.value)
+    assert "smaller" in str(e.value)
 
 
 def test_only_close_run():
@@ -83,7 +83,7 @@ def test_overlapping_runs():
 
         sut.open_run(15)
         sut.close_run(19)
-    assert "overlapping" in str(e.value)
+    assert "before the end" in str(e.value)
 
 
 def test_filter():
