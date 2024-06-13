@@ -18,9 +18,7 @@ class GZip:
             return Path(str(input) + ".gz")
         elif action == GZipAction.Decompress:
             if len(input.suffixes) == 0:
-                raise RuntimeError(
-                    f"Unable to determine decompressed filename, invalid filename {str(input)} (no extensions)."
-                )
+                raise RuntimeError(f"Error decompressing {input!s}: no extension")
             no_ext = input.name.removesuffix("".join(input.suffixes))
             ext = "".join(input.suffixes[:-1])
             return input.with_name(no_ext + ext)
@@ -42,7 +40,7 @@ class GZip:
         action_flags = {GZipAction.Compress: "", GZipAction.Decompress: "-d"}
 
         try:
-            process = self._external.gzip([action_flags[action], str(input)], wait=True)
+            self._external.gzip([action_flags[action], str(input)], wait=True)
         except RuntimeError as ex:
             # RAFZ format is libz compatible but will make gzip sometime exit
             # with a != 0 code, complaining about "trailing garbage data".

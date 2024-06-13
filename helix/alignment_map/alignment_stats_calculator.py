@@ -47,7 +47,8 @@ class AlignmentStatsCalculator:
             ready_reference = self.aligned_file.reference_genome.ready_reference
             if ready_reference is None:
                 raise RuntimeError(
-                    "Unable to compute stats because there is no reference available for a CRAM file"
+                    "Unable to compute stats because there is"
+                    "no reference available for a CRAM file"
                 )
             options.extend(["-T", ready_reference.fasta])
         options.append(self.aligned_file.path)
@@ -165,12 +166,14 @@ class AlignmentStatsCalculator:
             return None
         if count_quality <= 2:
             self._logger.error(
-                "Unable to compute alignment quality stats as the number of valid samples is less than 2."
+                "Unable to compute alignment quality stats as the number "
+                "of valid samples is less than 2."
             )
             return None
         if read_type == ReadType.Unknown:
             self._logger.error(
-                "Unable to determine read type as there's a similar number of single vs paired reads."
+                "Unable to determine read type as there's a "
+                "similar number of single vs paired reads."
             )
             return None
 

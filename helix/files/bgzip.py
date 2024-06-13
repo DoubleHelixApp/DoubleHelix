@@ -47,7 +47,8 @@ class BGzip:
         elif action == BgzipAction.Decompress:
             if len(input.suffixes) == 0:
                 raise RuntimeError(
-                    f"Unable to determine decompressed filename, invalid filename {str(input)} (no extensions)."
+                    f"Unable to determine decompressed filename, invalid filename "
+                    f"{str(input)} (no extensions)."
                 )
             ext = "".join(input.suffixes[:-1])
             name = input.name.removesuffix("".join(input.suffixes))
@@ -76,7 +77,7 @@ class BGzip:
         if action == BgzipAction.Reindex and output is None:
             output = inferred_filename
 
-        out = self._external.bgzip(
+        self._external.bgzip(
             [action_flags[action], str(input), "-@", str(self._config.threads)],
             wait=True,
         )

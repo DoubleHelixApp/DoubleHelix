@@ -174,7 +174,8 @@ class MicroarrayConverter:
             file.writelines(lines)
 
         print(
-            f"Target {target.name} has a total of {len(lines)-2} entries with same rsID but different coordinates."
+            f"Target {target.name} has a total of {len(lines)-2} entries "
+            f"with same rsID but different coordinates."
         )
 
         lines = []
@@ -200,7 +201,8 @@ class MicroarrayConverter:
             file.writelines(lines)
 
         print(
-            f"Target {target.name} has a total of {len(lines)-2} entries with same coordinate but different rsIDs."
+            f"Target {target.name} has a total of {len(lines)-2} entries "
+            f"with same coordinate but different rsIDs."
         )
 
     def convert(self, input: Path, target: MicroarrayConverterTarget):
@@ -237,13 +239,15 @@ class MicroarrayConverter:
                         )
                     query_entry = query_entries[chromosome][position][0].result
                     if len(query_entries[chromosome][position]) != 1:
-                        # Sanity check: we've multiple entries for the same chromosome and the same position.
-                        # The genotype should be the same. If it's not, warn the user and set a null value.
+                        # Sanity check: we've multiple entries for the same chromosome
+                        # and the same position. The genotype should be the same.
+                        # If it's not, warn the user and set a null value.
                         for entry in query_entries[chromosome][position]:
                             if entry.result != query_entry:
                                 genomes = set(query_entries[chromosome][position])
                                 logging.warn(
-                                    f"Found different genotypes for the same position and the same chromosome: {genomes!s}."
+                                    f"Found different genotypes for the same "
+                                    f"position and the same chromosome: {genomes!s}."
                                 )
                                 query_entry = self._null_result(target)
                                 break

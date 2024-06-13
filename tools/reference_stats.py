@@ -36,7 +36,10 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--external",
-        help="Indicate the root directory for 3rd parties executables (only needed to generate the .dict file if not already available).",
+        help=(
+            "Indicate the root directory for 3rd parties executables "
+            "(only needed to generate the .dict file if not already available)."
+        ),
         type=Path,
         default=None,
     )

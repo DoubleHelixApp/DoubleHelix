@@ -62,7 +62,8 @@ class AlignmentMapFile:
         """Returns a subset of the alignment map file based on the specified percentage.
 
         Args:
-            percentage (float): The percentage of the original file to be subsetted. Must be between 0 and 1.
+            percentage (float):
+                The percentage of the original file to be subsetted. Must be between 0 and 1.
 
         Returns:
             An AlignmentMapFile object representing the subsetted file.
@@ -133,7 +134,9 @@ class AlignmentMapFile:
         suffixes = self.path.suffixes.copy()
         suffixes[-1] = ".fasta"
         output = self.path.with_name(self.path.stem + "".join(suffixes))
-        reference = str(self.file_info.reference_genome.ready_reference.fasta)
+        reference = str(  # noqa: F841
+            self.file_info.reference_genome.ready_reference.fasta
+        )
 
         io = None
         # TODO: get a percentage of input read file size according to region

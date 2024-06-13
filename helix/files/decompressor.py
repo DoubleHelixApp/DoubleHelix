@@ -55,7 +55,7 @@ class Decompressor:
             files = f.namelist()
             if len(files) > 1:
                 raise RuntimeError(
-                    "More than one file found inside the .zip, unable to proceed."
+                    f"Error decompressing {input_file!s}: zip contains more than 1 file"
                 )
             extracted = Path(f.extract(files[0], output_file.parent))
             if extracted != output_file:
@@ -76,15 +76,16 @@ class Decompressor:
 
     def perform(self, genome: Genome, downloaded: Path = None):
         if not downloaded.exists():
-            raise FileNotFoundError(f"Unable to find file {downloaded.name}")
+            raise FileNotFoundError(
+                f"Error decompressing {str(genome)}: "
+                f"unable to find input file {downloaded!s}"
+            )
 
         no_ext = downloaded.name.removesuffix("".join(downloaded.suffixes))
         target = downloaded.with_name(no_ext + ".fa")
         type = self._type_checker.get_type(downloaded)
         if type not in self._handlers:
-            raise RuntimeError(
-                f"Trying to decompress a file with an unknown type: {downloaded.name}"
-            )
+            raise RuntimeError(f"Error decompressing {str(genome)}: unknown type")
 
         handler = self._handlers[type]
         logging.debug(
@@ -93,7 +94,7 @@ class Decompressor:
         handler(self, downloaded, target)
         if not target.exists():
             raise RuntimeError(
-                f"Error during the decompression of {str(genome)}. Decompressed file is not present."
+                f"Error decompressing {str(genome)}: Decompressed file not found"
             )
 
         type = self._type_checker.get_type(target)
@@ -105,15 +106,11 @@ class Decompressor:
         if genome.decompressed_size is None:
             genome.decompressed_size = target.stat().st_size
         elif genome.decompressed_size != target.stat().st_size:
-            raise RuntimeError(
-                f"Error during the decompression of {str(genome)}. Size mismatch."
-            )
+            raise RuntimeError(f"Error decompressing {str(genome)}: size mismatch")
 
         if genome.decompressed_md5 is None:
             genome.decompressed_md5 = self.calculate_md5_hash(target)
         elif genome.decompressed_md5 != self.calculate_md5_hash(target):
-            raise RuntimeError(
-                f"Error during the decompression of {str(genome)}. MD5 mismatch."
-            )
+            raise RuntimeError(f"Error decompressing {str(genome)}: MD5 mismatch")
 
         return target

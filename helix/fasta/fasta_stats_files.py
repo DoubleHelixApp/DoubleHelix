@@ -26,7 +26,10 @@ class FASTAStatsFiles:
     def save_nbin(self, sequences: typing.List[LetterRunCollection]):
         lines = [
             "#WGS Extract runs of N: BIN definition file\n",
-            f"#Processing Ref Model: {self._fasta_file.model_name} with >{self._long_run_threshold}bp of N runs\n",
+            (
+                f"#Processing Ref Model: {self._fasta_file.model_name} "
+                f"with >{self._long_run_threshold}bp of N runs\n"
+            ),
             "#SN\tBinID\tStart\tSize\n",
         ]
         for sequence in sequences:
@@ -43,7 +46,10 @@ class FASTAStatsFiles:
     def save_bed(self, sequences: typing.List[LetterRunCollection]):
         lines = [
             "#WGS Extract runs of N: BED file of bin definitions\n",
-            f"#Processing Ref Model: {self._fasta_file.model_name} with >{self._long_run_threshold}bp of N runs\n",
+            (
+                f"#Processing Ref Model: {self._fasta_file.model_name} "
+                f"with >{self._long_run_threshold}bp of N runs\n"
+            ),
             "#SN\tStart\tStop\n",
         ]
 
@@ -58,21 +64,30 @@ class FASTAStatsFiles:
         with open(self._fasta_file.genome.nbuc, "r") as f:
             reader = csv.DictReader(f, delimiter="\t")
             for row in reader:
+                pass
                 entries.append
-                sequence = LetterRunCollection(row[0], row[1])
+                # sequence = LetterRunCollection(row[0], row[1])
 
-                n_count = row[0]
-                NumNreg = row[0]
-                NregSizeMean = row[0]
-                NregSizeStdDev = row[0]
-                SmlNreg = row[0]
-                BuckSize = row[0]
+                # n_count = row[0]
+                # NumNreg = row[0]
+                # NregSizeMean = row[0]
+                # NregSizeStdDev = row[0]
+                # SmlNreg = row[0]
+                # BuckSize = row[0]
 
     def save_nbuc(self, sequences: typing.List[LetterRunCollection]):
         lines = [
             "#WGS Extract generated Sequence of N summary file\n",
-            f"#Model {self._fasta_file.model_name} with >{self._long_run_threshold}bp Sequence of N and {self._buckets_number} buckets per sequence\n",
-            "#Seq\tNumBP\tNumNs\tNumNreg\tNregSizeMean\tNregSizeStdDev\tSmlNreg\tBuckSize\tBucket Sparse List (bp start, ln value) when nonzero\n",
+            (
+                f"#Model {self._fasta_file.model_name} with "
+                f">{self._long_run_threshold}bp Sequence of N "
+                f"and {self._buckets_number} buckets per sequence\n"
+            ),
+            (
+                "#Seq\tNumBP\tNumNs\tNumNreg\tNregSizeMean\tNregSizeStdDev\t"
+                "SmlNreg\tBuckSize\tBucket Sparse List (bp start, ln value) "
+                "when nonzero\n"
+            ),
         ]
         for sequence in sequences:
             bucket_length = int(math.floor(sequence.length / self._buckets_number))
@@ -93,7 +108,11 @@ class FASTAStatsFiles:
                 long_run_avg = int(statistics.mean(long_run_lengths))
                 long_run_stdev = int(statistics.stdev(long_run_lengths))
 
-            row = f"{sequence.name}\t{sequence.length}\t{long_runs_total}\t{len(long_run_lengths)}\t{long_run_avg}\t{long_run_stdev}\t{short_runs_total}\t{bucket_length}"
+            row = (
+                f"{sequence.name}\t{sequence.length}\t{long_runs_total}\t"
+                f"{len(long_run_lengths)}\t{long_run_avg}\t{long_run_stdev}\t"
+                f"{short_runs_total}\t{bucket_length}"
+            )
 
             buckets = LetterRunBuckets(
                 sequence, self._buckets_number, self._long_run_threshold

@@ -50,11 +50,11 @@ class FASTQFile:
                 line_count += 1
 
         average_read_length = 0
-        average_read_stddev = 0
+        average_read_stddev = 0  # noqa: F841
         if rcnt > 2:
             rstd = sqrt(rM2 / (rcnt - 1))
             average_read_length = rmean
-            average_read_stddev = rstd
+            average_read_stddev = rstd  # noqa: F841
 
         # Do a quick estimate based on the character count in the first 10,000 lines above
         # (2500 read segments) divided into the file size.

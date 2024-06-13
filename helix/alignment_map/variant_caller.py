@@ -103,8 +103,14 @@ class VariantCaller(SimpleWorker):
             f"{self._input_file.path.stem}_{self._calling_type.name}.vcf.gz"
         )
 
-        pileup_opt = f'mpileup -B -I -C 50 --threads {self._ext_config.threads} -f "{reference}" -Ou "{input_file}"'
-        call_opt = f'call --ploidy-file "{self._ploidy}" {skip_variant_opt} -mv -P 0 --threads {self._ext_config.threads} -Oz -o "{output_file}"'
+        pileup_opt = (
+            f"mpileup -B -I -C 50 --threads {self._ext_config.threads}"
+            f'-f "{reference}" -Ou "{input_file}"'
+        )
+        call_opt = (
+            f'call --ploidy-file "{self._ploidy}" {skip_variant_opt} -mv'
+            f'-P 0 --threads {self._ext_config.threads} -Oz -o "{output_file}"'
+        )
         tabix_opt = f'-p vcf "{output_file}"'
 
         pileup_opt = shlex.split(pileup_opt)
