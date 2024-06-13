@@ -8,17 +8,28 @@ import debugpy
 
 
 class SimpleWorker(Thread):
-    """Run a function that returns a Popen in another
-    thread and provide a way to kill it.
+    """Execute a function in another thread.
 
-    Args:
-        Thread (_type_): _description_
+    It can work in two ways:
+        1. Supplying a function that returns a Popen object
+        2. Supplying any function and an object that contains a
+           kill function
+    Example:
+        >>> worker = SimpleWorker(None, lambda: Popen(["sleep", "10"]))
+        >>> worker.kill()
+    In this case SimpleWorker will call the lambda, store the Popen object
+    and call .communicate() on it.
+        >>> worker = SimpleWorker(MyObjectClass, my_object.long_operation)
+        >>> worker.kill()
+    In this case SimpleWorker will call long_operation in another thread
+    and call my_object.kill() when attempting to kill the operation. How the
+    operation will be killed is delegated to MyObjectClass.
     """
 
-    def __init__(self, function, *args, **kwargs) -> None:
+    def __init__(self, object, function, *args, **kwargs) -> None:
         super().__init__()
         self.function = function
-        self.process = None
+        self.object = object
         self._kwargs = kwargs
         self._args = args
         if self.function is not None:
@@ -27,19 +38,19 @@ class SimpleWorker(Thread):
     def run(self):
         if debugpy.is_client_connected():
             debugpy.debug_this_thread()
-        self.process = self.function(*self._args, **self._kwargs)
-        if self.process is not None and isinstance(self.process, Popen):
-            self.process.communicate()
+        self.object = self.function(*self._args, **self._kwargs)
+        if self.object is not None and isinstance(self.object, Popen):
+            self.object.communicate()
 
     def kill(self):
-        process = self.process
-        if process is None:
+        object = self.object
+        if object is None:
             logging.error("Trying to kill a SimpleWorker but there's nothing to kill.")
             return
         try:
-            if hasattr(os.sys, "winver") or not isinstance(process, Popen):
-                process.kill()
+            if hasattr(os.sys, "winver") or not isinstance(object, Popen):
+                object.kill()
             else:
-                process.send_signal(signal.SIGTERM)
+                object.send_signal(signal.SIGTERM)
         except Exception as e:
             logging.error(f"Error when killing process {e!s}")

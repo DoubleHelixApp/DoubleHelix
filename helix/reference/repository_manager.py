@@ -181,7 +181,9 @@ class Repository:
             sequences.append(sequence)
         return sequences
 
-    def _create_companion_files(self, genome: Genome, force=False):
+    def _create_companion_files(
+        self, genome: Genome, force=False, progress=None, action: str = None
+    ):
         samtools = Samtools()
         bgzip = BGzip()
         logging.info(f"{genome}: Starting post-download tasks.")
@@ -218,7 +220,7 @@ class Repository:
                 except Exception as e:
                     logging.critical(e)
 
-    def download(
+    def acquire(
         self, genome: Genome, progress: Callable[[str, int], None] = None, force=False
     ):
         """
@@ -252,14 +254,31 @@ class Repository:
             genome.download_size = None
             genome.decompressed_size = None
 
-        logging.info(f"1/4: Downloading fasta from: {genome.fasta_url}.")
-        download_output = downloader.perform(genome, progress)
-        logging.info(f"2/4: Decompressing: {download_output.name}.")
-        decompressor_output = decompressor.perform(genome, download_output)
-        logging.info(f"3/4: Compressing to gzip: {decompressor_output.name}.")
-        compressor_output = compressor.perform(genome, decompressor_output)
-        logging.info(f"4/4: Creating companion files: {compressor_output.name}.")
-        self._create_companion_files(genome)
+        logging.info(f"Start Downloading from: {genome.fasta_url}.")
+        download_output = downloader.perform(
+            genome, progress, f"[1/4] Downloading from: {genome.fasta_url}"
+        )
+        logging.info(f"Start Decompressing: {download_output.name}.")
+        decompressor_output = decompressor.perform(
+            genome,
+            progress,
+            download_output,
+            f"[2/4] Decompressing: {download_output.name}",
+        )
+        logging.info(f"Start compressing to BGZip: {decompressor_output.name}.")
+        compressor_output = compressor.perform(
+            genome,
+            progress,
+            decompressor_output,
+            f"[3/4] Compressing to BGZip: {decompressor_output.name}",
+        )
+        logging.info(f"Creating companion files: {compressor_output.name}.")
+        self._create_companion_files(
+            genome,
+            force,
+            progress,
+            f"[4/4] Creating companion files: {compressor_output.name}",
+        )
         return genome
 
     def ingest(self, url=None, source=None, build=None, force=False):
@@ -282,7 +301,7 @@ class Repository:
         genome = Genome(url, source=source, build=build)
         genome.parent_folder = self._config.genomes
         logging.info(f"Ingesting {genome}.")
-        genome = self.download(genome, force)
+        genome = self.acquire(genome, force)
         genome.sequences = self._get_sequences(genome)
         return genome
 

@@ -6,9 +6,10 @@ from PySide6.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
-    # QHeaderView,
+    QLineEdit,
 )
 
+from helix.adapters.search import Search
 from helix.data.tabular_data import TabularData
 
 
@@ -20,16 +21,29 @@ class TableDialog(QDialog):
         self.resize(640, 480)
 
         self.tableWidget = QTableWidget(self)
-        # self.tableWidget.horizontalHeader().setSectionResizeMode(
-        #     QHeaderView.ResizeMode.ResizeToContents
-        # )
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.searchbox = QLineEdit()
+        self.searchbox.textChanged.connect(self._search)
 
         self.verticalLayout = QVBoxLayout(self)
+        self.verticalLayout.addWidget(self.searchbox)
         self.verticalLayout.addWidget(self.tableWidget)
 
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
         QMetaObject.connectSlotsByName(self)
+        self.display_data = None
+        self.full_data = None
+
+    def _search(self, text):
+        data = self.full_data
+        if not isinstance(data, dict):
+            data = {None: data}
+        s = Search(data)
+        refined = s.search(text)
+        if not isinstance(data, dict):
+            self.set_data(refined[None])
+        else:
+            self.set_data(refined)
 
     def set_data(self, data: TabularData):
         self.tableWidget.setRowCount(len(data.rows))
@@ -54,6 +68,9 @@ class TableDialog(QDialog):
                 self.tableWidget.setItem(row_index, col_index, QTableWidgetItem(text))
         if not vertical_header:
             self.tableWidget.verticalHeader().hide()
+        if self.full_data is None:
+            self.full_data = data
+        self.display_data = data
 
 
 class ListTableDialog(TableDialog):
@@ -62,7 +79,7 @@ class ListTableDialog(TableDialog):
     def __init__(self, title="Dialog", parent=None, f=Qt.WindowType.Dialog) -> None:
         super().__init__(title, parent, f)
         self.itemList = QComboBox(self)
-        self.verticalLayout.insertWidget(0, self.itemList)
+        self.verticalLayout.insertWidget(1, self.itemList)
         self.data = None
         self.itemList.currentIndexChanged.connect(self.index_changed)
 

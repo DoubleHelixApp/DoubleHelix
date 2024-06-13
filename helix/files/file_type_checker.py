@@ -59,7 +59,7 @@ class FileTypeChecker:
         # Extensions can be wrong or misleading; Use htsfile and
         # eventually fallback on extension.
 
-        file_type = self._external.get_file_type(file)
+        file_type = self._external.htsfile(file, wait=True, text=True)
         for key, value in FileTypeChecker._HTSFILE_TO_TYPE.items():
             if key in file_type:
                 return value

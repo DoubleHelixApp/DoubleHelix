@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
     QTableWidgetItem,
     QAbstractScrollArea,
 )
+from PySide6.QtGui import QShortcut
 
 from helix.adapters.alignment_map_file_info_adapter import AlignmentMapFileInfoAdapter
 from helix.adapters.alignment_stats_adapter import AlignmentStatsAdapter
@@ -45,7 +46,6 @@ from helix.utility.updater import Updater
 
 
 class HelixWindow(QMainWindow):
-
     _percentage_updated = Signal(int)
     _message_updated = Signal(str)
     _operation_ended = Signal()
@@ -55,21 +55,34 @@ class HelixWindow(QMainWindow):
         self,
         parent=None,
         config=MANAGER_CFG.GENERAL,
+        repo_config=MANAGER_CFG.REPOSITORY,
         external=External(),
         samtools=Samtools(),
         repository=Repository(),
         updater=Updater(),
+        shortcut=Shortcut(),
     ):
         super().__init__(parent)
         self._external = external
         self._samtools = samtools
         self._repository = repository
         self.config = config
+        self.repo_config = repo_config
         self.current_file = None
         self._logger = logging.getLogger("main")
         self._updater = updater
+        self._shortcut = shortcut
 
         self.switch_to_main()
+
+        QShortcut("Ctrl+Shift+R", self).activated.connect(
+            lambda: self.load_aligned(self.current_file.path, ignore_meta=True)
+        )
+        QShortcut("Ctrl+R", self).activated.connect(
+            lambda: self.load_aligned(self.current_file.path, ignore_meta=False)
+        )
+        QShortcut("Ctrl+G", self).activated.connect(self._open_genome_dir)
+        QShortcut("Ctrl+D", self).activated.connect(self._open_loaded_dir)
         self.ui.actionDocumentation.triggered.connect(self.on_doc)
         self.ui.actionOpen.triggered.connect(self.on_open)
         self.ui.actionExit.triggered.connect(self.on_close)
@@ -85,7 +98,7 @@ class HelixWindow(QMainWindow):
         dialog.show()
 
     def create_launcher(self):
-        path = Shortcut().create()
+        path = self._shortcut.create()
         message_box = QMessageBox()
         message_box.setWindowTitle("Created")
         message_box.setText(f"A link to DoubleHelix was created at {path}")
@@ -167,8 +180,8 @@ class HelixWindow(QMainWindow):
     def on_settings(self):
         pass
 
-    def load_aligned(self, file):
-        self.current_file = AlignmentMapFile(Path(file))
+    def load_aligned(self, file, ignore_meta=False):
+        self.current_file = AlignmentMapFile(Path(file), ignore_meta)
         adapted: TabularData = AlignmentMapFileInfoAdapter.adapt(
             self.current_file.file_info
         )
@@ -207,7 +220,7 @@ class HelixWindow(QMainWindow):
         if self.current_file is None:
             return
         handlers = {
-            "Directory": self._open_dir,
+            "Directory": self._open_loaded_dir,
             "Sorted": self._do_sorting,
             "Indexed": self._do_indexing,
             "Reference": self._show_reference,
@@ -221,9 +234,15 @@ class HelixWindow(QMainWindow):
             return
         handlers[item.text()]()
 
-    def _open_dir(self):
+    def open_dir(self, path):
         if getattr(os, "startfile", None):
-            os.startfile(self.current_file.file_info.path.parent)
+            os.startfile(path)
+
+    def _open_loaded_dir(self):
+        self.open_dir(self.current_file.file_info.path.parent)
+
+    def _open_genome_dir(self):
+        self.open_dir(self.repo_config.genomes)
 
     def _do_sorting(self):
         if self.current_file is None:
@@ -344,6 +363,12 @@ class HelixWindow(QMainWindow):
                 "Index stats needs to be calculated for this file.",
                 "Do you want to calculate the stats? This may take a while.",
             )
+            if self._long_operation is not None:
+                self._ok_message_box(
+                    "Unable to get stats",
+                    "Please wait until the current operation is finished.",
+                )
+                return
             if choice == QMessageBox.StandardButton.No:
                 return
 
@@ -411,7 +436,7 @@ class HelixWindow(QMainWindow):
                 "Would you like to download it?",
             )
             if choice == QMessageBox.StandardButton.Yes:
-                self._perform_reference_download()
+                self._long_operation = SimpleWorker(self._download_reference)
                 return
         reference = self.current_file.file_info.reference_genome
         dialog = TableDialog("Reference genome", self)
@@ -422,24 +447,29 @@ class HelixWindow(QMainWindow):
         dialog.tableWidget.resizeColumnsToContents()
         dialog.exec()
 
-    def _perform_reference_download(self):
-        self._long_operation = SimpleWorker(self._download_reference)
-
     def _download_reference(self):
         if self.current_file is None:
-            return
+            raise RuntimeError("Download reference was called without any loaded file")
+
         status = self.current_file.file_info.reference_genome.status
         if status != ReferenceStatus.Downloadable:
-            return
+            raise RuntimeError(
+                "Download reference was called but the reference cannot be downloaded"
+            )
 
         self._prepare_long_operation("Start Downloading.")
         reference = self.current_file.file_info.reference_genome
         for match in reference.matching:
             try:
-                self._repository.download(match, self._set_progress)
+                self._repository.acquire(match, self._set_progress)
                 break
             except Exception as e:
                 self._logger.error(f"Error while downloading the reference: {e!s}")
+                self._ok_message_box(
+                    "Download failed",
+                    f"The download of {match.fasta_url} failed with error {e!s}.",
+                    "If the genome is available from another source it will tried now.",
+                )
 
     def _show_alignment_stats(self):
         if self.current_file is None:

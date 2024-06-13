@@ -24,7 +24,11 @@ class BGzip:
         self._external = external
         self._config = config
 
-    def perform(self, genome: Genome, file: Path) -> Path:
+    def perform(
+        self,
+        genome: Genome,
+        file: Path,
+    ) -> Path:
         file_type = self._type_checker.get_type(file)
         if file_type == FileType.BGZIP:
             if genome.fasta != file:

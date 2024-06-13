@@ -40,6 +40,10 @@ class ExtractWizard(QDialog):
         self.setObjectName("extract")
         self.setWindowTitle("Extract data")
 
+        # Specify what options were selected
+        self.status = None
+        self.options = None
+
         # [Back] <--> [Next]
         self.back_button = QPushButton("Back", self)
         self.back_button.setObjectName("backButton")
@@ -184,6 +188,14 @@ class ExtractWizard(QDialog):
         else:
             self.move_to(self._sequence_selection)
 
+    def _microarray_selected(self):
+        selected = [x for x in self._microarray_selection.checkboxes if x.isChecked()]
+        if len(selected) == 0:
+            return
+        self.status = ExtractTargetFormat.Microarray
+        self.options = [x.text() for x in selected]
+        self.close()
+
     def _sequence_selected(self):
         selected = [x.isChecked() for x in self._sequence_selection.sequencesOptions]
         if not any(selected):
@@ -191,8 +203,10 @@ class ExtractWizard(QDialog):
         assert len([x for x in selected if x]) == 1
         index = selected.index(True)
         button = self._sequence_selection.sequencesOptions[index]
-        self._target_sequences = ExtractTargetSequences[button.objectName()]
-        self._format_handlers[self._target_format]()
+        self.status = ExtractTargetSequences[button.objectName()]
+        self.options = button.text()
+        self.close()
+        # self._format_handlers[self._target_format]()
 
     def back(self):
         if self.main.objectName() == FormatSelection.__name__:
@@ -208,4 +222,4 @@ class ExtractWizard(QDialog):
         elif self.main.objectName() == SequenceSelection.__name__:
             self._sequence_selected()
         elif self.main.objectName() == MicroarraySelection.__name__:
-            pass
+            self._microarray_selected()
