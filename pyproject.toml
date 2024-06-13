@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "DoubleHelix"
 description = "Genomic data manipulation tool"
 readme = { file = "README.md", content-type = "text/markdown" }
-authors = [{ name = "Multiple", email = "unavailable@doublehelix.bio" }]
+authors = [{ name = "Multiple", email = "hello@doublehelix.app" }]
 keywords = ["bioinformatics", "genetics", "wgs", "microarray", "science"]
 license = {file = "LICENSE"}
 classifiers = [
@@ -45,11 +45,11 @@ dependencies = [
 ]
 
 [project.urls]
+Documentation = "https://doublehelix.app"
 homepage = "https://github.com/DoubleHelixApp/DoubleHelix"
-Documentation = "https://helix.readthedocs.io/en/latest/"
 Repository = "https://github.com/DoubleHelixApp/DoubleHelix"
 Issues = "https://github.com/DoubleHelixApp/DoubleHelix/issues"
-Changelog = "https://github.com/DoubleHelix/DoubleHelix/releases"
+Changelog = "https://github.com/DoubleHelixApp/DoubleHelix/releases"
 
 [tool.setuptools.packages.find]
 include = ["helix", "helix.*"]
