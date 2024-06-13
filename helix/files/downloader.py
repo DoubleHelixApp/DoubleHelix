@@ -3,6 +3,7 @@ import logging
 import os
 from pathlib import Path
 
+import certifi
 import pycurl
 from google.cloud import storage
 
@@ -195,30 +196,25 @@ class Downloader:
         progress_calc: BaseProgressCalculator = None,
     ):
         curl = self._curl_class()
-        with target.open("wb" if resume_from is None else "ab") as f:
-            curl.setopt(pycurl.URL, url)
-            curl.setopt(pycurl.WRITEDATA, f)
-            curl.setopt(pycurl.FOLLOWLOCATION, True)
-            if progress_calc is not None:
-                curl.setopt(pycurl.NOPROGRESS, False)
+        curl.setopt(pycurl.URL, url)
+        curl.setopt(pycurl.FOLLOWLOCATION, True)
+        curl.setopt(pycurl.CAINFO, certifi.where())
 
-            if resume_from is not None:
-                curl.setopt(pycurl.RESUME_FROM, resume_from)
+        if resume_from is not None:
+            curl.setopt(pycurl.RESUME_FROM, resume_from)
 
-            # TODO: find an easy way (if it exists) to load ca-bundle
-            # on every platform. Or remove this TODO as we don't really
-            # care about people MITM-ing our reference genome download.
-            curl.setopt(pycurl.SSL_VERIFYPEER, 0)
-            curl.setopt(pycurl.SSL_VERIFYHOST, 0)
+        if progress_calc is not None:
+            curl.setopt(pycurl.NOPROGRESS, False)
+            curl.setopt(
+                pycurl.PROGRESSFUNCTION,
+                lambda _tot_down, down, _tot_up, _up: progress_calc.compute(down),
+            )
 
-            if progress_calc is not None:
-                curl.setopt(
-                    pycurl.PROGRESSFUNCTION,
-                    lambda tot_down, down, tot_up, up: progress_calc.compute(down),
-                )
-
-            curl.perform()
-            curl.close()
-            # Signal the download is done
+        try:
+            with target.open("wb" if resume_from is None else "ab") as f:
+                curl.setopt(pycurl.WRITEDATA, f)
+                curl.perform()
+                curl.close()
+        finally:
             if progress_calc is not None:
                 progress_calc.compute(None)
