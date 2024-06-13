@@ -1,4 +1,4 @@
-import collections
+from collections import OrderedDict
 import math
 import typing
 
@@ -6,7 +6,9 @@ from helix.fasta.letter_run_collection import LetterRunCollection
 
 
 class LetterRunBuckets:
-    """Represent a collection of run of letters partitioned into subsequences of fixed length called buckets"""
+    """Represent a collection of run of letters partitioned into
+    subsequences of fixed length called buckets.
+    """
 
     def __init__(
         self,
@@ -27,9 +29,9 @@ class LetterRunBuckets:
         if self._buckets_number > self._sequence.length:
             # Can't have less than 1 N per bucket.
             # This can happen in short sequence (i.e., decoy).
-            return collections.OrderedDict()
+            return OrderedDict()
 
-        buckets = collections.OrderedDict()
+        buckets = OrderedDict()
         bucket_size = int(math.floor(self._sequence.length / self._buckets_number))
 
         for run in self._sequence.filter(

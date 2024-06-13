@@ -17,34 +17,11 @@ from helix.utility.samtools import Samtools
 
 class Repository:
     """
-    The central repository class that holds all the necessary objects to perform
-    various operations. This class encapsulates a set of functionalities that are
-    related to biological data processing and manipulation.
+    Manages the reference genomes and their metadata.
 
-    Attributes
-    ----------
-
-        * alignment_map_header: AlignmentMapHeader
-            - A header object representing an alignment map.
-        * configuration: RepositoryConfig
-            - The repository's configuration settings.
-        * decompressor: Decompressor
-            - An object for decompressing files.
-        * downloader: Downloader
-            - A class used to download files from a remote location.
-        * genome: Genome
-            - Represents the genomic data.
-        * metadata_loader: MetadataLoader
-            - Used to load metadata about genomes and sequences.
-        * mt_dna: MtDNA
-            - Handles mitochondrial DNA-related operations.
-        * samtools: Samtools
-            - An object providing functions for manipulating SAM/BAM files.
-
-    Methods
-    -------
-
-    # Insert docstring explaining methods, if any.
+    Example:
+        >>> repository = Repository()
+        >>> repository.find(file.file_info.sequences)
     """
 
     def __init__(
@@ -68,16 +45,6 @@ class Repository:
         self._config = config
 
     def analyze_references(self) -> None:
-        """
-        Analyze the references in the repository and provide some basic information.
-
-        This method currently just prints out some statistics about the sequences.
-        It needs to be improved to provide more useful information about supported
-        references. For now, it's just a placeholder.
-
-        :return: None
-        :rtype: NoneType
-        """
         # Analyzing sequence by sequence
         different_md5_same_length = []
         for length, seqs in self._sequences_by_length.items():
@@ -117,16 +84,6 @@ class Repository:
                 index += 1
 
     def find(self, sequences: list[Sequence]):
-        """
-        Find the references that match the given sequence(s) based on their MD5
-        or length if an MD5 is not available.
-
-        This method returns a Reference object containing the matching sequences.
-
-        :param sequences: A list of Sequence objects to search for.
-        :return: A Reference object with the matching sequences.
-        :rtype: helix.reference.reference.Reference
-        """
         md5_available = all([x.md5 is not None for x in sequences])
         matching = OrderedDict([(x, []) for x in sequences])
         if md5_available:
@@ -200,14 +157,6 @@ class Repository:
             logging.info(f"{genome}: Dictionary file exists.")
 
     def self_test(self):
-        """Runs tests on the current reference data to ensure its integrity and consistency.
-
-        This method checks if all genomes have sequences by comparing the lengths of their
-        sequence lists with the number of sequences in their fasta files. If any genome is found
-        without sequences, it attempts to download the missing sequences from the original source.
-
-        :return: None
-        """
         for index, reference in enumerate(self.genomes):
             if reference.sequences is None:
                 try:
@@ -222,20 +171,20 @@ class Repository:
 
     def acquire(
         self, genome: Genome, progress: Callable[[str, int], None] = None, force=False
-    ):
+    ) -> Genome:
         """
-        This Python function downloads, decompresses, compresses, and extracts sequence data from a
-        genome file, with optional progress tracking and force download capability.
+        This Python function downloads, and convert to BGZip format (if necessary) a reference
+        genome.
 
-        :param genome: Represents the genome for which the download operation is being performed
-        :type genome: Genome
-        :param progress: Callback function that takes two arguments: a string indicating the progress
-        message and an integer indicating the progress percentage.
-        :type progress: Callable[[str, int], None]
-        :param force: Determines whether to overwrite existing files. If `force` is set to `True`, the
-        method will delete any existing files related to the genome being downloaded and re-download them.
-        :return: The `download` method returns the `genome` object after performing the download,
-        decompression, compression, and creation of companion files.
+        Args:
+            genome (Genome): Genome to acquire
+            progress (Callable[[str, int], None]): Callback function that takes two
+                arguments: a string indicating the progress message and an integer
+                indicating the progress percentage.
+            force (bool): Determines whether to overwrite existing files.
+
+        Returns:
+            Genome: The reference genome.
         """
         downloader = Downloader()
         decompressor = Decompressor()
@@ -281,22 +230,20 @@ class Repository:
         )
         return genome
 
-    def ingest(self, url=None, source=None, build=None, force=False):
-        """Creates a new Genome object and ingests the provided URL, source, and build information.
+    def ingest(self, url, source, build, force=False):
+        """Add a genome to the repository.
 
-        This method downloads, decompresses, compresses, and extracts sequence data from a
-        genome file, with optional progress tracking and force download capability. The created
-        Genome object is then returned.
+        Build a new Genome object with the input parameters and call acquire() on it
 
-        :param url: The URL of the genome file
-        :type url: str
-        :param source: The source of the genome file
-        :type source: str
-        :param build: The build version of the genome file
-        :type build: str
-        :param force: Determines whether to overwrite existing files. If `force` is set to `True`, the
-        method will delete any existing files related to the genome being downloaded and re-download them.
-        :return: A new Genome object after performing the download, decompression, compression, and creation of companion files.
+        Args:
+            url (str): Url for the FASTA file.
+            source (str): Source of the Genome (i.e., "Ensembl")
+            build (str): Build of the Genome (i.e., "38").
+            force (bool, optional): True to force the ingestion even if the files exist.
+                Defaults to False.
+
+        Returns:
+            Genome: Genome after ingestion
         """
         genome = Genome(url, source=source, build=build)
         genome.parent_folder = self._config.genomes
