@@ -108,14 +108,27 @@ def jar(f):
 
 
 class External:
-    """Wrapper around 3rd party executables
+    """Wrapper around 3rd party executables.
 
-    TODO: make this class contains only wrappers around exe/jar files and
-    move the rest of the logic somewhere else (e.g., Samtools class with
-    view(), consensus(), ..., a Haplogrep class, a gzip class etc.).
+    This class provide a set of methods whose name is identical
+    to a 3rd-party executable that the class expect to find.
+
+    The executable are provided either by another package (doublehelix-external)
+    or they need to be found under PATH.
     """
 
     def __init__(self, config=MANAGER_CFG.EXTERNAL) -> None:
+        """Initialize the class.
+
+        Args:
+            config (ExternalConfig, optional):
+                Configuration for this class. Refer to the documentation of
+                ExternalConfig for more information. Defaults to MANAGER_CFG.EXTERNAL.
+
+        Raises:
+            FileNotFoundError:
+                A `root` directory was configured but it doesn't exist.
+        """
         self._config = config
         if not self._config.root.exists():
             raise FileNotFoundError(
@@ -124,13 +137,8 @@ class External:
         if str(self._config.root) not in os.environ["PATH"]:
             os.environ["PATH"] += ";" + str(self._config.root)
 
-        self._htsfile = "htsfile"
-
-    def get_file_type(self, path: Path):
-        process = subprocess.run([self._htsfile, path], capture_output=True, check=True)
-        return process.stdout.decode("utf-8")
-
     def haplogrep_classify(self, vcf_file, output_file):
+        # TODO: this needs to live in another class.
         output = self.haplogrep(
             ["classify", "--in", vcf_file, "--format", "vcf", "--out", output_file],
             wait=True,
@@ -142,6 +150,19 @@ class External:
     # just calling executables with the same name.
     # See the implementation of @exe and @jar decorator
     # for more details.
+
+    @exe
+    def htsfile(
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
+    ):
+        raise FileNotFoundError()
 
     @exe
     def gzip(
