@@ -18,7 +18,7 @@ from helix.data.sequence_type import SequenceType
 from helix.data.sorting import Sorting
 from helix.reference.reference import Reference, ReferenceStatus
 from helix.progress.base_progress_calculator import BaseProgressCalculator
-from helix.reference.repository_manager import Repository
+from helix.reference.repository import Repository
 from helix.mtDNA.mt_dna import MtDNA
 from helix.utility.samtools import Samtools
 

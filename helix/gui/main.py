@@ -37,7 +37,7 @@ from helix.gui.extract.extract_wizard import ExtractWizard
 from helix.gui.table_dialog import ListTableDialog, TableDialog
 from helix.gui.ui_form import Ui_MainWindow
 from helix.progress.base_progress_calculator import BaseProgressCalculator
-from helix.reference.repository_manager import Repository
+from helix.reference.repository import Repository
 from helix.utility.external import External
 from helix.utility.samtools import Samtools
 from helix.utility.shortcut import Shortcut
