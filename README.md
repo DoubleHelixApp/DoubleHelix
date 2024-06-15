@@ -3,11 +3,11 @@
 </p>
   <h1 align="center">DoubleHelix</h1>
 
-[![Build + Lint](https://github.com/DoubleHelixApp/DoubleHelix/actions/workflows/python-build-lint.yml/badge.svg)](https://github.com/Helix/Helix/actions/workflows/python-build-lint.yml)
-[![Python Publish](https://github.com/DoubleHelixApp/DoubleHelix/actions/workflows/python-publish.yml/badge.svg)](https://github.com/Helix/Helix/actions/workflows/python-publish.yml/badge.svg)
+[![Build + Lint](https://github.com/DoubleHelixApp/DoubleHelix/actions/workflows/python-build-lint.yml/badge.svg)](https://github.com/DoubleHelixApp/Helix/actions/workflows/python-build-lint.yml)
+[![Python Publish](https://github.com/DoubleHelixApp/DoubleHelix/actions/workflows/python-publish.yml/badge.svg)](https://github.com/DoubleHelixApp/Helix/actions/workflows/python-publish.yml/badge.svg)
 
-[![PyInstaller release for Linux](https://github.com/DoubleHelixApp/DoubleHelix/actions/workflows/python-pyinstaller-linux.yml/badge.svg)](https://github.com/Helix/Helix/actions/workflows/python-pyinstaller-linux.yml)
-[![PyInstaller release for Windows](https://github.com/DoubleHelixApp/DoubleHelix/actions/workflows/python-pyinstaller-win.yml/badge.svg)](https://github.com/Helix/Helix/actions/workflows/python-pyinstaller-win.yml)
+[![PyInstaller release for Linux](https://github.com/DoubleHelixApp/DoubleHelix/actions/workflows/python-pyinstaller-linux.yml/badge.svg)](https://github.com/DoubleHelixApp/Helix/actions/workflows/python-pyinstaller-linux.yml)
+[![PyInstaller release for Windows](https://github.com/DoubleHelixApp/DoubleHelix/actions/workflows/python-pyinstaller-win.yml/badge.svg)](https://github.com/DoubleHelixApp/Helix/actions/workflows/python-pyinstaller-win.yml)
 
 DoubleHelix is a tool to manipulate genomic data made for laymen. Still under heavy development. Don't expect anything working.
 
