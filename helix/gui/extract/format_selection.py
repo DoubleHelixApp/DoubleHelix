@@ -30,7 +30,7 @@ class FormatSelection(QWidget):
         self._format_options = [
             QRadioButton(label, self.format)
             for label in [
-                "Microarray, textual format containing genotyping info",
+                "Microarray, textual format containing microarray-based genotyping info",
                 "SAM, textual format for aligned file",
                 "BAM, binary equivalent of SAM",
                 "CRAM, highly compressed equivalent of BAM",
