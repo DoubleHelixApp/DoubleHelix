@@ -41,7 +41,8 @@ dependencies = [
     "debugpy",
     "psutil",
     "pydantic",
-    "certifi"
+    "certifi",
+    "parse"
 ]
 
 [project.urls]
