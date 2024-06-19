@@ -14,12 +14,6 @@ from helix.reference.genome_metadata_loader import Genome
 from helix.files.file_type_checker import FileTypeChecker
 from helix.utility.unit_prefix import UnitPrefix
 
-logger = logging.getLogger(__name__)
-# There libs are very chatty for everything less than WARNING
-logging.getLogger("requests").setLevel(logging.WARNING)
-logging.getLogger("urllib3").setLevel(logging.WARNING)
-logging.getLogger("google").setLevel(logging.WARNING)
-
 HANDLERS = {}
 SIZE_HANDLERS = {}
 

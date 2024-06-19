@@ -22,6 +22,14 @@ else:
 logger = logging.getLogger("configuration")
 logging.getLogger().setLevel(logging.DEBUG)
 
+# Parse is very chatty for everything less than INFO
+logging.getLogger("parse").setLevel(logging.INFO)
+
+# There libs are very chatty for everything less than WARNING
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("google").setLevel(logging.WARNING)
+
 
 class HelixDefaults:
     """Specify some directory where to find configuration files."""
