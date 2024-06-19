@@ -21,6 +21,13 @@ class FileTypeChecker:
     This class uses the utility `htsfile` to get the type of a file. If it fails to
     get the type of a file using `htsfile`, it will try to guess its type based on its
     extension.
+
+    Examples:
+        >>> input = Path("file.fasta")
+        >>> checker = FileTypeChecker()
+        >>> assert checker.get_type() == FileType.DECOMPRESSED
+        >>> input = input.rename("file")
+        >>> assert checker.get_ext() == ".fa"
     """
 
     _EXT_TO_TYPE = {
@@ -79,6 +86,17 @@ class FileTypeChecker:
         return None
 
     def get_extension(self, file: Path) -> str:
+        """Get an extension based on the content of the file.
+
+        NOTE: if the input file is gzipped/bgzipped, this function
+        will assume the extension is .fa.gz
+
+        Args:
+            file (Path): Input file
+
+        Returns:
+            str: Extension
+        """
         type = self.get_type(file)
         matches = [x for x in FileTypeChecker._EXT_TO_TYPE.items() if x[1] == type]
         if len(matches) > 0:
