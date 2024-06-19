@@ -30,7 +30,7 @@ class MicroarrayMeta(BaseModel):
     input_format: str = "{id}\t{chromosome}\t{position}\n"
     output_format: str = "{id}\t{chromosome}\t{position}\t{result}\n"
     file_extension: Optional[str] = None
-    undetermined: str = "00"
+    undetermined: str = "--"
     skip: int = 0
 
 
@@ -52,7 +52,7 @@ class RawFile:
 
     def load(self) -> ParsedMicroarrayFile:
         grouped: dict[str, dict[int, set[RawEntry]]] = dict()
-        meta: MicroarrayMeta = MicroarrayMeta()
+        meta: MicroarrayMeta = None
         comments = []
 
         # Comments are only at the beginning of the file: Parse the
@@ -76,6 +76,10 @@ class RawFile:
                     break
             canonicalized = {}
             index = 0
+            # If no metadata was found, just create a default object
+            if meta is None:
+                meta = MicroarrayMeta()
+
             for line in file:
                 if index < meta.skip:
                     index += 1

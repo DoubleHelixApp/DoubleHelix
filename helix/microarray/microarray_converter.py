@@ -1,6 +1,6 @@
 import gzip
-import logging
 from pathlib import Path
+from typing import Callable
 
 from helix.configuration import MANAGER_CFG
 from helix.data.microarray_converter import MicroarrayConverterTarget
@@ -27,7 +27,7 @@ class MicroarrayConverter:
             return "00"
         return "--"
 
-    def ingest(self, input: Path):
+    def ingest(self, input: Path, progress: Callable[[str, float], None] = None):
         name_noext = input.name.removesuffix("".join(input.suffixes))
         target = self._template_folder.joinpath(name_noext).with_suffix(".txt.gz")
 
@@ -40,20 +40,21 @@ class MicroarrayConverter:
             )
 
         rawfile = RawFile(input)
-        template = rawfile.parse()
+        template = rawfile.load()
 
-        lines = []
-        for chromosome in Converter.sort(template.grouped_entries.keys()):
-            ordered_positions = list(template.grouped_entries[chromosome].keys())
-            ordered_positions.sort()
-            for position in ordered_positions:
-                lines.extend(template.grouped_entries[chromosome][position])
-
+        entries = []
         with gzip.open(target, "wt") as file:
             if template.meta is not None:
                 file.write(f"##{template.meta.model_dump_json()}\n")
             file.writelines(template.comments)
-            file.writelines(lines)
+            for chromosome in Converter.sort(list(template.grouped_entries.keys())):
+                ordered_positions = list(template.grouped_entries[chromosome].keys())
+                ordered_positions.sort()
+                for position in ordered_positions:
+                    entries = template.grouped_entries[chromosome][position]
+                    for entry in entries:
+                        file.write(template.meta.input_format.format(**entry.__dict__))
+        return target
 
     def convert(self, input: Path, target: Path):
         if not target.exists():
@@ -61,8 +62,8 @@ class MicroarrayConverter:
                 f"Unable to find body file for microarray template at {target!s}"
             )
 
-        template = RawFile(target).parse()
-        query_entries = RawFile(input).parse()
+        template = RawFile(target).load()
+        query_entries = RawFile(input).load()
 
         lines = []
         for chromosome in template.grouped_entries:
@@ -80,26 +81,10 @@ class MicroarrayConverter:
                         raise RuntimeError(
                             f"Bug: could not find a query entry for {chromosome} {position}"
                         )
-                    query_entry = query_entries.grouped_entries[chromosome][position][
-                        0
-                    ].result
-                    if len(query_entries.grouped_entries[chromosome][position]) != 1:
-                        # Sanity check: we've multiple entries for the same chromosome
-                        # and the same position. The genotype should be the same.
-                        # If it's not, warn the user and set a null value.
-                        for entry in query_entries.grouped_entries[chromosome][
-                            position
-                        ]:
-                            if entry.result != query_entry:
-                                genomes = set(
-                                    query_entries.grouped_entries[chromosome][position]
-                                )
-                                logging.warn(
-                                    f"Found different genotypes for the same "
-                                    f"position and the same chromosome: {genomes!s}."
-                                )
-                                query_entry = self._null_result(target)
-                                break
+                    entries = query_entries.grouped_entries[chromosome][position]
+                    entries = list(entries)
+                    query_entry = entries[0].result
+
                 for template_entry in template_entries:
                     output_line = template.meta.output_format.format(
                         id=template_entry.id,
