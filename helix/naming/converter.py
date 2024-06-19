@@ -1,3 +1,4 @@
+from typing import Iterable
 from helix.data.chromosome_name_type import ChromosomeNameType
 from helix.data.sequence_type import SequenceType
 from helix.naming.lookup_tables import (
@@ -43,7 +44,7 @@ class Converter:
             return SequenceType.Unmapped
         return SequenceType.Other
 
-    def sort(sequence_names: list[str], others: bool = True) -> list[str]:
+    def sort(sequence_names: Iterable[str], others: bool = True) -> list[str]:
         name_type_map = {x: [] for x in SequenceType}
         for name in sequence_names:
             name_type_map[Converter.get_type(name)].append(name)
