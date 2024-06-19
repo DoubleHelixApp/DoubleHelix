@@ -13,7 +13,7 @@ class RawEntry(BaseModel, frozen=True):
     id: str
     chromosome: str
     position: int
-    result: str = None
+    result: Optional[str] = None
 
     @property
     def template_entry(self):
@@ -31,6 +31,7 @@ class MicroarrayMeta(BaseModel):
     output_format: str = "{id}\t{chromosome}\t{position}\t{result}\n"
     file_extension: Optional[str] = None
     undetermined: str = "00"
+    skip: int = 0
 
 
 class ParsedMicroarrayFile(BaseModel):
@@ -49,11 +50,15 @@ class RawFile:
         else:
             self.open_file = lambda: self.path.open("rt")
 
-    def parse(self) -> ParsedMicroarrayFile:
+    def load(self) -> ParsedMicroarrayFile:
         grouped: dict[str, dict[int, set[RawEntry]]] = dict()
         meta: MicroarrayMeta = MicroarrayMeta()
         comments = []
 
+        # Comments are only at the beginning of the file: Parse the
+        # comments and do another cycle to to parse the rest to avoid
+        # the overhead of these intial if line.startswith() which are
+        # REALLY slow (Python 3.12).
         with self.open_file() as file:
             for line in file:
                 if line.startswith("##"):
@@ -67,11 +72,19 @@ class RawFile:
                 elif line.startswith("#"):
                     comments.append(line)
                     continue
+                else:
+                    break
+            canonicalized = {}
+            index = 0
+            for line in file:
+                if index < meta.skip:
+                    index += 1
+                    continue
                 parsed = parse(self.meta.output_format, line)
                 if parsed is None:
                     parsed = parse(self.meta.input_format, line)
                     if parsed is None:
-                        self._logger.debug(
+                        self._logger.warning(
                             f"Found invalid line in {self.path!s}: {self.meta.input_format}!={line}"
                         )
                         continue
@@ -82,10 +95,11 @@ class RawFile:
                     position=parsed["position"],
                     result=parsed["result"] if "result" in parsed else None,
                 )
-                if isinstance(entry, str):
-                    comments.append(entry)
-                    continue
-                chromosome = Converter.canonicalize(entry.chromosome)
+                if entry.chromosome not in canonicalized:
+                    canonicalized[entry.chromosome] = Converter.canonicalize(
+                        entry.chromosome
+                    )
+                chromosome = canonicalized[entry.chromosome]
                 if chromosome not in grouped:
                     grouped[chromosome] = dict()
                 if entry.position not in grouped[chromosome]:
