@@ -19,7 +19,7 @@ class VariantCallingType(enum.Enum):
 
 
 class VariantCaller(SimpleWorker):
-    """This class is responsible for calling variants in a given alignment file.
+    """This class is responsible for calling variants for a given alignment-map file.
 
     Args:
         input (AlignmentMapFile):
@@ -80,10 +80,6 @@ class VariantCaller(SimpleWorker):
         return self.run()
 
     def run(self):
-        """Equivalent of call().
-
-        Needed to provide a run() method for the Thread interface.
-        """
         self.current_file = self._input_file
         reference = str(
             self._input_file.file_info.reference_genome.ready_reference.fasta
