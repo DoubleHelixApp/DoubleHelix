@@ -17,6 +17,7 @@ class Converter:
     def canonicalize(sequence_name: str) -> str:
         """Convert a sequence name into a "canonical" form,
             which is essentially the Number format:
+
             - Digits only for autosome
             - X/Y for sexual
             - M for mitochondrial
@@ -49,10 +50,8 @@ class Converter:
         for name in sequence_names:
             name_type_map[Converter.get_type(name)].append(name)
 
-        ordered = [
-            int(Converter.canonicalize(x)) for x in name_type_map[SequenceType.Autosome]
-        ]
-        ordered.sort()
+        ordered = [x for x in name_type_map[SequenceType.Autosome]]
+        ordered.sort(key=lambda x: int(Converter.canonicalize(x)))
         ordered.extend(name_type_map[SequenceType.X])
         ordered.extend(name_type_map[SequenceType.Y])
         ordered.extend(name_type_map[SequenceType.Mitochondrial])
