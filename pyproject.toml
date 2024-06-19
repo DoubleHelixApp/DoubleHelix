@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "DoubleHelix"
 description = "Genomic data manipulation tool"
 readme = { file = "README.md", content-type = "text/markdown" }
-authors = [{ name = "Multiple", email = "hello@doublehelix.app" }]
+authors = [{ name = "chaplin89", email = "hello@doublehelix.app" }]
 keywords = ["bioinformatics", "genetics", "wgs", "microarray", "science"]
 license = {file = "LICENSE"}
 classifiers = [
