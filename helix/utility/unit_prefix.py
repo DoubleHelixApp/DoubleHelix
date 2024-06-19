@@ -10,11 +10,11 @@ class UnitPrefix:
 
     Examples:
         >>> UnitPrefix.convert_bytes(1024)
-        '1 kB'
+        '1kB'
         >>> UnitPrefix.convert(1000)
-        '1 k'
+        '1k'
         >>> UnitPrefix.convert(0.01)
-        '10 m'
+        '10m'
     """
 
     def convert_bytes(input: int, decimal=2) -> str:

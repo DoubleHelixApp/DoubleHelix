@@ -19,9 +19,9 @@ class Repository:
     """
     Manages the reference genomes and their metadata.
 
-    Example:
+    Examples:
         >>> repository = Repository()
-        >>> repository.find(file.file_info.sequences)
+        >>> reference = repository.find(file.file_info.sequences)
     """
 
     def __init__(
@@ -173,8 +173,8 @@ class Repository:
         self, genome: Genome, progress: Callable[[str, int], None] = None, force=False
     ) -> Genome:
         """
-        This Python function downloads, and convert to BGZip format (if necessary) a reference
-        genome.
+        Download and convert to BGZip format (if necessary) a reference genome. Create
+        additionals files that are needed by DoubleHelix.
 
         Args:
             genome (Genome): Genome to acquire
@@ -244,6 +244,17 @@ class Repository:
 
         Returns:
             Genome: Genome after ingestion
+
+        Examples:
+            >>> manager = RepositoryManager()
+            >>> manager.genomes.append(
+            >>>     manager.ingest(
+            >>>         "https://source/reference.fa",
+            >>>         "NIH", # Should match an entry in sources.json
+            >>>         "38",  # Only 38 or 37
+            >>>     )
+            >>> )
+            >>> GenomeMetadataLoader().save(manager.genomes)
         """
         genome = Genome(url, source=source, build=build)
         genome.parent_folder = self._config.genomes
