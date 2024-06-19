@@ -15,11 +15,11 @@ from helix.naming.lookup_tables import (
 class Converter:
     def canonicalize(sequence_name: str) -> str:
         """Convert a sequence name into a "canonical" form,
-        which is essentially the Number format:
-        - Digits only for autosome
-        - X/Y for sexual
-        - M for mitochondrial
-        - Other sequences are not touched
+            which is essentially the Number format:
+            - Digits only for autosome
+            - X/Y for sexual
+            - M for mitochondrial
+            - Other sequences are not touched
 
         Args:
             sequence_name (str): Sequence to convert
@@ -42,6 +42,23 @@ class Converter:
         elif canonical_name == "*":
             return SequenceType.Unmapped
         return SequenceType.Other
+
+    def sort(sequence_names: list[str], others: bool = True) -> list[str]:
+        name_type_map = {x: [] for x in SequenceType}
+        for name in sequence_names:
+            name_type_map[Converter.get_type(name)].append(name)
+
+        ordered = [
+            int(Converter.canonicalize(x)) for x in name_type_map[SequenceType.Autosome]
+        ]
+        ordered.sort()
+        ordered.extend(name_type_map[SequenceType.X])
+        ordered.extend(name_type_map[SequenceType.Y])
+        ordered.extend(name_type_map[SequenceType.Mitochondrial])
+        if others:
+            ordered.extend(name_type_map[SequenceType.Other])
+            ordered.extend(name_type_map[SequenceType.Unmapped])
+        return ordered
 
     def _find_in_table(input, table):
         normalized = input
