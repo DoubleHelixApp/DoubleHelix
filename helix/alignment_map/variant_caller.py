@@ -19,7 +19,33 @@ class VariantCallingType(enum.Enum):
 
 
 class VariantCaller(SimpleWorker):
-    """This class is responsible for calling variants in a given alignment file."""
+    """This class is responsible for calling variants in a given alignment file.
+
+    Args:
+        input (AlignmentMapFile):
+            File that contains aligned reads.
+        calling_type (VariantCallingType, optional):
+            Type of variant calling to perform. Defaults to VariantCallingType.Both.
+        repo_config (RepositoryConfig, optional):
+            Configuration for reference genome repository. Defaults to
+            MANAGER_CFG.REPOSITORY.
+        ext_config (ExternalConfig, optional):
+            Configuration for external tools. Defaults to MANAGER_CFG.EXTERNAL.
+        external (External, optional):
+            Object that contains functions to call external tools.
+            Defaults to External().
+        progress (Callable[[str, int], optional):
+            Function that accept a status message and a percentage,
+            for progress tracking. Defaults to None.
+        logger (Logger, optional):
+            Logger object. Defaults to logging.getLogger(__name__).
+
+    Raises:
+        RuntimeError:
+            If the index stats inside `input` are not available.
+        RuntimeError:
+            If the reference genome for `input` is not available.
+    """
 
     def __init__(
         self,
@@ -31,33 +57,7 @@ class VariantCaller(SimpleWorker):
         progress: Callable[[str, int], None] = None,
         logger: logging.Logger = logging.getLogger(__name__),
     ) -> None:
-        """Initialize the class.
 
-        Args:
-            input (AlignmentMapFile):
-                File that contains aligned reads.
-            calling_type (VariantCallingType, optional):
-                Type of variant calling to perform. Defaults to VariantCallingType.Both.
-            repo_config (RepositoryConfig, optional):
-                Configuration for reference genome repository. Defaults to
-                MANAGER_CFG.REPOSITORY.
-            ext_config (ExternalConfig, optional):
-                Configuration for external tools. Defaults to MANAGER_CFG.EXTERNAL.
-            external (External, optional):
-                Object that contains functions to call external tools.
-                Defaults to External().
-            progress (Callable[[str, int], optional):
-                Function that accept a status message and a percentage,
-                for progress tracking. Defaults to None.
-            logger (Logger, optional):
-                Logger object. Defaults to logging.getLogger(__name__).
-
-        Raises:
-            RuntimeError:
-                If the index stats inside `input` are not available.
-            RuntimeError:
-                If the reference genome for `input` is not available.
-        """
         super().__init__(None)
         self._external = external
         self._ext_config = ext_config

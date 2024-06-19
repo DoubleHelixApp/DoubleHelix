@@ -16,6 +16,12 @@ class FileType(enum.Enum):
 
 
 class FileTypeChecker:
+    """Gets the type of a file trying to not relying on its extension (if possible)
+
+    This class uses the utility `htsfile` to get the type of a file. If it fails to
+    get the type of a file using `htsfile`, it will try to guess its type based on its
+    extension.
+    """
 
     _EXT_TO_TYPE = {
         ".7z": FileType.SEVENZIP,
