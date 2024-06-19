@@ -1,6 +1,4 @@
 import logging
-import shutil
-import time
 from collections import OrderedDict
 from pathlib import Path
 
@@ -9,23 +7,17 @@ from helix.data.microarray_converter import MicroarrayConverterTarget
 from helix.microarray.microarray_line_formatter import TARGET_FORMATTER_MAP
 from helix.microarray.raw_file import RawEntry, RawFile
 from helix.naming.converter import Converter
-from helix.naming.orderer import SequenceOrderer
 
 
 class MicroarrayConverter:
     def __init__(self, config=MANAGER_CFG.REPOSITORY) -> None:
         self._config = config
         self._template_folder = self._config.metadata.joinpath("microarray_templates")
-        self._head_folder = self._template_folder.joinpath("head")
-        self._body_folder = self._template_folder.joinpath("body")
+        self._comments = []
 
-        if not self._body_folder.exists():
+        if not self._template_folder.exists():
             raise FileNotFoundError(
-                f"Unable to find microarray template body folder at {self._body_folder!s}"
-            )
-        if not self._head_folder.exists():
-            raise FileNotFoundError(
-                f"Unable to find microarray template head folder at {self._head_folder!s}"
+                f"Unable to find microarray template body folder at {self._template_folder!s}"
             )
 
     def _group_entries(
@@ -33,6 +25,10 @@ class MicroarrayConverter:
     ) -> OrderedDict[str, OrderedDict[int, list[RawEntry]]]:
         grouped: OrderedDict[str, OrderedDict[int, list[RawEntry]]] = OrderedDict()
         for entry in RawFile(path):
+            if entry is None:
+                continue
+            elif isinstance(entry, str):
+                continue
             chromosome = Converter.canonicalize(entry.chromosome)
             if chromosome not in grouped:
                 grouped[chromosome] = OrderedDict()
@@ -50,13 +46,8 @@ class MicroarrayConverter:
         return "--"
 
     def ingest(self, target: MicroarrayConverterTarget):
-        header_path = self._head_folder.joinpath(target.name).with_suffix(".txt")
-        body_path = self._body_folder.joinpath(target.name).with_suffix(".txt.gz")
+        body_path = self._template_folder.joinpath(target.name).with_suffix(".txt.gz")
 
-        if not header_path.exists():
-            raise FileNotFoundError(
-                f"Unable to find header file for microarray template at {header_path!s}"
-            )
         if not body_path.exists():
             raise FileNotFoundError(
                 f"Unable to find body file for microarray template at {body_path!s}"
@@ -64,7 +55,7 @@ class MicroarrayConverter:
 
         template = self._group_entries(body_path)
         lines = []
-        for _, chromosome in SequenceOrderer(template.keys()):
+        for chromosome in Converter.sort(template.keys()):
             ordered_positions = list(template[chromosome].keys())
             ordered_positions.sort()
             for position in ordered_positions:
@@ -74,156 +65,19 @@ class MicroarrayConverter:
         with body_path.with_name(body_path.stem).open("wt") as file:
             file.writelines(lines)
 
-    def analyze(self, target: MicroarrayConverterTarget):
-        header_path = self._head_folder.joinpath(target.name).with_suffix(".txt")
-        body_path = self._body_folder.joinpath(target.name).with_suffix(".txt")
-        duplicate_coords = self._body_folder.joinpath(
-            target.name + "_duplicate_coordinates"
-        ).with_suffix(".csv")
-        non_sequential = self._body_folder.joinpath(
-            target.name + "_non_sequential"
-        ).with_suffix(".csv")
-        same_rsid_different_c = self._body_folder.joinpath(
-            target.name + "_same_rsid_different_coordinates"
-        ).with_suffix(".csv")
-        same_c_different_rsid = self._body_folder.joinpath(
-            target.name + "_same_coordinate_different_rsid"
-        ).with_suffix(".csv")
-
-        if not header_path.exists():
-            raise FileNotFoundError(
-                f"Unable to find header file for microarray template at {header_path!s}"
-            )
-        if not body_path.exists():
-            raise FileNotFoundError(
-                f"Unable to find body file for microarray template at {body_path!s}"
-            )
-        template = self._group_entries(body_path)
-        lines = []
-        lines.append("# Duplicate coordinate report\n")
-        lines.append("# Duplicates,Chromosome,Position\n")
-        for chromosome, positions in template.items():
-            position = 0
-            for position, entry in positions.items():
-                if len(entry) != 1:
-                    lines.append(f"{len(entry)},{chromosome},{position}\n")
-        print(
-            f"Target {target.name} has a total of {len(lines)-2} duplicate coordinates."
-        )
-
-        with duplicate_coords.open("wt") as file:
-            file.writelines(lines)
-
-        lines = []
-        lines.append("# Non sequential entries\n")
-        lines.append("# RSID,Chromosome,Position\n")
-        index_by_rsid = dict()
-        index_by_coord = dict()
-        last_chromosome = None
-        last_position = None
-        for entry in RawFile(body_path):
-            chromosome = Converter.canonicalize(entry.chromosome)
-            if chromosome != last_chromosome:
-                last_chromosome = chromosome
-                last_position = 0
-
-            if entry.id not in index_by_rsid:
-                index_by_rsid[entry.id] = []
-            index_by_rsid[entry.id].append(entry)
-            coord = f"{entry.chromosome},{entry.position}"
-            if coord not in index_by_coord:
-                index_by_coord[coord] = []
-            index_by_coord[coord].append(entry)
-
-            if entry.position < last_position:
-                lines.append(f"{entry.id},{entry.chromosome},{entry.position}\n")
-            last_position = entry.position
-
-        with non_sequential.open("wt") as file:
-            file.writelines(lines)
-
-        print(
-            f"Target {target.name} has a total of {len(lines)-2} non sequential entries."
-        )
-
-        lines = []
-        lines.append("# Same RSID different coordinates\n")
-        lines.append("# RSID,Chromosome,Position\n")
-        same_rsids: list[list[RawEntry]] = [
-            index_by_rsid[x] for x in index_by_rsid if len(index_by_rsid[x]) > 1
-        ]
-
-        for same_rsid in same_rsids:
-            first_element = same_rsid[0]
-            broken_elements = set(
-                x
-                for x in same_rsid
-                if x.chromosome != first_element.chromosome
-                or x.position != first_element.position
-            )
-            if len(broken_elements) > 0:
-                lines.append(
-                    f"{first_element.id},{first_element.chromosome},{first_element.position}\n"
-                )
-            for broken_element in broken_elements:
-                lines.append(
-                    f"{broken_element.id},{broken_element.chromosome},{broken_element.position}\n"
-                )
-
-        with same_rsid_different_c.open("wt") as file:
-            file.writelines(lines)
-
-        print(
-            f"Target {target.name} has a total of {len(lines)-2} entries "
-            f"with same rsID but different coordinates."
-        )
-
-        lines = []
-        lines.append("# Same coordinates different RSID\n")
-        lines.append("# RSID,Chromosome,Position\n")
-        same_coords: list[list[RawEntry]] = [
-            index_by_coord[x] for x in index_by_coord if len(index_by_coord[x]) > 1
-        ]
-
-        for same_coord in same_coords:
-            first_element = same_coord[0]
-            broken_elements = set(x for x in same_coord if x.id != first_element.id)
-            if len(broken_elements) > 0:
-                lines.append(
-                    f"{first_element.id},{first_element.chromosome},{first_element.position}\n"
-                )
-            for broken_element in broken_elements:
-                lines.append(
-                    f"{broken_element.id},{broken_element.chromosome},{broken_element.position}\n"
-                )
-
-        with same_c_different_rsid.open("wt") as file:
-            file.writelines(lines)
-
-        print(
-            f"Target {target.name} has a total of {len(lines)-2} entries "
-            f"with same coordinate but different rsIDs."
-        )
-
     def convert(self, input: Path, target: MicroarrayConverterTarget):
-        header_path = self._head_folder.joinpath(target.name).with_suffix(".txt")
-        body_path = self._body_folder.joinpath(target.name).with_suffix(".txt.gz")
+        templates = self._template_folder.joinpath(target.name).with_suffix(".txt.gz")
 
-        if not header_path.exists():
+        if not templates.exists():
             raise FileNotFoundError(
-                f"Unable to find header file for microarray template at {header_path!s}"
-            )
-        if not body_path.exists():
-            raise FileNotFoundError(
-                f"Unable to find body file for microarray template at {body_path!s}"
+                f"Unable to find body file for microarray template at {templates!s}"
             )
 
-        template = self._group_entries(body_path)
+        template = self._group_entries(templates)
         query_entries = self._group_entries(input)
 
         lines = []
 
-        # TODO: this is easy to parallelize. Check if it's worth it
         for chromosome in template:
             for position in template[chromosome]:
                 template_entries = template[chromosome][position]
@@ -271,19 +125,6 @@ class MicroarrayConverter:
         stem = input.stem.replace("_CombinedKit", "")
         output = input.with_name(f"{stem}_{target.name}{suffix}")
 
-        shutil.copy(header_path, output)
         with output.open("a", newline="\n") as f:
             for line in lines:
                 f.write(line)
-
-
-if __name__ == "__main__":
-    logging.getLogger().setLevel(logging.DEBUG)
-    converter = MicroarrayConverter()
-
-    for value in MicroarrayConverterTarget:
-        start = time.time()
-        print(f"Ingesting target: {value.name}")
-        converter.ingest(value)
-        end = time.time()
-        print(f"Total: {end-start:.1f}s")
