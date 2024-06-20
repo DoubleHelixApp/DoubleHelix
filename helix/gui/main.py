@@ -53,7 +53,6 @@ class HelixWindow(QMainWindow):
 
     def __init__(
         self,
-        parent=None,
         config=MANAGER_CFG.GENERAL,
         repo_config=MANAGER_CFG.REPOSITORY,
         external=External(),
@@ -61,17 +60,18 @@ class HelixWindow(QMainWindow):
         repository=Repository(),
         updater=Updater(),
         shortcut=Shortcut(),
+        logger=logging.getLogger(__name__),
     ):
-        super().__init__(parent)
+        super().__init__()
+        self.config = config
+        self.repo_config = repo_config
         self._external = external
         self._samtools = samtools
         self._repository = repository
-        self.config = config
-        self.repo_config = repo_config
-        self.current_file = None
-        self._logger = logging.getLogger("main")
         self._updater = updater
         self._shortcut = shortcut
+        self._logger = logger
+        self.current_file = None
 
         self.switch_to_main()
 
