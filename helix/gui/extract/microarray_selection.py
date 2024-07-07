@@ -12,6 +12,41 @@ from PySide6.QtWidgets import (
 
 from helix.microarray.microarray_converter import MicroarrayConverterTarget
 
+# helix.plugin.* are provided by a different package.
+# Same concept explained in helix/__init__.py
+# from helix.plugins import microarray # type: ignore
+
+
+# class MicroarraySelection1(QWidget):
+#     def __init__(self):
+#         super().__init__()
+
+#         microarray_folder = Path(microarray.__file__).parent
+#         self.microarray_meta = microarray_folder.joinpath("meta.json")
+#         self.setWindowTitle("Table Widget with Checkboxes")
+#         self.setGeometry(100, 100, 500, 300)
+
+#         # Create a QTableWidget
+#         self.table_widget = QTableWidget(self)
+#         self.table_widget.setRowCount(4)  # Set the number of rows
+#         self.table_widget.setColumnCount(3)  # Set the number of columns
+#         self.setCentralWidget(self.table_widget)
+
+#         # Set headers
+#         self.table_widget.setHorizontalHeaderLabels(["", "Provider", "Version", "Tags"])
+
+#     def populate_table(self, path: )
+#         # Add items with checkboxes in the first column
+#         for row in range(self.table_widget.rowCount()):
+#             check_item = QTableWidgetItem()
+#             check_item.setFlags(check_item.flags() | Qt.ItemIsUserCheckable)
+#             check_item.setCheckState(Qt.Unchecked)
+#             self.table_widget.setItem(row, 0, check_item)
+
+#             # Add sample data in the other columns
+#             self.table_widget.setItem(row, 1, QTableWidgetItem(f"Item {row+1} - 1"))
+#             self.table_widget.setItem(row, 2, QTableWidgetItem(f"Item {row+1} - 2"))
+
 
 class MicroarraySelection(QWidget):
     def __init__(self, parent):
