@@ -25,7 +25,7 @@ pip install --index-url https://test.pypi.org/simple/ doublehelix
 helix
 ```
 
-Stable releases are installable from prod PyPI (currently no stable releases are available):
+Stable releases will be installable from prod PyPI (currently no stable releases are available):
 ```bash
 sudo apt install libqt6waylandclient6 samtools tabix bcftools -y # Only for Linux
 python -m pip install doublehelix
