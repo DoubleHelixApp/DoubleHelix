@@ -12,14 +12,15 @@
 
 DoubleHelix is a tool to manipulate genomic data made for laymen. Still under heavy development. Don't expect anything working.
 
-- [PyPi Package](https://pypi.org/project/doublehelix/)
+- [Stable PyPI Package](https://pypi.org/project/doublehelix/) (no stable release available)
+- [Pre-release PyPI package](https://test.pypi.org/project/DoubleHelix/)
 - [Documentation](https://doublehelix.app/)
 - [Telegram Channel](https://t.me/DoubleHelixApp) (administered by [DoubleHelix's own Telegram bot](https://github.com/DoubleHelixApp/DoubleHelix-Telegram-BOT))
 
 ### Install
-The only currently supported way to install `DoubleHelix` is with a pypi package.
+The only currently supported way to install `DoubleHelix` is with a PyPI package.
 
-Pre-release version are installable specifying test PyPi index:
+Pre-release version are installable specifying test PyPI index:
 ```bash
 sudo apt install libqt6waylandclient6 samtools tabix bcftools -y # Only for Linux
 pip install --index-url https://test.pypi.org/simple/ doublehelix
@@ -33,4 +34,4 @@ python -m pip install doublehelix
 helix
 ```
 
-_NOTE_: See the [doc](https://doublehelix.app/) for more details.
+__NOTE__: See the [doc](https://doublehelix.app/) for more details.
