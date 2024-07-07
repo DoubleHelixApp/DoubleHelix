@@ -13,7 +13,7 @@ DoubleHelix is a tool to manipulate genomic data made for laymen. Still under he
 
 - [PyPi Package](https://pypi.org/project/doublehelix/)
 - [Documentation](https://doublehelix.app/)
-- [Telegram Channel](https://t.me/DoubleHelixApp) (administered by [DoubleHelix's own Telegram bot](https://github.com/DoubleHelixApp/TelegramBOT))
+- [Telegram Channel](https://t.me/DoubleHelixApp) (administered by [DoubleHelix's own Telegram bot](https://github.com/DoubleHelix-Telegram-BOT))
 
 ### Install
 The only currently supported way to install `DoubleHelix` is with a pypi package.
