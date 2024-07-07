@@ -22,14 +22,14 @@ The only currently supported way to install `DoubleHelix` is with a PyPI package
 
 Pre-release version are installable specifying test PyPI index:
 ```bash
-sudo apt install libqt6waylandclient6 samtools tabix bcftools -y # Only for Linux
-pip install --index-url https://test.pypi.org/simple/ doublehelix
+sudo apt install libqt6waylandclient6 samtools tabix bcftools python-is-python3 -y # Only for Linux
+python -m pip install --index-url https://test.pypi.org/simple/ doublehelix
 helix
 ```
 
 Stable releases will be installable from prod PyPI (currently no stable releases are available):
 ```bash
-sudo apt install libqt6waylandclient6 samtools tabix bcftools -y # Only for Linux
+sudo apt install libqt6waylandclient6 samtools tabix bcftools python-is-python3 -y # Only for Linux
 python -m pip install doublehelix
 helix
 ```
