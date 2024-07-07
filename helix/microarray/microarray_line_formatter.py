@@ -11,7 +11,7 @@ TARGET_FORMATTER_MAP: dict[
 def target(
     target: MicroarrayConverterTarget, extension=MicroarrayConverterExtensions.TXT
 ):
-    """Simple decorator that it binds a microarray target with a function.
+    """Simple decorator that binds a microarray target with a function.
 
     Args:
         target (MicroarrayConverterTarget): Target to bind to the function
