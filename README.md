@@ -18,6 +18,14 @@ DoubleHelix is a tool to manipulate genomic data made for laymen. Still under he
 ### Install
 The only currently supported way to install `DoubleHelix` is with a pypi package.
 
+Pre-release version are installable specifying test PyPi index:
+```bash
+sudo apt install libqt6waylandclient6 samtools tabix bcftools -y # Only for Linux
+pip install --index-url https://test.pypi.org/simple/ doublehelix
+helix
+```
+
+Stable releases are installable from prod PyPI (currently no stable releases are available):
 ```bash
 sudo apt install libqt6waylandclient6 samtools tabix bcftools -y # Only for Linux
 python -m pip install doublehelix
