@@ -6,8 +6,6 @@ import sys
 
 from helix import metadata, mtDNA
 
-# Why third_party is not recognized by the IDE?
-# See helix/__init__.py
 
 if sys.platform == "win32":
     from helix import third_party
