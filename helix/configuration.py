@@ -17,7 +17,7 @@ else:
     # This will probably change in the future but for the moment just
     # provide anything else that have a __file__ so that nothing here
     # crashes.
-    import helix as third_party
+    third_party = sys.modules[__name__]
 
 logger = logging.getLogger("configuration")
 logging.getLogger().setLevel(logging.DEBUG)
