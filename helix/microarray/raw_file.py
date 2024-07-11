@@ -77,21 +77,22 @@ class RawFile:
             canonicalized = {}
             index = 0
             # If no metadata was found, just create a default object
-            if meta is None:
-                meta = MicroarrayMeta()
+            if meta is not None:
+                self.meta = meta
 
             for line in file:
-                if index < meta.skip:
+                if index < self.meta.skip:
                     index += 1
                     continue
-                parsed = parse(self.meta.output_format, line)
+                break
+
+            for line in file:
+                parsed = parse(self.meta.input_format, line)
                 if parsed is None:
-                    parsed = parse(self.meta.input_format, line)
-                    if parsed is None:
-                        self._logger.warning(
-                            f"Found invalid line in {self.path!s}: {self.meta.input_format}!={line}"
-                        )
-                        continue
+                    self._logger.warning(
+                        f"Found invalid line in {self.path!s}: {self.meta.input_format}!={line}"
+                    )
+                    continue
 
                 entry = RawEntry(
                     id=parsed["id"],
@@ -110,14 +111,14 @@ class RawFile:
                     grouped[chromosome][entry.position] = set()
                 grouped[chromosome][entry.position].add(entry)
 
-        if meta.file_extension is None:
+        if self.meta.file_extension is None:
             if len(self.path.suffixes) > 1 and self.path.suffixes[-1] == ".gz":
-                meta.file_extension = self.path.suffixes[-2]
+                self.meta.file_extension = self.path.suffixes[-2]
             elif len(self.path.suffixes) > 0:
-                meta.file_extension = self.path.suffixes[-1]
+                self.meta.file_extension = self.path.suffixes[-1]
 
         return ParsedMicroarrayFile(
             grouped_entries=grouped,
             comments=comments,
-            meta=meta,
+            meta=self.meta,
         )
