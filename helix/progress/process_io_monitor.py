@@ -25,12 +25,12 @@ class ProcessIOMonitor(Thread):
                 if process.status() != psutil.STATUS_RUNNING:
                     break
                 time.sleep(self.polling)
-        except Exception as e:
+        except psutil.NoSuchProcess:
             # The process can end anytime and psutil will fail.
             # That's not an error.
-            if not isinstance(e, psutil.NoSuchProcess):
-                logging.error(f"Exception in ProcessIOMonitor: {e!s}")
             pass
+        except Exception as e:
+            logging.error(f"Exception in ProcessIOMonitor: {e!s}")
         finally:
             # Signal the process ended.
             self.report(None, None)
