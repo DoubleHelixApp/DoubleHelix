@@ -52,7 +52,7 @@ class Converter:
             return
 
         self._worker = SimpleWorker(
-            self.current_file,
+            None,
             self.current_file.convert,
             file_type,
             progress=self._progress,
