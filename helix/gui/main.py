@@ -146,6 +146,7 @@ class HelixWindow(QMainWindow):
             self._long_operation = Converter(
                 self.current_file, target[0], target[1], self._set_progress
             )
+            self._long_operation.start()
         else:
             self._prepare_ready()
 

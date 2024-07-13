@@ -15,6 +15,12 @@ class Converter:
         options,
         progress=None,
     ) -> None:
+        if current_file is None:
+            raise ValueError("current_file cannot be null")
+
+        if target_format is None:
+            raise ValueError("target_format cannot be null")
+
         self._format_handlers = {
             ExtractTargetFormat.Microarray: self._to_microarray,
             ExtractTargetFormat.BAM: lambda: self._simple_conversion(FileType.BAM),
@@ -27,6 +33,9 @@ class Converter:
             ExtractTargetFormat.Unknown: self._to_unknown,
         }
 
+        if target_format not in self._format_handlers:
+            raise ValueError("Invalid target_format")
+
         self.current_file = current_file
         self.target_format = target_format
         self.options = options
@@ -35,12 +44,18 @@ class Converter:
         # TODO: move to test
         assert all(x in self._format_handlers for x in ExtractTargetFormat)
 
+    def start(self):
+        self._format_handlers[self.target_format]()
+
     def _simple_conversion(self, file_type):
         if self.current_file is None:
             return
 
         self._worker = SimpleWorker(
-            self.current_file.convert, file_type, progress=self._progress
+            self.current_file,
+            self.current_file.convert,
+            file_type,
+            progress=self._progress,
         )
 
     def _to_html(self):
