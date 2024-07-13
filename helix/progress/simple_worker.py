@@ -31,8 +31,8 @@ class SimpleWorker(Thread):
 
     def __init__(self, object, function, *args, **kwargs) -> None:
         super().__init__()
-        self.function = function
         self.object = object
+        self.function = function
         self._kwargs = kwargs
         self._args = args
         if self.function is not None:
