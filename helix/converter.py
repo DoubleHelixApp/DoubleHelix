@@ -17,11 +17,11 @@ class Converter:
     ) -> None:
         self._format_handlers = {
             ExtractTargetFormat.Microarray: self._to_microarray,
-            ExtractTargetFormat.BAM: self._to_bam,
-            ExtractTargetFormat.SAM: self._to_sam,
-            ExtractTargetFormat.CRAM: self._to_cram,
-            ExtractTargetFormat.FASTQ: self._to_fastq,
-            ExtractTargetFormat.FASTA: self._to_fasta,
+            ExtractTargetFormat.BAM: lambda: self._simple_conversion(FileType.BAM),
+            ExtractTargetFormat.SAM: lambda: self._simple_conversion(FileType.SAM),
+            ExtractTargetFormat.CRAM: lambda: self._simple_conversion(FileType.CRAM),
+            ExtractTargetFormat.FASTQ: lambda: self._simple_conversion(FileType.FASTQ),
+            ExtractTargetFormat.FASTA: lambda: self._simple_conversion(FileType.FASTA),
             ExtractTargetFormat.HTML: self._to_html,
             ExtractTargetFormat.VCF: self._to_vcf,
             ExtractTargetFormat.Unknown: self._to_unknown,
@@ -35,42 +35,12 @@ class Converter:
         # TODO: move to test
         assert all(x in self._format_handlers for x in ExtractTargetFormat)
 
-    def _to_bam(self):
+    def _simple_conversion(self, file_type):
         if self.current_file is None:
             return
 
         self._worker = SimpleWorker(
-            self.current_file.convert, FileType.BAM, progress=self._progress
-        )
-
-    def _to_sam(self):
-        if self.current_file is None:
-            return
-        self._worker = SimpleWorker(
-            self.current_file.convert, FileType.SAM, progress=self._progress
-        )
-
-    def _to_cram(self):
-        if self.current_file is None:
-            return
-
-        self._worker = SimpleWorker(
-            self.current_file.convert, FileType.CRAM, progress=self._progress
-        )
-
-    def _to_fasta(self):
-        if self.current_file is None:
-            return
-
-        self._worker = SimpleWorker(
-            self.current_file.convert, FileType.FASTA, progress=self._progress
-        )
-
-    def _to_fastq(self):
-        if self.current_file is None:
-            return
-        self._worker = SimpleWorker(
-            self.current_file.convert, FileType.FASTQ, progress=self._progress
+            self.current_file.convert, file_type, progress=self._progress
         )
 
     def _to_html(self):
@@ -100,3 +70,8 @@ class Converter:
 
     def _to_unknown(self):
         raise RuntimeError("BUG: Invalid target format")
+
+    def kill(self):
+        if self._worker is None:
+            return
+        self._worker.kill()
