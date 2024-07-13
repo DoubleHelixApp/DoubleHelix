@@ -1,20 +1,7 @@
-import enum
-
 from PySide6.QtWidgets import QGroupBox, QRadioButton, QVBoxLayout, QWidget
 
+from helix.data.extract_target_format import ExtractTargetFormat
 from helix.data.file_type import FileType
-
-
-class ExtractTargetFormat(enum.Enum):
-    Microarray = enum.auto()
-    SAM = enum.auto()
-    BAM = enum.auto()
-    CRAM = enum.auto()
-    FASTA = enum.auto()
-    FASTQ = enum.auto()
-    HTML = enum.auto()
-    VCF = enum.auto()
-    Unknown = enum.auto()
 
 
 class FormatSelection(QWidget):

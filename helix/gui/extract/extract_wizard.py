@@ -1,5 +1,4 @@
 import enum
-import webbrowser
 
 from PySide6.QtCore import QMetaObject, Qt
 from PySide6.QtWidgets import (
@@ -11,16 +10,12 @@ from PySide6.QtWidgets import (
 )
 
 from helix.alignment_map.alignment_map_file import AlignmentMapFile
-from helix.alignment_map.variant_caller import VariantCaller
-from helix.data.file_type import FileType
 from helix.gui.extract.format_selection import ExtractTargetFormat, FormatSelection
 from helix.gui.extract.microarray_selection import MicroarraySelection
 from helix.gui.extract.sequence_selection import (
     ExtractTargetSequences,
     SequenceSelection,
 )
-from helix.progress.simple_worker import SimpleWorker
-from helix.renderers.html_aligned_file_report import HTMLAlignedFileReport
 
 
 class ExtractTargetSteps(enum.Enum):
@@ -30,18 +25,16 @@ class ExtractTargetSteps(enum.Enum):
 
 
 class ExtractWizard(QDialog):
-    def __init__(self, current_file, parent=None, progress=None) -> None:
+    def __init__(self, current_file, parent=None) -> None:
         self.current_file: AlignmentMapFile = current_file
         super().__init__(parent, Qt.WindowType.Dialog)
-        self._progress = progress
-        self._worker = None
 
         self.resize(648, 600)
         self.setObjectName("extract")
         self.setWindowTitle("Extract data")
 
         # Specify what options were selected
-        self.status = None
+        self.target_format = None
         self.options = None
 
         # [Back] <--> [Next]
@@ -77,93 +70,9 @@ class ExtractWizard(QDialog):
         self.next_button.clicked.connect(self.next)
         self.back_button.clicked.connect(self.back)
 
-        self._format_handlers = {
-            ExtractTargetFormat.Microarray: self._to_microarray,
-            ExtractTargetFormat.BAM: self._to_bam,
-            ExtractTargetFormat.SAM: self._to_sam,
-            ExtractTargetFormat.CRAM: self._to_cram,
-            ExtractTargetFormat.FASTQ: self._to_fastq,
-            ExtractTargetFormat.FASTA: self._to_fasta,
-            ExtractTargetFormat.HTML: self._to_html,
-            ExtractTargetFormat.VCF: self._to_vcf,
-            ExtractTargetFormat.Unknown: self._to_unknown,
-        }
-
-        # TODO: move to test
-        assert all(x in self._format_handlers for x in ExtractTargetFormat)
-
-    def _to_bam(self):
-        if self.current_file is None:
-            return
-
-        self._worker = SimpleWorker(
-            self.current_file.convert, FileType.BAM, progress=self._progress
-        )
-        self.close()
-
-    def _to_sam(self):
-        if self.current_file is None:
-            return
-        self._worker = SimpleWorker(
-            self.current_file.convert, FileType.SAM, progress=self._progress
-        )
-        self.close()
-
-    def _to_cram(self):
-        if self.current_file is None:
-            return
-
-        self._worker = SimpleWorker(
-            self.current_file.convert, FileType.CRAM, progress=self._progress
-        )
-        self.close()
-
-    def _to_fasta(self):
-        if self.current_file is None:
-            return
-
-        self._worker = SimpleWorker(
-            self.current_file.convert, FileType.FASTA, progress=self._progress
-        )
-        self.close()
-
-    def _to_fastq(self):
-        if self.current_file is None:
-            return
-        self._worker = SimpleWorker(
-            self.current_file.convert, FileType.FASTQ, progress=self._progress
-        )
-        self.close()
-
-    def _to_html(self):
-        if self.current_file is None:
-            return
-
-        html_page = HTMLAlignedFileReport.from_aligned_file(self.current_file)
-        current_path = self.current_file.path
-        extensions = "".join(current_path.suffixes[:-1])
-        name = current_path.stem + extensions + ".html"
-        target = current_path.with_name(name)
-
-        with target.open("wt") as f:
-            f.write(html_page)
-        self._progress(None, None)
-        webbrowser.open(target)
-        self.close()
-
-    def _to_microarray(self):
-        pass
-
-    def _to_vcf(self):
-        if self.current_file is None:
-            return
-
-        self._worker = VariantCaller(self.current_file, progress=self._progress)
-        self._worker.start()
-        self.close()
-
-    def _to_unknown(self):
-        raise RuntimeError("BUG: Invalid target format")
+    def exec(self):
+        super().exec()
+        return (self.target_format, self.options)
 
     def move_to(self, target):
         if self.main is not None:
@@ -179,11 +88,11 @@ class ExtractWizard(QDialog):
         assert len([x for x in selected if x]) == 1
         index = selected.index(True)
         button = self._format_selection._format_options[index]
-        self._target_format = ExtractTargetFormat[button.objectName()]
+        self.target_format = ExtractTargetFormat[button.objectName()]
 
-        if self._target_format == ExtractTargetFormat.HTML:
-            self._to_html()
-        elif self._target_format == ExtractTargetFormat.Microarray:
+        if self.target_format == ExtractTargetFormat.HTML:
+            self.close()
+        elif self.target_format == ExtractTargetFormat.Microarray:
             self.move_to(self._microarray_selection)
         else:
             self.move_to(self._sequence_selection)
@@ -192,7 +101,6 @@ class ExtractWizard(QDialog):
         selected = [x for x in self._microarray_selection.checkboxes if x.isChecked()]
         if len(selected) == 0:
             return
-        self.status = ExtractTargetFormat.Microarray
         self.options = [x.text() for x in selected]
         self.close()
 
@@ -203,10 +111,9 @@ class ExtractWizard(QDialog):
         assert len([x for x in selected if x]) == 1
         index = selected.index(True)
         button = self._sequence_selection.sequencesOptions[index]
-        self.status = ExtractTargetSequences[button.objectName()]
+        self.target = ExtractTargetSequences[button.objectName()]
         self.options = button.text()
         self.close()
-        # self._format_handlers[self._target_format]()
 
     def back(self):
         if self.main.objectName() == FormatSelection.__name__:

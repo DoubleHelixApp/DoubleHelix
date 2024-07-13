@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QTableWidgetItem,
     QAbstractScrollArea,
+    QLabel,
 )
 from PySide6.QtGui import QShortcut
 
@@ -29,6 +30,7 @@ from helix.alignment_map.alignment_map_file import AlignmentMapFile
 from helix.alignment_map.depth_analyzer import CoverageStatsCalculator
 from helix.alignment_map.index_stats_calculator import IndexStatsCalculator
 from helix.configuration import MANAGER_CFG
+from helix.converter import Converter
 from helix.data.sorting import Sorting
 from helix.data.tabular_data import TabularData, TabularDataRow
 from helix.reference.genome_metadata_loader import MetadataLoader
@@ -72,6 +74,7 @@ class HelixWindow(QMainWindow):
         self._shortcut = shortcut
         self._logger = logger
         self.current_file = None
+        self.current_label = QLabel()
 
         self.switch_to_main()
 
@@ -109,15 +112,18 @@ class HelixWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+        self.ui.statusbar.addWidget(self.current_label)
         self.ui.fileInformationTable.doubleClicked.connect(self.file_item_clicked)
         self.ui.extract.clicked.connect(self.export)
         self.ui.stop.clicked.connect(self.stop)
 
-        self._message_updated.connect(self.ui.statusbar.showMessage)
+        self._message_updated.connect(self.current_label.setText)
         self._percentage_updated.connect(self.ui.progress.setValue)
         self._coverage_ready.connect(self._show_coverage_stats)
         self._operation_ended.connect(self._prepare_ready)
 
+        # Everything that has a kill()
+        # function can be assigned here.
         self._long_operation = None
         self._prepare_ready(self.config.last_path)
 
@@ -133,11 +139,13 @@ class HelixWindow(QMainWindow):
         if self._long_operation is not None:
             return
 
-        dialog = ExtractWizard(self.current_file, self, progress=self._set_progress)
-        dialog.exec()
-        if dialog._worker is not None:
+        dialog = ExtractWizard(self.current_file, self)
+        target = dialog.exec()
+        if target[0] is not None:
             self._prepare_long_operation("Prepare exporting")
-            self._long_operation = dialog._worker
+            self._long_operation = Converter(
+                self.current_file, target[0], target[1], self._set_progress
+            )
         else:
             self._prepare_ready()
 
@@ -310,7 +318,7 @@ class HelixWindow(QMainWindow):
         self.ui.stop.setEnabled(True)
         self.ui.stop.show()
         self.ui.extract.hide()
-        self.ui.statusbar.showMessage(message)
+        self.current_label.setText(message)
 
     def _prepare_ready(self, path=None):
         self._long_operation = None
@@ -321,7 +329,8 @@ class HelixWindow(QMainWindow):
             self.on_open(self.current_file.path)
         elif path is not None:
             self.on_open(path)
-        self.ui.statusbar.showMessage("Ready")
+        self.ui.statusbar.removeWidget
+        self.current_label.setText("Ready")
         self.ui.extract.show()
 
     def _ok_message_box(self, title, text, info=None):
