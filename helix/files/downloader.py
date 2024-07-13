@@ -8,7 +8,7 @@ import pycurl
 from google.cloud import storage
 
 from helix.configuration import MANAGER_CFG
-from helix.progress.base_progress_calculator import BaseProgressCalculator
+from helix.progress.base_progress_calculator import BaseProgressCalculator, ComputeOn
 from helix.progress.file_io_monitor import FileIOMonitor
 from helix.reference.genome_metadata_loader import Genome
 from helix.files.file_type_checker import FileTypeChecker
@@ -109,10 +109,10 @@ class Downloader:
         if target.exists():
             if target.stat().st_size == genome.download_size:
                 return self.post_download_action(genome, target)
-        base_calc = BaseProgressCalculator(callback, genome.download_size, "Download")
-        monitor = FileIOMonitor(
-            target, base_calc.compute_on_write_bytes, genome.download_size
+        base_calc = BaseProgressCalculator(
+            callback, genome.download_size, ComputeOn.Write, "Download"
         )
+        monitor = FileIOMonitor(target, base_calc.compute, genome.download_size)
         blob.download_to_filename(target)
         monitor.quit()
         return self.post_download_action(genome, target)
@@ -168,7 +168,7 @@ class Downloader:
         progress_calc = None
         if progress is not None:
             progress_calc = BaseProgressCalculator(
-                progress, genome.download_size, "Download"
+                progress, genome.download_size, ComputeOn.Proxy, "Download"
             )
 
         total = UnitPrefix.convert_bytes(genome.download_size)

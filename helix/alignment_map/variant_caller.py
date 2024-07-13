@@ -5,7 +5,7 @@ import subprocess
 from time import sleep
 from typing import Callable
 
-from helix.progress.base_progress_calculator import BaseProgressCalculator
+from helix.progress.base_progress_calculator import BaseProgressCalculator, ComputeOn
 from helix.alignment_map.alignment_map_file import AlignmentMapFile
 from helix.configuration import MANAGER_CFG, ExternalConfig, RepositoryConfig
 from helix.progress.simple_worker import SimpleWorker
@@ -128,14 +128,13 @@ class VariantCaller(SimpleWorker):
             )
 
             progress = BaseProgressCalculator(
-                self._progress, total_bytes, "[1/2] Calling"
+                self._progress, total_bytes, ComputeOn.Write, "[1/2] Calling"
             )
-            progress = progress.compute_on_write_bytes
 
         self._current_operation = self._external.bcftools(
             pileup_opt,
             stdout=subprocess.PIPE,
-            io=progress,
+            io=progress.compute,
         )
 
         call = self._external.bcftools(call_opt, stdin=self._current_operation.stdout)
@@ -145,11 +144,9 @@ class VariantCaller(SimpleWorker):
             return
 
         progress = BaseProgressCalculator(
-            self._progress, output_file.stat().st_size, "[2/2] Indexing"
+            self._progress, output_file.stat().st_size, ComputeOn.Read, "[2/2] Indexing"
         )
-        self._current_operation = self._external.tabix(
-            tabix_opt, io=progress.compute_on_read_bytes
-        )
+        self._current_operation = self._external.tabix(tabix_opt, io=progress.compute)
         self._current_operation.wait()
         self._quitting_ack = True
 

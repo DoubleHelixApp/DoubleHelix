@@ -1,4 +1,12 @@
+import enum
 import time
+from typing import Callable
+
+
+class ComputeOn(enum.Enum):
+    Read = enum.auto()
+    Write = enum.auto()
+    Proxy = enum.auto()
 
 
 class BaseProgressCalculator:
@@ -6,8 +14,9 @@ class BaseProgressCalculator:
 
     def __init__(
         self,
-        progress,
-        total_bytes,
+        progress: Callable[[str, float], None],
+        total_bytes: int,
+        compute_on: ComputeOn,
         op_name="",
     ) -> None:
         self._previous_bytes = None
@@ -17,10 +26,18 @@ class BaseProgressCalculator:
         self._op_name = op_name
         self._progress = progress
         self._total_bytes = total_bytes
-        self.compute_on_write_bytes = lambda _, w: self.compute(w)
-        self.compute_on_read_bytes = lambda r, _: self.compute(r)
+        self._compute_on = compute_on
+        self.compute = None
+        if compute_on == ComputeOn.Read:
+            self.compute = lambda r, _: self._compute(r)
+        elif compute_on == ComputeOn.Write:
+            self.compute = lambda _, w: self._compute(w)
+        elif compute_on == ComputeOn.Proxy:
+            self.compute = self._compute
+        else:
+            raise ValueError("Invalid progress_on parameter")
 
-    def compute(self, current_bytes):
+    def _compute(self, current_bytes):
         if current_bytes is None:
             self._progress(None, None)
             return

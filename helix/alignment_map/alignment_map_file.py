@@ -17,7 +17,7 @@ from helix.data.read_type import ReadType
 from helix.data.sequence_type import SequenceType
 from helix.data.sorting import Sorting
 from helix.reference.reference import Reference, ReferenceStatus
-from helix.progress.base_progress_calculator import BaseProgressCalculator
+from helix.progress.base_progress_calculator import BaseProgressCalculator, ComputeOn
 from helix.reference.repository import Repository
 from helix.mtDNA.mt_dna import MtDNA
 from helix.utility.samtools import Samtools
@@ -98,7 +98,7 @@ class AlignmentMapFile:
     def _load_header(self) -> AlignmentMapHeader:
         return AlignmentMapHeader(self._samtools.header(self.path))
 
-    def _to_fastq(self, io):
+    def _to_fastq(self, progress):
         options_fq = ["fastq"]
         if self.file_info.alignment_stats.read_type == ReadType.Paired:
             name_1 = self.path.stem + "_R1.fastq.gz"
@@ -114,13 +114,22 @@ class AlignmentMapFile:
         options_fq.append("-n")
         options_fq.extend(["-@", self._config.threads])
 
+        # TODO: get a percentage of input read file size according to region
+        if progress is not None:
+            io = BaseProgressCalculator(
+                progress,
+                self.path.stat().st_size,
+                ComputeOn.Read,
+                "Converting to FASTQ",
+            )
+
         view = self._samtools.view(
             self.path,
             target_format=FileType.BAM,
             cram_reference=self.file_info.reference_genome.ready_reference,
             header=True,
             uncompressed=True,
-            io=io,
+            io=io.compute,
         )
 
         # sort = self._samtools.sort(self.path)
@@ -142,12 +151,14 @@ class AlignmentMapFile:
         # TODO: get a percentage of input read file size according to region
         if progress is not None:
             io = BaseProgressCalculator(
-                progress, self.path.stat().st_size, "Converting to FASTA"
+                progress,
+                self.path.stat().st_size,
+                ComputeOn.Read,
+                "Converting to FASTA",
             )
-            io = io.compute_on_read_bytes
 
         # faidx = self._samtools.fasta_index(reference, regions=regions)
-        consensus = self._samtools.consensus(input, output, io=io)
+        consensus = self._samtools.consensus(input, output, io=io.compute)
         return consensus
 
     def _to_alignment_map(self, target: FileType, regions, progress):
@@ -172,9 +183,11 @@ class AlignmentMapFile:
         # TODO: get a percentage of input read file size according to region
         if progress is not None:
             io = BaseProgressCalculator(
-                progress, self.path.stat().st_size, f"Converting to {target.name}"
+                progress,
+                self.path.stat().st_size,
+                ComputeOn.Read,
+                f"Converting to {target.name}",
             )
-            io = io.compute_on_read_bytes
 
         return self._samtools.view(
             self.path,
@@ -182,7 +195,7 @@ class AlignmentMapFile:
             output=output,
             regions=regions,
             cram_reference=reference,
-            io=io,
+            io=io.compute,
             wait=False,
         )
 

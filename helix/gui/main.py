@@ -38,7 +38,7 @@ from helix.reference.reference import ReferenceStatus
 from helix.gui.extract.extract_wizard import ExtractWizard
 from helix.gui.table_dialog import ListTableDialog, TableDialog
 from helix.gui.ui_form import Ui_MainWindow
-from helix.progress.base_progress_calculator import BaseProgressCalculator
+from helix.progress.base_progress_calculator import BaseProgressCalculator, ComputeOn
 from helix.reference.repository import Repository
 from helix.utility.external import External
 from helix.utility.samtools import Samtools
@@ -285,7 +285,10 @@ class HelixWindow(QMainWindow):
                 return
         self._prepare_long_operation("Start indexing.")
         progress = BaseProgressCalculator(
-            self._set_progress, self.current_file.path.stat().st_size, "Indexing"
+            self._set_progress,
+            self.current_file.path.stat().st_size,
+            ComputeOn.Read,
+            "Indexing",
         )
 
         try:
@@ -293,7 +296,7 @@ class HelixWindow(QMainWindow):
                 None,
                 self._samtools.index,
                 self.current_file.path,
-                io=progress.compute_on_read_bytes,
+                io=progress.compute,
             )
         except Exception as e:
             self._logger.error(f"Error while initializing indexing: {e!s}")

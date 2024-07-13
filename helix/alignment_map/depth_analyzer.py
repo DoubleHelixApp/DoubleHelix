@@ -8,7 +8,7 @@ from helix.data.file_type import FileType
 from helix.data.sequence_type import SequenceType
 from helix.reference.reference import ReferenceStatus
 from helix.naming.converter import Converter
-from helix.progress.base_progress_calculator import BaseProgressCalculator
+from helix.progress.base_progress_calculator import BaseProgressCalculator, ComputeOn
 from helix.utility.external import External
 from helix.utility.regions import RegionType, Regions
 
@@ -70,7 +70,7 @@ class CoverageStatsCalculator(Thread):
                 ]
             )
             self._progress_calc = BaseProgressCalculator(
-                self._progress, total_bases, "Calculating depth"
+                self._progress, total_bases, ComputeOn.Proxy, "Calculating depth"
             )
         self._process = self._external.samtools(
             options, stdout=subprocess.PIPE, text=True
