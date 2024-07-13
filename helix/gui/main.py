@@ -329,7 +329,6 @@ class HelixWindow(QMainWindow):
             self.on_open(self.current_file.path)
         elif path is not None:
             self.on_open(path)
-        self.ui.statusbar.removeWidget
         self.current_label.setText("Ready")
         self.ui.extract.show()
 
