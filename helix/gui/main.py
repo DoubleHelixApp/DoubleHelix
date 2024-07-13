@@ -290,6 +290,7 @@ class HelixWindow(QMainWindow):
 
         try:
             self._long_operation = SimpleWorker(
+                None,
                 self._samtools.index,
                 self.current_file.path,
                 io=progress.compute_on_read_bytes,
@@ -411,7 +412,9 @@ class HelixWindow(QMainWindow):
             if choice == QMessageBox.StandardButton.No:
                 return
             self._prepare_long_operation("Preparing to compute coverage stats")
-            self._long_operation = SimpleWorker(self._compute_coverage_stats)
+            self._long_operation = SimpleWorker(
+                self._compute_coverage_stats
+            )  # FIXME: wtf is this shit
         else:
             coverage_statistics = self.current_file.file_info.coverage_stats
             dialog = TableDialog("Coverage Statistics", self)
