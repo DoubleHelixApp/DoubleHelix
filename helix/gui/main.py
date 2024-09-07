@@ -161,7 +161,7 @@ class HelixWindow(QMainWindow):
     def on_doc(self):
         webbrowser.open("https://doublehelix.app", 2)
 
-    def on_open(self, file: Path = False):
+    def on_open(self, file: Path | None = False):
         if not file:
             title = "Open file"
             type = "Aligned File (*.bam *.sam *.cram);;"
@@ -416,7 +416,7 @@ class HelixWindow(QMainWindow):
                 return
             self._prepare_long_operation("Preparing to compute coverage stats")
             self._long_operation = SimpleWorker(
-                self._compute_coverage_stats
+                None, self._compute_coverage_stats
             )  # FIXME: wtf is this shit
         else:
             coverage_statistics = self.current_file.file_info.coverage_stats
@@ -451,7 +451,7 @@ class HelixWindow(QMainWindow):
                 "Would you like to download it?",
             )
             if choice == QMessageBox.StandardButton.Yes:
-                self._long_operation = SimpleWorker(self._download_reference)
+                self._long_operation = SimpleWorker(None, self._download_reference)
                 return
         reference = self.current_file.file_info.reference_genome
         dialog = TableDialog("Reference genome", self)
