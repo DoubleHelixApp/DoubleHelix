@@ -39,12 +39,15 @@ class SimpleWorker(Thread):
             self.start()
 
     def run(self):
-        if debugpy is not None:
-            if debugpy.is_client_connected():
-                debugpy.debug_this_thread()
-        self.object = self.function(*self._args, **self._kwargs)
-        if self.object is not None and isinstance(self.object, Popen):
-            self.object.communicate()
+        try:
+            if debugpy is not None:
+                if debugpy.is_client_connected():
+                    debugpy.debug_this_thread()
+            self.object = self.function(*self._args, **self._kwargs)
+            if self.object is not None and isinstance(self.object, Popen):
+                self.object.communicate()
+        except Exception:
+            pass
 
     def kill(self):
         object = self.object
