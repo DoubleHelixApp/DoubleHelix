@@ -31,7 +31,7 @@ jobs:
     - name: Make pyinstaller release
       run: |
         pyinstaller .//helix//main.py --clean -y --collect-all helix --log-level=WARN --add-data .//helix//metadata//*.*:.//helix//metadata --add-data .//helix//metadata//report_templates//*.*:.//helix//metadata//report_templates --windowed --onefile
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: Helix
         path: ./dist/main.exe
