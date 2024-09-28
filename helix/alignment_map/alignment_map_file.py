@@ -126,7 +126,7 @@ class AlignmentMapFile:
         view = self._samtools.view(
             self.path,
             target_format=FileType.BAM,
-            cram_reference=self.file_info.reference_genome.ready_reference,
+            reference=self.file_info.reference_genome.ready_reference,
             header=True,
             uncompressed=True,
             io=io.compute,
@@ -166,6 +166,8 @@ class AlignmentMapFile:
         if len(suffixes) == 0:
             suffixes = [None]
         reference = None
+        if self.file_info.reference_genome.ready_reference is not None:
+            reference = self.file_info.reference_genome.ready_reference.fasta
         if target == FileType.BAM:
             suffixes[-1] = ".bam"
         elif target == FileType.CRAM:
@@ -174,7 +176,6 @@ class AlignmentMapFile:
                 raise RuntimeError(
                     "Reference genome was not found but is mandatory for CRAM files."
                 )
-            reference = self.file_info.reference_genome.ready_reference.fasta
         elif target == FileType.SAM:
             suffixes[-1] = ".sam"
         output = self.path.with_name(self.path.stem + "".join(suffixes))
@@ -194,7 +195,7 @@ class AlignmentMapFile:
             target_format=target,
             output=output,
             regions=regions,
-            cram_reference=reference,
+            reference=reference,
             io=io.compute,
             wait=False,
         )

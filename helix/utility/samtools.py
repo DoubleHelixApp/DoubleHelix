@@ -75,17 +75,19 @@ class Samtools:
         output: Path = None,
         regions: str = None,
         subsample: float = None,
-        cram_reference: Path = None,
+        reference: Path = None,
         header=False,
         uncompressed=False,
         io=None,
         wait=True,
     ):
         options = ["view", "--no-PG"]
+        if reference is not None:
+            options.extend(["-T", str(reference)])
         if target_format == FileType.BAM:
             options.append("-b")
         elif target_format == FileType.CRAM:
-            options.extend(["-C", "-T", str(cram_reference)])
+            options.extend(["-C"])
         elif target_format == FileType.SAM:
             pass
         else:
