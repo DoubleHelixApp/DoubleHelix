@@ -205,21 +205,21 @@ class Repository:
 
         logging.info(f"Start Downloading from: {genome.fasta_url}.")
         download_output = downloader.perform(
-            genome, progress, f"[1/4] Downloading from: {genome.fasta_url}"
+            genome, progress  # , f"[1/4] Downloading from: {genome.fasta_url}"
         )
         logging.info(f"Start Decompressing: {download_output.name}.")
         decompressor_output = decompressor.perform(
             genome,
-            progress,
+            # progress,
             download_output,
-            f"[2/4] Decompressing: {download_output.name}",
+            # f"[2/4] Decompressing: {download_output.name}",
         )
         logging.info(f"Start compressing to BGZip: {decompressor_output.name}.")
         compressor_output = compressor.perform(
             genome,
-            progress,
+            # progress,
             decompressor_output,
-            f"[3/4] Compressing to BGZip: {decompressor_output.name}",
+            # f"[3/4] Compressing to BGZip: {decompressor_output.name}",
         )
         logging.info(f"Creating companion files: {compressor_output.name}.")
         self._create_companion_files(
@@ -256,15 +256,16 @@ class Repository:
             >>> )
             >>> GenomeMetadataLoader().save(manager.genomes)
         """
-        genome = Genome(url, source=source, build=build)
-        genome.parent_folder = self._config.genomes
+        genome = Genome(
+            url, source=source, build=build, parent_folder=self._config.genomes
+        )
         logging.info(f"Ingesting {genome}.")
         genome = self.acquire(genome, force)
         genome.sequences = self._get_sequences(genome)
         return genome
 
 
-if __name__ == "__main__":
+def unused():
     import tempfile
     import hashlib
     from os import close
@@ -308,3 +309,7 @@ if __name__ == "__main__":
             genome.dict.rename(target_dict)
         if not target_gzi.exists() and genome.gzi.exists():
             genome.gzi.rename(target_gzi)
+
+
+if __name__ == "__main__":
+    pass
