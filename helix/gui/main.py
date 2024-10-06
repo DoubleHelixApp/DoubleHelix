@@ -1,3 +1,4 @@
+import enum
 import logging
 import os
 import webbrowser
@@ -38,13 +39,28 @@ from helix.reference.reference import ReferenceStatus
 from helix.gui.extract.extract_wizard import ExtractWizard
 from helix.gui.table_dialog import ListTableDialog, TableDialog
 from helix.gui.ui_form import Ui_MainWindow
-from helix.progress.base_progress_calculator import BaseProgressCalculator, ComputeOn
+from helix.progress.progress_calculator import ProgressCalculator, ComputeOn
 from helix.reference.repository import Repository
 from helix.utility.external import External
 from helix.utility.samtools import Samtools
 from helix.utility.shortcut import Shortcut
-from helix.progress.simple_worker import SimpleWorker
+from helix.progress.worker import Worker
 from helix.utility.updater import Updater
+
+
+class GUIState(enum.Enum):
+    Idle = enum.auto()
+    Busy = enum.auto()
+
+
+def GUIRequire(function, status):
+    def wrapper(self, *args, kvarg):
+
+        if self._status != status:
+            return
+        return function(self, args, kvarg)
+
+    return wrapper
 
 
 class HelixWindow(QMainWindow):
@@ -120,18 +136,18 @@ class HelixWindow(QMainWindow):
         self._message_updated.connect(self.current_label.setText)
         self._percentage_updated.connect(self.ui.progress.setValue)
         self._coverage_ready.connect(self._show_coverage_stats)
-        self._operation_ended.connect(self._prepare_ready)
+        self._operation_ended.connect(self._to_idle)
 
         # Everything that has a kill()
         # function can be assigned here.
         self._long_operation = None
-        self._prepare_ready(self.config.last_path)
+        self._to_idle(self.config.last_path)
 
     def stop(self):
         long_op = self._long_operation
         if long_op is not None:
             long_op.kill()
-        self._prepare_ready()
+        self._to_idle()
 
     def export(self):
         if self.current_file is None:
@@ -142,13 +158,13 @@ class HelixWindow(QMainWindow):
         dialog = ExtractWizard(self.current_file, self)
         target = dialog.exec()
         if target[0] is not None:
-            self._prepare_long_operation("Prepare exporting")
+            self._to_busy("Prepare exporting")
             self._long_operation = Converter(
                 self.current_file, target[0], target[1], self._set_progress
             )
             self._long_operation.start()
         else:
-            self._prepare_ready()
+            self._to_idle()
 
     def closeEvent(self, event=False):
         MANAGER_CFG.save()
@@ -283,8 +299,8 @@ class HelixWindow(QMainWindow):
             )
             if choice == QMessageBox.StandardButton.No:
                 return
-        self._prepare_long_operation("Start indexing.")
-        progress = BaseProgressCalculator(
+        self._to_busy("Start indexing.")
+        progress = ProgressCalculator(
             self._set_progress,
             self.current_file.path.stat().st_size,
             ComputeOn.Read,
@@ -292,7 +308,7 @@ class HelixWindow(QMainWindow):
         )
 
         try:
-            self._long_operation = SimpleWorker(
+            self._long_operation = Worker(
                 None,
                 self._samtools.index,
                 self.current_file.path,
@@ -300,7 +316,7 @@ class HelixWindow(QMainWindow):
             )
         except Exception as e:
             self._logger.error(f"Error while initializing indexing: {e!s}")
-            self._prepare_ready()
+            self._to_idle()
 
     def _set_progress(self, label, percentage):
         # Memento: this is always called from another thread.
@@ -315,7 +331,7 @@ class HelixWindow(QMainWindow):
         self._percentage_updated.emit(percentage)
         self._message_updated.emit(label)
 
-    def _prepare_long_operation(self, message):
+    def _to_busy(self, message):
         self.ui.progress.setMaximum(100)
         self.ui.progress.setMinimum(0)
         self.ui.progress.setValue(0)
@@ -325,7 +341,7 @@ class HelixWindow(QMainWindow):
         self.ui.extract.hide()
         self.current_label.setText(message)
 
-    def _prepare_ready(self, path=None):
+    def _to_idle(self, path=None):
         self._long_operation = None
         self.ui.progress.hide()
         self.ui.stop.setEnabled(False)
@@ -414,8 +430,8 @@ class HelixWindow(QMainWindow):
             )
             if choice == QMessageBox.StandardButton.No:
                 return
-            self._prepare_long_operation("Preparing to compute coverage stats")
-            self._long_operation = SimpleWorker(
+            self._to_busy("Preparing to compute coverage stats")
+            self._long_operation = Worker(
                 None, self._compute_coverage_stats
             )  # FIXME: wtf is this shit
         else:
@@ -451,7 +467,7 @@ class HelixWindow(QMainWindow):
                 "Would you like to download it?",
             )
             if choice == QMessageBox.StandardButton.Yes:
-                self._long_operation = SimpleWorker(None, self._download_reference)
+                self._long_operation = Worker(None, self._download_reference)
                 return
         reference = self.current_file.file_info.reference_genome
         dialog = TableDialog("Reference genome", self)
@@ -472,7 +488,7 @@ class HelixWindow(QMainWindow):
                 "Download reference was called but the reference cannot be downloaded"
             )
 
-        self._prepare_long_operation("Start Downloading.")
+        self._to_busy("Start Downloading.")
         reference = self.current_file.file_info.reference_genome
         for match in reference.matching:
             try:

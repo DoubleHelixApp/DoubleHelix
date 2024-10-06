@@ -3,7 +3,7 @@ from helix.alignment_map.alignment_map_file import AlignmentMapFile
 from helix.alignment_map.variant_caller import VariantCaller
 from helix.data.extract_target_format import ExtractTargetFormat
 from helix.data.file_type import FileType
-from helix.progress.simple_worker import SimpleWorker
+from helix.progress.worker import Worker
 from helix.renderers.html_aligned_file_report import HTMLAlignedFileReport
 
 
@@ -51,7 +51,7 @@ class Converter:
         if self.current_file is None:
             return
 
-        self._worker = SimpleWorker(
+        self._worker = Worker(
             None,
             self.current_file.convert,
             file_type,

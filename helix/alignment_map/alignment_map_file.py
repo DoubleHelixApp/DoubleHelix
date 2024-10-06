@@ -17,7 +17,7 @@ from helix.data.read_type import ReadType
 from helix.data.sequence_type import SequenceType
 from helix.data.sorting import Sorting
 from helix.reference.reference import Reference, ReferenceStatus
-from helix.progress.base_progress_calculator import BaseProgressCalculator, ComputeOn
+from helix.progress.progress_calculator import ProgressCalculator, ComputeOn
 from helix.reference.repository import Repository
 from helix.mtDNA.mt_dna import MtDNA
 from helix.utility.samtools import Samtools
@@ -116,7 +116,7 @@ class AlignmentMapFile:
 
         # TODO: get a percentage of input read file size according to region
         if progress is not None:
-            io = BaseProgressCalculator(
+            io = ProgressCalculator(
                 progress,
                 self.path.stat().st_size,
                 ComputeOn.Read,
@@ -150,7 +150,7 @@ class AlignmentMapFile:
         io = None
         # TODO: get a percentage of input read file size according to region
         if progress is not None:
-            io = BaseProgressCalculator(
+            io = ProgressCalculator(
                 progress,
                 self.path.stat().st_size,
                 ComputeOn.Read,
@@ -183,7 +183,7 @@ class AlignmentMapFile:
         io = None
         # TODO: get a percentage of input read file size according to region
         if progress is not None:
-            io = BaseProgressCalculator(
+            io = ProgressCalculator(
                 progress,
                 self.path.stat().st_size,
                 ComputeOn.Read,

@@ -8,6 +8,15 @@ import psutil
 
 
 class ProcessIOMonitor(Thread):
+    """Monitor read/write on disk of a process
+    until its death.
+
+    Args:
+        process (Popen): Process to monitor
+        report Callable[[str, float], None]: function to report read/write on disk
+        polling (float): Seconds between polling
+    """
+
     def __init__(self, process: Popen, report, polling=1) -> None:
         super().__init__()
         self.process: Popen = process

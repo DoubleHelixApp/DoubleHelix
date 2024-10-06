@@ -5,10 +5,9 @@ import subprocess
 from time import sleep
 from typing import Callable
 
-from helix.progress.base_progress_calculator import BaseProgressCalculator, ComputeOn
+from helix.progress.progress_calculator import ProgressCalculator, ComputeOn
 from helix.alignment_map.alignment_map_file import AlignmentMapFile
 from helix.configuration import MANAGER_CFG, ExternalConfig, RepositoryConfig
-from helix.progress.simple_worker import SimpleWorker
 from helix.utility.external import External
 
 
@@ -18,7 +17,7 @@ class VariantCallingType(enum.Enum):
     Both = enum.auto()
 
 
-class VariantCaller(SimpleWorker):
+class VariantCaller:
     """This class is responsible for calling variants for a given alignment-map file.
 
     Args:
@@ -57,8 +56,6 @@ class VariantCaller(SimpleWorker):
         progress: Callable[[str, int], None] = None,
         logger: logging.Logger = logging.getLogger(__name__),
     ) -> None:
-
-        super().__init__(None)
         self._external = external
         self._ext_config = ext_config
         self._ploidy = str(repo_config.metadata.joinpath("ploidy.txt"))
@@ -127,7 +124,7 @@ class VariantCaller(SimpleWorker):
                 * 112
             )
 
-            progress = BaseProgressCalculator(
+            progress = ProgressCalculator(
                 self._progress, total_bytes, ComputeOn.Write, "[1/2] Calling"
             )
 
@@ -143,7 +140,7 @@ class VariantCaller(SimpleWorker):
             self._quitting_ack = True
             return
 
-        progress = BaseProgressCalculator(
+        progress = ProgressCalculator(
             self._progress, output_file.stat().st_size, ComputeOn.Read, "[2/2] Indexing"
         )
         self._current_operation = self._external.tabix(tabix_opt, io=progress.compute)
