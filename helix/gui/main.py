@@ -28,7 +28,7 @@ from helix.adapters.header_adapter import (
 from helix.adapters.index_stats_adapter import IndexStatsAdapter
 from helix.adapters.reference_adapter import ReferenceAdapter
 from helix.alignment_map.alignment_map_file import AlignmentMapFile
-from helix.alignment_map.depth_analyzer import CoverageStatsCalculator
+from helix.alignment_map.coverage_stats_calculator import CoverageStatsCalculator
 from helix.alignment_map.index_stats_calculator import IndexStatsCalculator
 from helix.configuration import MANAGER_CFG
 from helix.converter import Converter
