@@ -56,7 +56,10 @@ class CoverageStatsCalculator(Thread):
                     "Unable to find the reference genome for loaded file."
                 )
             options.extend(
-                ["-T", self._file.file_info.reference_genome.ready_reference]
+                [
+                    "--reference",
+                    self._file.file_info.reference_genome.ready_reference.fasta,
+                ]
             )
 
         options.append(str(self._file.path))
