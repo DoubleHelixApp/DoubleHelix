@@ -34,7 +34,6 @@ class HelixDefaults:
 
     HELIX_FOLDER = Path(__file__).parents[1]
     LOCAL_FOLDER = Path(Path.home(), ".helix")
-    LOCAL_CONFIG = Path(HELIX_FOLDER, "configuration", "main.ini")
     GLOBAL_CONFIG = Path(Path.home(), ".helix", "main.ini")
 
 
@@ -150,11 +149,8 @@ class ConfigurationManager:
 
     def load(self) -> None:
         self._parser = configparser.ConfigParser(interpolation=None)
-        if HelixDefaults.LOCAL_CONFIG.exists():
-            logging.info(f"Loading {HelixDefaults.LOCAL_CONFIG}")
         if HelixDefaults.GLOBAL_CONFIG.exists():
             logging.info(f"Loading {HelixDefaults.GLOBAL_CONFIG}")
-        self._parser.read(HelixDefaults.LOCAL_CONFIG)
         self._parser.read(HelixDefaults.GLOBAL_CONFIG)
 
         for var_name, var_value in ConfigurationManager.__dict__.items():
@@ -195,16 +191,10 @@ class ConfigurationManager:
                     self._parser[section][key] = str(value)
             if len(self._parser[section]) == 0 and not save_defaults:
                 self._parser.remove_section(section)
-        ordered_config_paths = [HelixDefaults.GLOBAL_CONFIG, HelixDefaults.LOCAL_CONFIG]
-        if not any([x.exists() for x in ordered_config_paths]):
-            with ordered_config_paths[1].open("wt") as f:
-                pass
-        for config in ordered_config_paths:
-            if not config.exists():
-                continue
-            with config.open("wt") as f:
-                self._parser.write(f)
-            break
+        if not HelixDefaults.GLOBAL_CONFIG.exists():
+            return
+        with HelixDefaults.GLOBAL_CONFIG.open("wt") as f:
+            self._parser.write(f)
 
 
 MANAGER_CFG = None
