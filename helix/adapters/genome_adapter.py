@@ -4,6 +4,7 @@ from helix.utility.unit_prefix import UnitPrefix
 
 
 class GenomeAdapter:
+    @staticmethod
     def adapt(genome: Genome):
         column = {
             "FASTA URL": genome.fasta_url,
