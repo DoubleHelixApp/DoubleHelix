@@ -10,8 +10,10 @@ from helix.data.source import Source
 
 class MetadataLoader:
     class _CircularReferenceEncoder(json.JSONEncoder):
-        """Helps with the serialization of metadata, ensuring
-        that is serialized only what's really needed."""
+        """
+        Helps with the serialization of metadata, ensuring
+        that is serialized only what's really needed.
+        """
 
         def __init__(self, **kwargs) -> None:
             self.seen = set()

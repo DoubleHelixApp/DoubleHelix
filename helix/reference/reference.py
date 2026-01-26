@@ -39,7 +39,7 @@ class Reference:
             self.build = [f"Likely {sorted[-1].build}"]
 
         if len(self.build) > 1:
-            self._logger.warn(
+            self._logger.warning(
                 "Found more than one valid builds for the reference of the file. "
                 + "This is likely an issue with the reference genome metadata. "
                 + "Please open a bug report."
