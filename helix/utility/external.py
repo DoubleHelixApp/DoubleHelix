@@ -319,6 +319,19 @@ class External:
         text=False,
     ):
         raise FileNotFoundError()
+    
+    @exe
+    def snpEff(
+        self,
+        args=[],
+        stdout=None,
+        stdin=None,
+        stderr=None,
+        wait=False,
+        io=None,
+        text=False,
+    ):
+        raise FileNotFoundError()
 
     @jar
     def DISCVRSeq(
