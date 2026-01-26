@@ -14,9 +14,12 @@ from helix.naming.lookup_tables import (
 
 
 class Converter:
+
+    @staticmethod
     def canonicalize(sequence_name: str) -> str:
-        """Convert a sequence name into a "canonical" form,
-            which is essentially the Number format:
+        """
+        Convert a sequence name into a "canonical" form,
+        which is essentially the Number format:
 
             - Digits only for autosome
             - X/Y for sexual
@@ -30,7 +33,8 @@ class Converter:
             str: Converted name sequence.
         """
         return Converter.convert(sequence_name, ChromosomeNameType.Number)
-
+    
+    @staticmethod
     def get_type(sequence_name: str) -> SequenceType:
         canonical_name = Converter.canonicalize(sequence_name)
         if canonical_name.isnumeric():
@@ -45,6 +49,7 @@ class Converter:
             return SequenceType.Unmapped
         return SequenceType.Other
 
+    @staticmethod
     def sort(sequence_names: Iterable[str], others: bool = True) -> list[str]:
         name_type_map = {x: [] for x in SequenceType}
         for name in sequence_names:
@@ -60,6 +65,7 @@ class Converter:
             ordered.extend(name_type_map[SequenceType.Unmapped])
         return ordered
 
+    @staticmethod
     def _find_in_table(input, table):
         normalized = input
         for key in table:
@@ -68,6 +74,7 @@ class Converter:
                 break
         return normalized
 
+    @staticmethod
     def convert(input: str, target: ChromosomeNameType) -> str:
         # Chr to Number (e.g., chr1 -> 1; chrMT->MT)
         normalized = input.upper()
@@ -97,11 +104,11 @@ class Converter:
         elif target == ChromosomeNameType.Number:
             return normalized
         elif target == ChromosomeNameType.GenBank:
-            return NUMBER_TO_GENBANK.get(normalized, None)
+            return NUMBER_TO_GENBANK.get(normalized, "")
         elif target == ChromosomeNameType.RefSeq:
-            return NUMBER_TO_REFSEQ.get(normalized, None)
+            return NUMBER_TO_REFSEQ.get(normalized, "")
         elif target == ChromosomeNameType.RefSeqT2T:
-            return NUMBER_TO_REFSEQ_T2T.get(normalized, None)
+            return NUMBER_TO_REFSEQ_T2T.get(normalized, "")
         elif target == ChromosomeNameType.GenBankT2T:
-            return NUMBER_TO_GENBANK_T2T.get(normalized, None)
+            return NUMBER_TO_GENBANK_T2T.get(normalized, "")
         raise ValueError(f"Converting to unrecognized target format: {target.name}")

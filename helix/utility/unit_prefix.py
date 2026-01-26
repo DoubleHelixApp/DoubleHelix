@@ -17,6 +17,7 @@ class UnitPrefix:
         '10m'
     """
 
+    @staticmethod
     def convert_bytes(input: int, decimal=2) -> str:
         """Convert bytes using binary prefixes.
 
@@ -53,7 +54,7 @@ class UnitPrefix:
         input_log = log(input, 2)
         input_log = int(floor(input_log))
 
-        converted = None
+        converted = ""
         for letter, interval in si_prefixes.items():
             min_interval = interval[0]
             max_interval = interval[1]
@@ -76,6 +77,7 @@ class UnitPrefix:
                 break
         return converted
 
+    @staticmethod
     def convert(input: int, decimal=2) -> str:
         """Convert a quantity using metric prefixes.
 
