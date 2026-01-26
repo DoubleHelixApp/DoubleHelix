@@ -70,7 +70,8 @@ class Converter:
 
         with target.open("wt") as f:
             f.write(html_page)
-        self._progress(None, None)
+        if self._progress is not None:
+            self._progress(None, None)
         webbrowser.open(target)
 
     def _to_microarray(self):
