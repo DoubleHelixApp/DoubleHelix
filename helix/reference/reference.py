@@ -125,7 +125,10 @@ class Reference:
                     matching = False
                     break
             if matching:
-                self._logger.info(f"{genome!s} is a perfect match.")
+                if not genome.enabled:
+                    self._logger.info(f"{genome!s} is a perfect match but is not enabled. Ignoring.")
+                else:
+                    self._logger.info(f"{genome!s} is a perfect match.")
                 match_list.append(genome)
         return match_list
 
