@@ -1,5 +1,5 @@
 import hashlib
-import typing
+from typing import Optional
 from pathlib import Path
 
 from helix.data.build import Build
@@ -10,20 +10,21 @@ class Genome:
     def __init__(
         self,
         fasta_url: str,
-        fai_url: str = None,
-        gzi_url: str = None,
-        suffix: str = None,
-        build: str = None,
-        source: str = None,
-        sequences: typing.List[Sequence] = None,
-        description: str = None,
-        download_size: int = None,
-        decompressed_size: int = None,
-        bgzip_size: int = None,
-        downloaded_md5: str = None,
-        decompressed_md5: str = None,
-        bgzip_md5: str = None,
+        fai_url: Optional[str] = None,
+        gzi_url: Optional[str] = None,
+        suffix: Optional[str] = None,
+        build: Optional[str] = None,
+        source: Optional[str] = None,
+        sequences: Optional[list[Sequence]] = None,
+        description: Optional[str] = None,
+        download_size: Optional[int] = None,
+        decompressed_size: Optional[int] = None,
+        bgzip_size: Optional[int] = None,
+        downloaded_md5: Optional[str] = None,
+        decompressed_md5: Optional[str] = None,
+        bgzip_md5: Optional[str] = None,
         mitochondrial_model=None,
+        enabled: bool = True,
         parent_folder=Path("."),
     ) -> None:
         self.fasta_url = fasta_url
@@ -41,10 +42,11 @@ class Genome:
         self.decompressed_md5 = decompressed_md5
         self.bgzip_md5 = bgzip_md5
         self.mitochondrial_model = mitochondrial_model
+        self.enabled = enabled
         # Not serialized as it depends on the config
         self.__parent_folder = parent_folder
         # Not serialized as it's populated at runtime
-        self.__parent: Build = None
+        self.__parent: Optional[Build] = None
 
     @property
     def parent_folder(self):
@@ -70,7 +72,7 @@ class Genome:
         return hashlib.md5(url).hexdigest()
 
     @property
-    def all(self) -> typing.List[Path]:
+    def all(self) -> list[Path]:
         return [
             self.fasta,
             self.gzi,
