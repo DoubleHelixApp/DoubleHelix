@@ -221,7 +221,10 @@ class Repository:
                     logging.critical(e)
 
     def acquire(
-        self, genome: Genome, progress: Callable[[str, int], None] = None, force=False
+        self,
+        genome: Genome,
+        progress: Optional[Callable[[str, int], None]] = None,
+        force=False,
     ) -> Genome:
         """
         Download and convert to BGZip format (if necessary) a reference genome. Create
@@ -311,61 +314,6 @@ class Repository:
             url, source=source, build=build, parent_folder=self._config.genomes
         )
         logging.info(f"Ingesting {genome}.")
-        genome = self.acquire(genome, force)
+        genome = self.acquire(genome, None, force)
         genome.sequences = self._get_sequences(genome)
         return genome
-
-
-def unused():
-    import tempfile
-    import hashlib
-    from os import close
-    import pathlib
-
-    genomes = MetadataLoader().load()
-    for genome in genomes:
-        if genome.source == "Google":
-            genome.enabled = False
-    MetadataLoader().save(genomes)
-    return
-    decompressor = BGzip()
-    for genome in genomes:
-        if genome.decompressed_md5 is None:
-            continue
-        if genome.fasta.exists():
-            temp = tempfile.mkstemp(suffix=None, prefix=None, dir=None, text=False)
-            close(temp[0])
-            temp_file = pathlib.Path(temp[1])
-            temp_file.unlink()
-            decompressor.bgzip_wrapper(genome.fasta, temp_file, BgzipAction.Decompress)
-            md5_hash = hashlib.md5()
-            with temp_file.open("rb") as f:
-                while True:
-                    chunk = f.read(4096 * 1000)
-                    if not chunk:
-                        break
-                    md5_hash.update(chunk)
-            genome.decompressed_md5 = md5_hash.hexdigest()
-            temp_file.unlink()
-    MetadataLoader().save(genomes)
-    exit()
-
-    genomes = MetadataLoader().load()
-    genomes = [x for x in genomes if x.decompressed_md5 is not None]
-    for genome in genomes:
-        target = genome.fasta.with_name(genome.decompressed_md5)
-        target = target.with_suffix("".join(genome.fasta.suffixes))
-        target_dict = genome.dict.with_name(genome.decompressed_md5)
-        target_dict = target_dict.with_suffix("".join(genome.dict.suffixes))
-        target_gzi = genome.gzi.with_name(genome.decompressed_md5)
-        target_gzi = target_gzi.with_suffix("".join(genome.gzi.suffixes))
-        if not target.exists() and genome.fasta.exists():
-            genome.fasta.rename(target)
-        if not target_dict.exists() and genome.dict.exists():
-            genome.dict.rename(target_dict)
-        if not target_gzi.exists() and genome.gzi.exists():
-            genome.gzi.rename(target_gzi)
-
-
-if __name__ == "__main__":
-    unused()
