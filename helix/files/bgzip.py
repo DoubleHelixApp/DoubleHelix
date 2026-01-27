@@ -33,7 +33,7 @@ class BGzip:
         Perform an operation inferred from the file type.
         - If the file is compressed with BGZip, it will re-index it
         - If the file is decompressed, it will compress it with BGZip
-        
+
         :param self: Description
         :param genome: Description
         :type genome: Genome
@@ -57,7 +57,7 @@ class BGzip:
     def _gzip_filename(self, input: Path, action: BgzipAction):
         """
         Get the file name after the action is performed.
-        
+
         :param self: Description
         :param input: Description
         :type input: Path

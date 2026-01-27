@@ -35,7 +35,7 @@ class Repository:
         self._downloader = downloader or Downloader()
         self._mtdna = mtdna or MtDNA()
         self._config = config or RepositoryConfig()
-        
+
         self.genomes = self._loader.load()
 
         # Map MD5s to sequences
@@ -63,14 +63,14 @@ class Repository:
             - Genome 3, has sequences:
                 - A, length: 10, MD5: W
                 - B, length: 11, MD5: H
-        
+
         The first pass will highlight Genome 1, sequence A and Genome 2 sequence A.
         It's weird if A and B are chromosome's sequences, but is still not super problematic
         because the full sequence of length (10,11) is a fingerprint for the genome.
 
         The second pass will highlight Genome 1, Genome 3. This is the worst case as you cannot
         use the sequence of length (10,11) to fingerprint the genome.
-        
+
         :param self: Description
         """
 
@@ -78,18 +78,17 @@ class Repository:
         different_md5_same_length = []
         for length, sequences in self._sequences_by_length.items():
             unique_sequences = set()
-            name = None
             for sequence in sequences:
                 unique_sequences.add(sequence.md5)
-                name = sequence.name
             # There will be a lot of matches for small sequences
-            # but the most interesting one are chromosomes. 
-            # This number is just an heuristic to try to filter 
+            # but the most interesting one are chromosomes.
+            # This number is just an heuristic to try to filter
             # out small sequences.
             if len(unique_sequences) > 1 and length > 57227414:
                 different_md5_same_length.append(length)
                 logging.debug(
-                    f"There are {len(unique_sequences)} different MD5s for length {length} ({name})."
+                    f"There are {len(unique_sequences)} different"
+                    "MD5s for length {length} ({name})."
                 )
 
         # Genomes with same sequence of lengths having different MD5s (worst case)
@@ -177,7 +176,7 @@ class Repository:
         Given a genome, create companion files:
         - bgzip index
         - dictionary
-        
+
         :param self: Description
         :param genome: Description
         :type genome: Genome
@@ -204,9 +203,9 @@ class Repository:
     def self_test(self):
         """
         Perform a sanity check on the genome database.
-        If a genome is registered but has no sequences, 
+        If a genome is registered but has no sequences,
         perform the steps to obtain them.
-        
+
         :param self: Description
         """
         for index, reference in enumerate(self.genomes):
@@ -324,6 +323,11 @@ def unused():
     import pathlib
 
     genomes = MetadataLoader().load()
+    for genome in genomes:
+        if genome.source == "Google":
+            genome.enabled = False
+    MetadataLoader().save(genomes)
+    return
     decompressor = BGzip()
     for genome in genomes:
         if genome.decompressed_md5 is None:
@@ -364,4 +368,4 @@ def unused():
 
 
 if __name__ == "__main__":
-    pass
+    unused()

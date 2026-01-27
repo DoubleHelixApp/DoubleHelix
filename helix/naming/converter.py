@@ -33,7 +33,7 @@ class Converter:
             str: Converted name sequence.
         """
         return Converter.convert(sequence_name, ChromosomeNameType.Number)
-    
+
     @staticmethod
     def get_type(sequence_name: str) -> SequenceType:
         canonical_name = Converter.canonicalize(sequence_name)

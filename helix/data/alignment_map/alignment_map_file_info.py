@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
@@ -10,7 +9,6 @@ from helix.data.file_type import FileType
 from helix.data.gender import Gender
 from helix.data.mitochondrial_model_type import MitochondrialModelType
 from helix.data.mitochondrial_name_type import MitochondrialNameType
-from helix.data.sequence_type import SequenceType
 from helix.data.sorting import Sorting
 from helix.reference.reference import Reference
 

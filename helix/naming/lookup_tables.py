@@ -5,7 +5,7 @@
 # reversed.
 
 
-def __reverse(dictionary: dict) -> dict[str,str]:
+def __reverse(dictionary: dict) -> dict[str, str]:
     """Take a dictionary and swap keys with values"""
     return {v: k for k, v in dictionary.items()}
 

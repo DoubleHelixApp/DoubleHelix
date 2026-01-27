@@ -1,4 +1,4 @@
-import typing
+from typing import Optional
 
 
 class Build:
@@ -6,7 +6,7 @@ class Build:
         self,
         name: str,
         description=None,
-        urls: typing.List[str] = None,
+        urls: Optional[list[str]] = None,
     ) -> None:
         self.name = name
         self.description = description

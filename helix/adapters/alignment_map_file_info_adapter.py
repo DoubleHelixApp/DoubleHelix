@@ -6,7 +6,7 @@ from helix.utility.unit_prefix import UnitPrefix
 
 
 class AlignmentMapFileInfoAdapter:
-    
+
     @staticmethod
     def adapt(stats: AlignmentMapFileInfo) -> TabularData:
         label_map = OrderedDict(

@@ -319,7 +319,7 @@ class External:
         text=False,
     ):
         raise FileNotFoundError()
-    
+
     @exe
     def snpEff(
         self,

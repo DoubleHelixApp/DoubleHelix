@@ -20,7 +20,7 @@ SIZE_HANDLERS = {}
 
 def uri_handler(uri):
     def decorator(f):
-        global HANDLERS
+        global HANDLERS  # noqa: F824
         HANDLERS[uri] = f
         return f
 
@@ -29,7 +29,7 @@ def uri_handler(uri):
 
 def size_handler(uri):
     def decorator(f):
-        global SIZE_HANDLERS
+        global SIZE_HANDLERS  # noqa: F824
         SIZE_HANDLERS[uri] = f
         return f
 
@@ -73,49 +73,67 @@ class Downloader:
     def calculate_md5_hash(self, filename: Path, chunk_size=4096):
         md5_hash = hashlib.md5()
         with filename.open("rb") as f:
-            for chunk in iter(lambda: f.read(chunk_size), b""):
+            while True:
+                chunk = f.read(chunk_size)
+                if not chunk:
+                    break
                 md5_hash.update(chunk)
         return md5_hash.hexdigest()
 
     @size_handler("https://storage.cloud.google.com")
     @size_handler("gs://")
     def size_google(self, genome: Genome):
+        # Always use anonymous client for public Google Cloud Storage buckets
         storage_client = storage.Client.create_anonymous_client()
+
         uri = genome.fasta_url.strip()
         if not uri.startswith("gs://"):
             uri = "gs://" + uri.replace("https://storage.cloud.google.com/", "")
 
-        blob = storage.Blob.from_string(uri, client=storage_client)
-        blob.reload()
-        return blob.size
+        try:
+            blob = storage.Blob.from_string(uri, client=storage_client)
+            blob.reload()
+            size = blob.size
+            return size if size is not None else None
+        except Exception as e:
+            self._logger.warning(f"Failed to get size for {uri}: {e}")
+            return None
 
     @uri_handler("https://storage.cloud.google.com")
     @uri_handler("gs://")
     def download_google(self, genome: Genome, callback: any):
+        # Always use anonymous client for public Google Cloud Storage buckets
         storage_client = storage.Client.create_anonymous_client()
+
         uri = genome.fasta_url.strip()
         if not uri.startswith("gs://"):
             uri = "gs://" + uri.replace("https://storage.cloud.google.com/", "")
 
-        blob = storage.Blob.from_string(uri, client=storage_client)
-        blob.reload()
-        if genome.download_size is None:
-            genome.download_size = blob.size
-        if genome.downloaded_md5 is None:
-            genome.downloaded_md5 = blob.md5_hash
+        try:
+            blob = storage.Blob.from_string(uri, client=storage_client)
+            blob.reload()
+            if genome.download_size is None and blob.size is not None:
+                genome.download_size = blob.size
+            if genome.downloaded_md5 is None and blob.md5_hash is not None:
+                genome.downloaded_md5 = blob.md5_hash
 
-        target = self._config.temporary.joinpath(genome.name_only)
+            target = self._config.temporary.joinpath(genome.name_only)
 
-        if target.exists():
-            if target.stat().st_size == genome.download_size:
-                return self.post_download_action(genome, target)
-        base_calc = ProgressCalculator(
-            callback, genome.download_size, ComputeOn.Write, "Download"
-        )
-        monitor = FileSizeMonitor(target, base_calc.compute, genome.download_size)
-        blob.download_to_filename(target)
-        monitor.quit()
-        return self.post_download_action(genome, target)
+            if target.exists():
+                if target.stat().st_size == genome.download_size:
+                    return self.post_download_action(genome, target)
+            base_calc = ProgressCalculator(
+                callback, genome.download_size, ComputeOn.Write, "Download"
+            )
+            monitor = FileSizeMonitor(target, base_calc.compute, genome.download_size)
+            blob.download_to_filename(target)
+            monitor.quit()
+            return self.post_download_action(genome, target)
+        except Exception as e:
+            self._logger.error(
+                f"Error while downloading from Google Cloud Storage: {e}"
+            )
+            raise RuntimeError(f"Failed to download from Google Cloud Storage: {e}")
 
     def post_download_action(self, genome: Genome, downloaded: Path):
         md5 = self.calculate_md5_hash(downloaded)
@@ -158,7 +176,7 @@ class Downloader:
 
         target = self._config.temporary.joinpath(genome.name_only)
 
-        resume_from = None
+        resume_from = 0
         if target is not None and target.exists():
             if target.stat().st_size == genome.download_size:
                 return self.post_download_action(genome, target)
@@ -172,7 +190,7 @@ class Downloader:
             )
 
         total = UnitPrefix.convert_bytes(genome.download_size)
-        resume = UnitPrefix.convert_bytes(resume_from if resume_from is not None else 0)
+        resume = UnitPrefix.convert_bytes(resume_from)
         url = genome.fasta_url
         self._logger.info(
             "Downloading file from %s, resuming from %s (%s total)"
@@ -186,7 +204,7 @@ class Downloader:
         self,
         url: str,
         target: Path,
-        resume_from: int = None,
+        resume_from: int = 0,
         progress_calc: ProgressCalculator = None,
     ):
         curl = self._curl_class()
@@ -194,7 +212,7 @@ class Downloader:
         curl.setopt(pycurl.FOLLOWLOCATION, True)
         curl.setopt(pycurl.CAINFO, certifi.where())
 
-        if resume_from is not None:
+        if resume_from > 0:
             curl.setopt(pycurl.RESUME_FROM, resume_from)
 
         if progress_calc is not None:
@@ -205,7 +223,7 @@ class Downloader:
             )
 
         try:
-            with target.open("wb" if resume_from is None else "ab") as f:
+            with target.open("wb" if resume_from == 0 else "ab") as f:
                 curl.setopt(pycurl.WRITEDATA, f)
                 curl.perform()
                 curl.close()
